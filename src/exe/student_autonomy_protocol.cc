@@ -7,6 +7,7 @@
 #include <csignal>
 #include <Eigen/Dense>
 #include <ros/ros.h>
+#include <sstream>
 
 #include "yaml-cpp/yaml.h"
 #include "map3d.h"
@@ -18,6 +19,9 @@
 #include "quad_state_warden.h"
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
+
+#include "balloon_status_subscriber_node.h"
+#include "balloon_status.h"
 
 #include "trajectory_dispatcher.h"
 
@@ -94,15 +98,6 @@ int main(int argc, char** argv) {
       red_balloon_position_vector[1],
       red_balloon_position_vector[2]);
 
-  std::map<
-    std::string, 
-    Eigen::Vector3d, 
-    std::less<std::string>, 
-    Eigen::aligned_allocator<std::pair<const std::string, Eigen::Vector3d>>> balloon_map;
-
-  balloon_map["red"] = red_balloon_position;
-  balloon_map["blue"] = red_balloon_position;
-
   // Team Assignments
   std::vector<std::string> red_quad_names;
   std::vector<std::string> blue_quad_names;
@@ -115,11 +110,39 @@ int main(int argc, char** argv) {
     }
   }
 
+  // Parse the initial quad positions
+  std::map<std::string, std::string> initial_quad_positions_string;
+  if(false == nh.getParam("initial_quad_positions", initial_quad_positions_string)) {
+    std::cerr << "Required parameter not found on server: initial_quad_positions" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+  std::map<
+    std::string, 
+    Eigen::Vector3d, 
+    std::less<std::string>, 
+    Eigen::aligned_allocator<std::pair<const std::string, Eigen::Vector3d>>> initial_quad_positions;
+  for(const auto& kv: initial_quad_positions_string) {
+    const std::string& quad_name = kv.first;
+    const std::string& quad_position_string = kv.second;
+    std::stringstream ss(quad_position_string);
+    double x,y,z;
+    ss >> x >> y >> z;
+    initial_quad_positions[quad_name] = Eigen::Vector3d(x,y,z);
+  }
+
   // Initialize the QuadStateWarden
   auto quad_state_warden  = std::make_shared<QuadStateWarden>();
   for(const auto& kv: quad_state_topics) {
     const std::string& quad_name = kv.first;  
     quad_state_warden->Register(quad_name);
+
+    const Eigen::Vector3d initial_quad_pos = initial_quad_positions[quad_name];
+    const QuadState initial_quad_state(Eigen::Matrix<double, 13, 1>(
+          initial_quad_pos(0), initial_quad_pos(1), initial_quad_pos(2),
+          0,0,0,
+          1,0,0,0,
+          0,0,0));
+    quad_state_warden->Write(quad_name,initial_quad_state);
   }
 
   // Pipe ROS data into the QuadStateWarden
@@ -152,7 +175,6 @@ int main(int argc, char** argv) {
 
   // Initialize the TrajectoryWarden
   auto trajectory_warden_out = std::make_shared<TrajectoryWarden>();
-
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;  
     trajectory_warden_out->Register(quad_name);
@@ -164,14 +186,33 @@ int main(int argc, char** argv) {
       trajectory_dispatcher->Run(trajectory_warden_out, proposed_trajectory_publishers);
       });
 
+  // Balloon Status
+  std::map<std::string, std::string> balloon_status_topics;
+  if(false == nh.getParam("balloon_status_topics", balloon_status_topics)) {
+    std::cerr << "Required parameter not found on server: balloon_status_topics" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  auto red_balloon_status = std::make_shared<BalloonStatus>();
+  auto blue_balloon_status = std::make_shared<BalloonStatus>();
+
+  auto red_balloon_status_subscriber_node 
+    = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
+  auto blue_balloon_status_subscriber_node 
+    = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["blue"], blue_balloon_status);
+
   // The AutonomyProtocol
-  std::shared_ptr<AutonomyProtocol> autonomy_protocol = std::make_shared<StudentAutonomyProtocol>(
+  std::shared_ptr<AutonomyProtocol> autonomy_protocol 
+    = std::make_shared<StudentAutonomyProtocol>(
       blue_quad_names, 
       red_quad_names,
       game_snapshot,
       trajectory_warden_out,
       map3d,
-      balloon_map);
+      red_balloon_position,
+      blue_balloon_position,
+      red_balloon_status,
+      blue_balloon_status);
 
   // Start the autonomy protocol
   std::thread ap_thread(
@@ -189,11 +230,17 @@ int main(int argc, char** argv) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
           }
         }
+
+        ros::shutdown();
+
         autonomy_protocol->Stop();
         trajectory_dispatcher->Stop();
         quad_state_warden->Stop();
         trajectory_warden_out->Stop();
       });
+
+  // Spin for ros subscribers
+  ros::spin();
 
   // Wait for program termination via ctl-c
   kill_thread.join();
