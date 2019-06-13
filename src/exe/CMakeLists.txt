@@ -25,6 +25,27 @@ set_target_properties(mediation_layer
   RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
+add_executable(visualizer visualizer.cc)
+target_include_directories(visualizer PUBLIC ${catkin_INCLUDE_DIRS})
+target_link_libraries(visualizer
+  lib_geometry
+  lib_environment
+  lib_util
+  lib_mediation_layer
+  lib_ros_node
+  lib_ros_view
+  yaml-cpp
+  ${catkin_LIBRARIES}
+)
+
+set_target_properties(visualizer
+  PROPERTIES
+  CXX_STANDARD 14
+  CXX_STANDARD_REQUIRED YES
+  CXX_EXTENSIONS NO
+  RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+)
+
 add_executable(physics_simulator physics_simulator.cc)
 target_include_directories(physics_simulator PUBLIC ${catkin_INCLUDE_DIRS})
 target_link_libraries(physics_simulator

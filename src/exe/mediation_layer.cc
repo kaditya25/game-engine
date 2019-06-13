@@ -184,41 +184,6 @@ int main(int argc, char** argv) {
             quad_state_warden));
   }
 
-
-  // Create quad state guards that will be accessed by the mediation layer
-  std::unordered_map<std::string, std::shared_ptr<QuadStateGuard>> quad_state_guards;
-  for(const auto& kv: quad_state_topics) {
-    const std::string& quad_name = kv.first;
-    const Eigen::Vector3d& initial_quad_position = initial_quad_positions[quad_name];
-    quad_state_guards[quad_name] 
-      = std::make_shared<QuadStateGuard>(QuadState(Eigen::Matrix<double, 13, 1>(
-          initial_quad_position(0), initial_quad_position(1), initial_quad_position(2),
-          0,0,0,
-          1,0,0,0,
-          0,0,0
-          )));
-  }
-
-  // The quad state dispatcher pipes data from the state warden to any state
-  // guards
-  auto quad_state_dispatcher = std::make_shared<QuadStateDispatcher>();
-  std::thread quad_state_dispatcher_thread([&](){
-      quad_state_dispatcher->Run(quad_state_warden, quad_state_guards);
-      });
-
-  // Views
-  std::string quad_mesh_file_path;
-  if(false == nh.getParam("quad_mesh_file_path", quad_mesh_file_path)) {
-    std::cerr << "Required parameter not found on server: quad_mesh_file_path" << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-
-  std::string balloon_mesh_file_path;
-  if(false == nh.getParam("balloon_mesh_file_path", balloon_mesh_file_path)) {
-    std::cerr << "Required parameter not found on server: balloon_mesh_file_path" << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-
   std::vector<double> blue_balloon_position_vector;
   if(false == nh.getParam("blue_balloon_position", blue_balloon_position_vector)) {
     std::cerr << "Required parameter not found on server: blue_balloon_position" << std::endl;
@@ -239,36 +204,6 @@ int main(int argc, char** argv) {
       red_balloon_position_vector[1],
       red_balloon_position_vector[2]);
 
-  std::map<std::string, std::string> team_assignments;
-  if(false == nh.getParam("team_assignments", team_assignments)) {
-    std::cerr << "Required parameter not found on server: team_assignments" << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-
-  ViewManager::QuadViewOptions quad_view_options;
-  quad_view_options.quad_mesh_file_path = quad_mesh_file_path;
-  for(const auto& kv: team_assignments) {
-    const std::string& color = kv.second;
-    const std::string& quad_name = kv.first;
-    quad_view_options.quads.push_back(std::make_pair<>(color, quad_state_guards[quad_name]));
-  }
-
-  ViewManager::BalloonViewOptions balloon_view_options;
-  balloon_view_options.balloon_mesh_file_path = balloon_mesh_file_path;
-  balloon_view_options.balloons.push_back(std::make_pair("red", red_balloon_position));
-  balloon_view_options.balloons.push_back(std::make_pair("blue", blue_balloon_position));
-
-  ViewManager::EnvironmentViewOptions environment_view_options;
-  environment_view_options.map = map;
-
-  auto view_manager = std::make_shared<ViewManager>();
-  std::thread view_manager_thread(
-      [&]() {
-        view_manager->Run(
-            quad_view_options,
-            balloon_view_options,
-            environment_view_options);
-      });
 
   // Balloon Status
   std::map<std::string, std::string> balloon_status_topics;
@@ -356,9 +291,7 @@ int main(int argc, char** argv) {
         ros::shutdown();
 
         mediation_layer->Stop();
-        view_manager->Stop();
         trajectory_dispatcher->Stop();
-        quad_state_dispatcher->Stop();
 
         trajectory_warden_in->Stop();
         trajectory_warden_out->Stop();
@@ -376,9 +309,7 @@ int main(int argc, char** argv) {
 
   // Wait for other threads to die
   trajectory_dispatcher_thread.join();
-  quad_state_dispatcher_thread.join();
   mediation_layer_thread.join();
-  view_manager_thread.join();
   red_balloon_watchdog_thread.join();
   blue_balloon_watchdog_thread.join();
   quad_state_watchdog_thread.join();
