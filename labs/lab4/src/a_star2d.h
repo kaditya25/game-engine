@@ -14,9 +14,9 @@
 namespace game_engine {
 
   struct AStar2D {
-    using Node2DPtr = std::shared_ptr<Node2D>;
-
     // Students will implement this function
-    PathInfo Run(const Graph2D& graph, const Node2DPtr start_ptr, const Node2DPtr end_ptr);
+    PathInfo Run(const Graph2D& graph, 
+                 const std::shared_ptr<Node2D> start_ptr, 
+                 const std::shared_ptr<Node2D> end_ptr);
   };
 }

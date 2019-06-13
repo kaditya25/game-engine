@@ -11,8 +11,6 @@
 #include "gui2d.h"
 
 using namespace game_engine;
-using Node2DPtr = std::shared_ptr<Node2D>;
-
 
 ///////////////////////////////////////////////////////////////////
 // FUNCTION PROTOTYPES
@@ -21,20 +19,20 @@ using Node2DPtr = std::shared_ptr<Node2D>;
 void RunDepthFirstSearch(
     const Graph2D& graph,
     const OccupancyGrid2D* occupancy_grid,
-    const Node2DPtr& start_node,
-    const Node2DPtr& end_node);
+    const std::shared_ptr<Node2D>& start_node,
+    const std::shared_ptr<Node2D>& end_node);
 
 void RunDijkstra(
     const Graph2D& graph,
     const OccupancyGrid2D* occupancy_grid,
-    const Node2DPtr& start_node,
-    const Node2DPtr& end_node);
+    const std::shared_ptr<Node2D>& start_node,
+    const std::shared_ptr<Node2D>& end_node);
 
 void RunAStar(
     const Graph2D& graph,
     const OccupancyGrid2D* occupancy_grid,
-    const Node2DPtr& start_node,
-    const Node2DPtr& end_node);
+    const std::shared_ptr<Node2D>& start_node,
+    const std::shared_ptr<Node2D>& end_node);
 
 ///////////////////////////////////////////////////////////////////
 // MAIN FUNCTION
@@ -48,9 +46,9 @@ int main(int argc, char** argv) {
 
   // Parsing input
   const std::string occupancy_grid_file = argv[1];
-  const Node2DPtr start_node = std::make_shared<Node2D>(
+  const std::shared_ptr<Node2D> start_node = std::make_shared<Node2D>(
       Eigen::Vector2d(std::stoi(argv[2]),std::stoi(argv[3])));
-  const Node2DPtr end_node = std::make_shared<Node2D>(
+  const std::shared_ptr<Node2D> end_node = std::make_shared<Node2D>(
       Eigen::Vector2d(std::stoi(argv[4]),std::stoi(argv[5])));
 
   // Load an occupancy grid from a file
@@ -75,8 +73,8 @@ int main(int argc, char** argv) {
 void RunDepthFirstSearch(
     const Graph2D& graph,
     const OccupancyGrid2D* occupancy_grid,
-    const Node2DPtr& start_node,
-    const Node2DPtr& end_node) {
+    const std::shared_ptr<Node2D>& start_node,
+    const std::shared_ptr<Node2D>& end_node) {
   
   
   std::cout << "============================================" << std::endl;
@@ -97,7 +95,7 @@ void RunDepthFirstSearch(
   path_info.details.Print();
 
   std::cout << "===== PATH =====" << std::endl;
-  for(const Node2DPtr& node: path_info.path) {
+  for(const std::shared_ptr<Node2D>& node: path_info.path) {
     std::cout << "[" << node->Data().transpose() << "]" << std::endl;
   }
 
@@ -107,8 +105,8 @@ void RunDepthFirstSearch(
 void RunDijkstra(
     const Graph2D& graph,
     const OccupancyGrid2D* occupancy_grid,
-    const Node2DPtr& start_node,
-    const Node2DPtr& end_node) {
+    const std::shared_ptr<Node2D>& start_node,
+    const std::shared_ptr<Node2D>& end_node) {
   
   std::cout << "============================================" << std::endl;
   std::cout << "============= RUNNING DIJKSTRA =============" << std::endl;
@@ -128,7 +126,7 @@ void RunDijkstra(
   path_info.details.Print();
 
   std::cout << "===== PATH =====" << std::endl;
-  for(const Node2DPtr& node: path_info.path) {
+  for(const std::shared_ptr<Node2D>& node: path_info.path) {
     std::cout << "[" << node->Data().transpose() << "]" << std::endl;
   }
 
@@ -138,8 +136,8 @@ void RunDijkstra(
 void RunAStar(
     const Graph2D& graph,
     const OccupancyGrid2D* occupancy_grid,
-    const Node2DPtr& start_node,
-    const Node2DPtr& end_node) {
+    const std::shared_ptr<Node2D>& start_node,
+    const std::shared_ptr<Node2D>& end_node) {
   
   std::cout << "============================================" << std::endl;
   std::cout << "=============  RUNNING A Star  =============" << std::endl;
@@ -159,7 +157,7 @@ void RunAStar(
   path_info.details.Print();
 
   std::cout << "=====  PATH   =====" << std::endl;
-  for(const Node2DPtr& node: path_info.path) {
+  for(const std::shared_ptr<Node2D>& node: path_info.path) {
     std::cout << "[" << node->Data().transpose() << "]" << std::endl;
   }
 

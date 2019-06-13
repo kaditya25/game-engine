@@ -13,8 +13,6 @@ namespace game_engine {
 
   // Structure that encapsulates information about a path
   struct PathInfo {
-    using Node2DPtr = std::shared_ptr<Node2D>;
-
     struct Details {
       // Number of nodes explored
       size_t num_nodes_explored{0};
@@ -42,7 +40,7 @@ namespace game_engine {
     };
    
     // These must be filled
-    std::vector<Node2DPtr> path;
+    std::vector<std::shared_ptr<Node2D>> path;
     Details details;
   };
 }

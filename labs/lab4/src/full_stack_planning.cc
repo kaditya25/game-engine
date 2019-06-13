@@ -12,7 +12,6 @@
 #include "gui2d.h"
 
 using namespace game_engine;
-using Node2DPtr = std::shared_ptr<Node2D>;
 
 int main(int argc, char** argv) {
   if(argc != 6) {
@@ -22,9 +21,9 @@ int main(int argc, char** argv) {
 
   // Parsing input
   const std::string occupancy_grid_file = argv[1];
-  const Node2DPtr start_ptr = std::make_shared<Node2D>(
+  const std::shared_ptr<Node2D> start_ptr = std::make_shared<Node2D>(
       Eigen::Vector2d(std::stoi(argv[2]),std::stoi(argv[3])));
-  const Node2DPtr end_ptr = std::make_shared<Node2D>(
+  const std::shared_ptr<Node2D> end_ptr = std::make_shared<Node2D>(
       Eigen::Vector2d(std::stoi(argv[4]),std::stoi(argv[5])));
 
   // Load an occupancy grid from a file

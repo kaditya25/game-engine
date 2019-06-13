@@ -12,7 +12,6 @@
  */
 
 using namespace game_engine;
-using Node2DPtr = std::shared_ptr<Node2D>;
 
 int main(int argc, char** argv) {
   if(argc != 2) {
@@ -30,20 +29,20 @@ int main(int argc, char** argv) {
 
   // Define the start and end points
   // Create a node at (0,0) and a node at (4,4)
-  const Node2DPtr start_node = std::make_shared<Node2D>(Eigen::Vector2d(0,0));
-  const Node2DPtr end_node = std::make_shared<Node2D>(Eigen::Vector2d(4,4));
+  const std::shared_ptr<Node2D> start_node = std::make_shared<Node2D>(Eigen::Vector2d(0,0));
+  const std::shared_ptr<Node2D> end_node = std::make_shared<Node2D>(Eigen::Vector2d(4,4));
 
   // Access directed edges eminating from a node
   const std::vector<DirectedEdge2D> edges = graph.Edges(start_node);
   
   // Iterate through the list of edges
   for(const DirectedEdge2D& edge: edges) {
-    const Node2DPtr& source_ptr = edge.Source();
-    const Node2DPtr& sink_ptr = edge.Sink();
+    const std::shared_ptr<Node2D>& source_ptr = edge.Source();
+    const std::shared_ptr<Node2D>& sink_ptr = edge.Sink();
     const double cost = edge.Cost();
 
     // Print relevant data
-    // Node2DPtr->Data() is an Eigen::Vector2d. If you want to use
+    // std::shared_ptr<Node2D>->Data() is an Eigen::Vector2d. If you want to use
     // functions/accessors other than x() and y(), google Eigen::Vector2d
     std::cout 
       << "DirectedEdge2D from " 
@@ -56,10 +55,10 @@ int main(int argc, char** argv) {
   }
 
   // Access neighbors of a given node
-  const std::vector<Node2DPtr> neighbors = graph.Neighbors(start_node);
+  const std::vector<std::shared_ptr<Node2D>> neighbors = graph.Neighbors(start_node);
 
   // Iterate through the list of neighbors and print
-  for(const Node2DPtr neighbor: neighbors) {
+  for(const std::shared_ptr<Node2D> neighbor: neighbors) {
     std::cout 
       << "[" << neighbor->Data().transpose() << "]"
       << " is a neighbor of "
