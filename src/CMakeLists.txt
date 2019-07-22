@@ -5,7 +5,7 @@ find_package(Boost 1.40.0 COMPONENTS filesystem system iostreams REQUIRED)
 
 # Build pre-existing libraries
 add_subdirectory(P4)
-add_subdirectory(mg_msgs)
+add_subdirectory(mg-msgs)
 add_subdirectory(lib)
 
 # Build custom libraries
