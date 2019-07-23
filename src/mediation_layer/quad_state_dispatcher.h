@@ -14,7 +14,9 @@
 #include "quad_state.h"
 
 namespace game_engine {
-  // Class that manages data transfer between a state warden and state guards
+  // Class that manages data transfer between a state warden and state guards.
+  // See the doc/software-patterns.md file for futher information about how the
+  // guard, warden, and dispatcher patterns interact.
   class QuadStateDispatcher {
     private:
       volatile std::atomic_bool ok_{true};

@@ -22,12 +22,11 @@ rules changes, this integration is no longer necessary.
 ### Prerequisites 
 1. [Eigen](https://eigen.tuxfamily.org)
 2. [ROS](http://www.ros.org)
-3. [P4 Requirements](https://github.com/tuckerhaydon/P4.git)
-3. sudo apt install gnuplot
+3. [P4 Requirements](https://gitlab.com/todd.humphreys/p4-aerial-robotics)
 
 ### Clone
 ```bash
-git clone https://github.com/tuckerhaydon/MediationLayer.git GameEngine
+git clone https://gitlab.com/todd.humphreys/gameengine GameEngine
 cd GameEngine
 git submodule update --init --recursive
 ```
@@ -96,13 +95,8 @@ cd build/test
 ./EXECUTABLE_OF_CHOICE
 ```
 
-## TODO
-- Disentagle the visualization parts of the ML from the logical parts of the ML.
-  Break them into two separate binaries 
-- Complete the ML's intended purpose: forward-integrating the intended
-  trajectory to create a mediated trajectory
-- Visualize the intended trajectories of the quadcopters
-- Create StateWatchdog: determine if a quadcopter has flown into the no-fly-zone
-  around obstacles. If so, end the game
-- Create StateConstraints structure that lists the constraints of a quadcopter's
-  actions. Pass an instance of this to the AutonomyProtocol.
+## Contributing
+### Software Patterns
+Please read the [software patterns](doc/software-patterns.md) document to
+understand the naming convention and the purpose of components in this system.
+
