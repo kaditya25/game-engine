@@ -164,12 +164,13 @@ int main(int argc, char** argv) {
     quad_state_warden->Register(quad_name);
 
     const Eigen::Vector3d& initial_quad_position = initial_quad_positions[quad_name];
-    quad_state_warden->Write(quad_name, QuadState(Eigen::Matrix<double, 13, 1>(
+    quad_state_warden->Write(quad_name, QuadState(
+          (Eigen::Matrix<double, 13, 1>() <<
           initial_quad_position(0), initial_quad_position(1), initial_quad_position(2),
           0,0,0,
           1,0,0,0,
           0,0,0
-          )));
+          ).finished()));
   }
 
   // For every quad, subscribe to its corresponding state topic

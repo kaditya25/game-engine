@@ -18,7 +18,8 @@ namespace game_engine {
   }
 
   void QuadStateSubscriberNode::SubscriberCallback(const nav_msgs::Odometry& msg) {
-    QuadState state(Eigen::Matrix<double, 13, 1>(
+    QuadState state(
+        (Eigen::Matrix<double, 13, 1>() <<
           msg.pose.pose.position.x, 
           msg.pose.pose.position.y, 
           msg.pose.pose.position.z, 
@@ -32,7 +33,7 @@ namespace game_engine {
           msg.twist.twist.angular.x,
           msg.twist.twist.angular.y,
           msg.twist.twist.angular.z
-          ));
+          ).finished());
     this->warden_->Write(this->key_, state);
   }
 }

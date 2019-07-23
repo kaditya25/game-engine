@@ -426,12 +426,13 @@ namespace game_engine {
       for(const auto& kv: quad_state_publishers) {
         const std::string& quad_name = kv.first;
         const Eigen::Matrix<double, 9, 1> pva_perturbed = pva_perturbed_register[quad_name];
-        QuadState quad_state(Eigen::Matrix<double, 13, 1>(
+        QuadState quad_state(
+            (Eigen::Matrix<double, 13, 1>() <<
               pva_perturbed(0), pva_perturbed(1), pva_perturbed(2),
               pva_perturbed(3), pva_perturbed(4), pva_perturbed(5),
               1,0,0,0,
               0,0,0 
-              ));
+              ).finished());
         quad_state_publishers[quad_name]->Publish(quad_state);
       }
     }
