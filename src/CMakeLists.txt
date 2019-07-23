@@ -4,9 +4,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Boost 1.40.0 COMPONENTS filesystem system iostreams REQUIRED)
 
 # Build pre-existing libraries
-add_subdirectory(P4)
-add_subdirectory(mg-msgs)
-add_subdirectory(lib)
+add_subdirectory(dependencies)
 
 # Build custom libraries
 add_subdirectory(util)
