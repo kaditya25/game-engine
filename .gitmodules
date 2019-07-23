@@ -1,6 +1,0 @@
-[submodule "src/P4"]
-	path = src/P4
-	url = https://gitlab.com/todd.humphreys/p4-aerial-robotics.git
-[submodule "src/mg-msgs"]
-	path = src/mg-msgs
-	url = https://gitlab.com/radionavlab/machine-games/mg-msgs.git
