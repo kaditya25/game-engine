@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 
   // Start ROS
   ros::init(argc, argv, "mediation_layer", ros::init_options::NoSigintHandler);
-  ros::NodeHandle nh("/mediation_layer");
+  ros::NodeHandle nh("/game_engine/");
 
   // YAML config
   std::string map_file_path;

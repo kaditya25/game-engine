@@ -9,7 +9,7 @@ namespace game_engine {
       std::shared_ptr<QuadStateWarden> warden) {
     this->key_ = key;
     this->warden_ = warden;
-    this->node_handle_ = ros::NodeHandle("/mediation_layer/");
+    this->node_handle_ = ros::NodeHandle("/game_engine/");
     this->subscriber_ = node_handle_.subscribe(
         topic, 
         1, 

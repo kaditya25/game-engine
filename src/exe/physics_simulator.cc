@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 
   // Start ROS
   ros::init(argc, argv, "physics_simulator", ros::init_options::NoSigintHandler);
-  ros::NodeHandle nh("/mediation_layer/");
+  ros::NodeHandle nh("/game_engine/");
 
   std::map<std::string, std::string> updated_trajectory_topics;
   if(false == nh.getParam("updated_trajectory_topics", updated_trajectory_topics)) {

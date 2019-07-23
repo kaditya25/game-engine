@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 
   // Start ROS
   ros::init(argc, argv, "autonomy_protocol", ros::init_options::NoSigintHandler);
-  ros::NodeHandle nh("/mediation_layer/");
+  ros::NodeHandle nh("/game_engine/");
 
   // Read ROS data
   std::string map_file_path;

@@ -7,7 +7,7 @@ namespace game_engine {
       const std::string& topic, 
       std::shared_ptr<BalloonStatus> balloon_status) {
     this->balloon_status_ = balloon_status;
-    this->node_handle_ = ros::NodeHandle("/mediation_layer/");
+    this->node_handle_ = ros::NodeHandle("/game_engine/");
     this->subscriber_ = node_handle_.subscribe(
         topic, 
         1, 
