@@ -26,8 +26,8 @@ rules changes, this integration is no longer necessary.
 
 ### Clone
 ```bash
-git clone https://gitlab.com/todd.humphreys/gameengine GameEngine
-cd GameEngine
+git clone git@gitlab.com:radionavlab/machine-games/game-engine.git
+cd game-engine
 git submodule update --init --recursive
 ```
 
@@ -40,7 +40,7 @@ make -j4
 ```
 
 ## Running the Mediation Layer
-The ML is comprised of a couple of executables. After building, you must ensure
+The ML is composed of a couple of executables. After building, you must ensure
 that the following programs are running. It may be helpful to use a terminal
 multiplexer like tmux or terminator and start each program in a separate pane.
 
