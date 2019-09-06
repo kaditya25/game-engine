@@ -22,7 +22,7 @@ rules changes, this integration is no longer necessary.
 ### Prerequisites 
 1. [Eigen](https://eigen.tuxfamily.org)
 2. [ROS](http://www.ros.org)
-3. [P4 Requirements](https://gitlab.com/todd.humphreys/p4-aerial-robotics)
+3. [P4](https://gitlab.com/radionavlab/machine-games/p4)
 
 ### Clone
 ```bash
