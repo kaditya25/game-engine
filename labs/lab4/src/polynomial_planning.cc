@@ -72,7 +72,7 @@ void Example() {
 
   // Use p4::PolynomialSolver object to solve for polynomial trajectories
   p4::PolynomialSolver solver(solver_options);
-  const p4::PolynomialPath path
+  const p4::PolynomialSolver::Solution path
     = solver.Run(
         times, 
         node_equality_bounds, 
@@ -156,7 +156,7 @@ void DerivativeExperiments() {
 
   // Use p4::PolynomialSolver object to solve for polynomial trajectories
   p4::PolynomialSolver solver(solver_options);
-  const p4::PolynomialPath path
+  const p4::PolynomialSolver::Solution path
     = solver.Run(
         times, 
         node_equality_bounds, 
@@ -240,7 +240,7 @@ void ArrivalTimeExperiments() {
 
   // Use p4::PolynomialSolver object to solve for polynomial trajectories
   p4::PolynomialSolver solver(solver_options);
-  const p4::PolynomialPath path
+  const p4::PolynomialSolver::Solution path
     = solver.Run(
         times, 
         node_equality_bounds, 
@@ -324,7 +324,7 @@ void NumWaypointExperiments() {
 
   // Use p4::PolynomialSolver object to solve for polynomial trajectories
   p4::PolynomialSolver solver(solver_options);
-  const p4::PolynomialPath path
+  const p4::PolynomialSolver::Solution path
     = solver.Run(
         times, 
         node_equality_bounds, 

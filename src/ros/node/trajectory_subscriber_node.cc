@@ -28,12 +28,12 @@ namespace game_engine {
       local_instant(0) = instant.pos.x;
       local_instant(1) = instant.pos.y;
       local_instant(2) = instant.pos.z;
-      local_instant(3) = instant.vel.linear.x;
-      local_instant(4) = instant.vel.linear.y;
-      local_instant(5) = instant.vel.linear.z;
-      local_instant(6) = instant.acc.linear.x;
-      local_instant(7) = instant.acc.linear.y;
-      local_instant(8) = instant.acc.linear.z;
+      local_instant(3) = instant.vel.x;
+      local_instant(4) = instant.vel.y;
+      local_instant(5) = instant.vel.z;
+      local_instant(6) = instant.acc.x;
+      local_instant(7) = instant.acc.y;
+      local_instant(8) = instant.acc.z;
       local_instant(9) = instant.yaw;
       local_instant(10) = instant.header.stamp.sec + (double)instant.header.stamp.nsec / 1e9;
       data.push_back(local_instant);
