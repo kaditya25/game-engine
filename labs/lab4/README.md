@@ -6,7 +6,7 @@ report are designated as follows:
 > This box contains a question that you must answer.
 
 Point values for each part of the lab are specified. 10 points are reserved for
-the lab report. Remember to write for busy readers --- _concisely_ answer all
+the lab report style. Remember to write for busy readers --- _concisely_ answer all
 the questions.
 
 To submit your lab, zip the entire ```game-engine``` directory and submit it
@@ -177,7 +177,7 @@ instructions for polynomial_planning in the appendix.
 > the number of waypoints on the edge of the circle. How does increasing or
 > decreasing the number of waypoints affect the final trajectory?
 
-## Putting it all together (15 points)
+## Putting it all together (20 points)
 For the following question, complete the helper functions in
 ```game-engine/labs/lab4/src/full_stack_planning.cc```. Run the executable by following the
 instructions for full_stack_planning in the appendix.
