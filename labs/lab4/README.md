@@ -27,7 +27,7 @@ Then enter the following commands.
 cd ~/Libraries/game-engine
 git remote rename origin old-origin
 git remote add origin https://gitlab.com/todd.humphreys/game-engine-student.git
-git pull
+git pull origin master
 git submodule update --init --recursive
 ```
 
