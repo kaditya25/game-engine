@@ -68,7 +68,7 @@ void Example() {
 
   osqp_set_default_settings(&solver_options.osqp_settings);
   solver_options.osqp_settings.polish = true;       // Polish the solution, getting the best answer possible
-  solver_options.osqp_settings.verbose = false;     // Suppress the printout
+  solver_options.osqp_settings.verbose = true;     // Suppress the printout
 
   // Use p4::PolynomialSolver object to solve for polynomial trajectories
   p4::PolynomialSolver solver(solver_options);
