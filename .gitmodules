@@ -3,7 +3,7 @@
 	url = https://github.com/jbeder/yaml-cpp
 [submodule "src/dependencies/P4"]
 	path = src/dependencies/P4
-	url = https://gitlab.com/radionavlab/todd-humphreys/p4-public.git
+	url = https://gitlab.com/todd.humphreys/p4-public.git
         branch = master
 [submodule "src/dependencies/mg-msgs"]
 	path = src/dependencies/mg-msgs
