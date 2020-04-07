@@ -45,7 +45,7 @@ roscore
 ROS params need only be loaded once. This must be run after roscore has been
 started or re-run if any of the parameters have been changed
 ```bash
-cd GameEngine/run
+cd game-engine/run
 rosparam load params.yaml /mediation_layer/
 ```
 
@@ -53,7 +53,7 @@ rosparam load params.yaml /mediation_layer/
 The ROS visualizer manages a 3D environment that the simulation will provides
 displays for.
 ```
-cd GameEngine/run
+cd game-engine/run
 rosrun rviz rviz -d config.rviz
 ```
 
@@ -61,7 +61,7 @@ rosrun rviz rviz -d config.rviz
 The mediation layer mediates proposed trajectories and ensures that they won't
 cause a quadcopter to crash.
 ```
-cd GameEngine/bin
+cd game-engine/bin
 ./mediation_layer
 ```
 
@@ -69,7 +69,7 @@ cd GameEngine/bin
 The physics simulator forward-integrates proposed quadcopter trajectories a
 small period in the future and publishes the resulting state.
 ```
-cd GameEngine/bin
+cd game-engine/bin
 ./physics_simulator
 ```
 
@@ -77,7 +77,7 @@ cd GameEngine/bin
 The autonomy protocol takes the current quadcopter state and publishes a
 proposed trajectory for the quadcopter to follow.
 ```
-cd GameEngine/bin
+cd game-engine/bin
 ./example_autonomy_protocol
 ```
 
