@@ -4,25 +4,17 @@ The Game Engine has three main components: the Mediation Layer (ML), the Physics
 Simulator (PS), and the Autonomy Protocol (AP). These three programs interact
 together to form the Game Engine (GE).
 
-The PS and the AP are co-dependent --- neither can accomplish its task without
-the other. The AP maps the current quadcopters' states to an intended
-trajectory. The PS forward-simulates the AP's intended trajectories, injecting
-distrubances, and returns the quadcopter's state at a future time point.
-
-The ML simply displays the data that the PS and the AP are passing back and
-forth.
-
-As it stands, the Mediation Layer is a vestige of a previous iteration of the
-Game Engine. Originally, the ML was supposed to forward-simulate the intended
-trajectories output by the AP and inject disturbances that would force the
-trajectories away from other static and dynamic objects. Since the Machine Games
-rules changes, this integration is no longer necessary.
+AP maps the quadcopter's state to an intended trajectory. ML mediates the
+intended trajectories, altering them if necessary to impose boundaries,
+simulate interaction with other objects, etc.  PS forward-simulates the
+mediated trajectory, injecting disturbances, and returns the quadcopter's state
+at a future time point.
 
 ## Installation
 ### Prerequisites 
 1. [Eigen](https://eigen.tuxfamily.org)
 2. [ROS](http://www.ros.org)
-3. [P4](https://gitlab.com/radionavlab/machine-games/p4)
+3. [P4](https://gitlab.com/radionavlab/public/p4)
 
 ### Clone
 ```bash
