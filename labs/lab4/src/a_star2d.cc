@@ -7,9 +7,9 @@
 namespace game_engine {
   // Anonymous namespace. Put any file-local functions or variables in here
   namespace {
-    // Helper struct. Functions as a linked list with data. The linked list
-    // represents a path. Data contained includes a node and a cost to reach
-    // that node. 
+    // Helper struct that functions as a linked list with data. The linked
+    // list represents a path. Data members are a node, a cost to reach that
+    // node, and a heuristic cost from the current node to the destination.
     struct NodeWrapper {
       std::shared_ptr<struct NodeWrapper> parent;
       std::shared_ptr<Node2D> node_ptr;
