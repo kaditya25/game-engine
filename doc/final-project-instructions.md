@@ -28,9 +28,6 @@ Students are allowed to add any additional files, functions, or enhancements to
 their GameEngine code base. However, students are not allowed to modify or
 delete current functionality without the explicit permission of one of the TAs.
 
-Students may request new functionality from the GameEngine from Tucker. Should
-he have time, he will endeavor to complete as many additional features as he can.
-
 ## Code Restrictions
 1) Students must not alter any code in the src/exe folder
 2) Students must not alter any of the AutonomyProtocol interfaces
