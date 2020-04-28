@@ -1,13 +1,12 @@
 # Tournament Structure
 
 ## Important Dates
-- May 1st, Pre-tournament Start Date. First day that students may submit
+- April 30th, Pre-tournament Start Date. First day that students may submit
   binaries
-- May 2nd, 1st pre-tournament Evaluation Date. Binaries and tournament standing
+- May 1st, 1st pre-tournament Evaluation Date. Binaries and tournament standing
   are evaluated at 9 am. Binaries will be updated and evaluated every day
   at 9 am thereafter until the end of the pre-tournament.
-- May 8th, Test image dataset released.
-- May 15th, Final day of pre-tournament. Final evaluation at 9 am. Final map of
+- May 14th, Final day of pre-tournament. Final evaluation at 9 am. Final map of
   arena released (this one will be used on the day of the tournament).
 - May 18th, Tournament day. 9 am
 
