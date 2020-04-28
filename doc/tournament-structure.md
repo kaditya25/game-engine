@@ -42,9 +42,9 @@ students may view the submitted strategies themselves.
 
 ## Maps
 Three maps are provided for autonomy protocol evaluation. They are located under
-GameEngine/resources/maps/. To change the map, the initial location of
+game-engine/resources/maps/. To change the map, the initial location of
 quadcopter, or the locations of the balloons, change the corresponding
-parameters in the GameEngine/run/params.yaml file and reload them.
+parameters in the game-engine/run/params.yaml file and reload them.
 
 The pre-tournament will be evaluated on the pretournament.map file. The other
 maps in the directory are provided for convenience and testing.
