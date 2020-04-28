@@ -9,35 +9,35 @@
 - May 8th, Test image dataset released.
 - May 15th, Final day of pre-tournament. Final evaluation at 9 am. Final map of
   arena released (this one will be used on the day of the tournament).
-- May 17th, Tournament day. 9 am
+- May 18th, Tournament day. 9 am
 
 ## Tournament Binaries
 To allow teams to evaluate their standing with respect to the other teams, but
 prevent code-sharing, the pre-tournament will employ binaries. Each GameEngine
 repository is set up to build a binary called "student_autonomy_protocol" and
-place it into the GameEngine/bin folder. Teams will be required to submit this
+place it into a game-engine/bin folder. Teams will be required to submit this
 binary for tournament evaluation.
 
 ### Binary Submission
 Members from each team will be added to a private gitlab repository owned by
-Tucker. To submit a binary, teams must copy their "student_autonomy_protocol"
-binary into the git repository and push it to gitlab.com. Tucker will pull these
+Dan. To submit a binary, teams must copy their "student_autonomy_protocol"
+binary into the git repository and push it to gitlab.com. Dan will pull these
 binaries every day at 9 am and evaluate tournament standings.
 
 ### Public Binaries
 All submitted binaries become are public. All teams may view their competition's
 submissions by cloning and updating the following git repository:
 ```bash
-git clone https://gitlab.com/tuckerhaydon/tournamentbinaries.git TournamentBinaries
+git clone https://gitlab.com/dmlachap/tournament-binaries.git
 ```
 
 To evaluate an opponent's strategy, launch all tournament executables as normal,
 but substitute an opponent's "student_autonomy_protocol".
 
 ### Binary Evaluation
-Tucker will evaluate the submitted binaries every day around 9 am and send out
+Dan will evaluate the submitted binaries every day around 9 am and send out
 a canvas announcement with the current tournament standings. The submitted
-binaries will be uploaded to the public TournamentBinaries folder so that
+binaries will be uploaded to the public Tournament Binaries folder so that
 students may view the submitted strategies themselves.
 
 ## Maps
