@@ -19,9 +19,9 @@ ensures that only you may view this code. Don't want your opponents to see your
 secrets! i
 
 In the repository settings/members, add your team members as maintainers to your
-repository. This allows them to view and edit the code. Also add Nick and Tucker
+repository. This allows them to view and edit the code. Also add Dan and Nick
 as Reporter to the code. We need the ability to audit your code. Our handles
-are: @tuckerhaydon @nickMont
+are: @dmlachap @nickMont
 
 ## Clone the GameEngine
 First, clone a fresh copy of the MediationLayer repository and call it the
