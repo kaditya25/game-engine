@@ -24,12 +24,12 @@ as Reporter to the code. We need the ability to audit your code. Our handles
 are: @dmlachap @nickMont
 
 ## Clone the GameEngine
-First, clone a fresh copy of the MediationLayer repository and call it the
+If necessary, first clone a fresh copy of the Game Engine repository and call it the
 'GameEngine'.
 ```bash
-cd ~/Workspace/
-git clone https://github.com/tuckerhaydon/MediationLayerStudent.git GameEngine
-cd GameEngine
+cd ~/Libraries/
+git clone https://gitlab.com/todd.humphreys/game-engine-student.git
+cd game-engine
 git submodule update --init --recursive
 ```
 
@@ -37,36 +37,36 @@ git submodule update --init --recursive
 Configure your GameEngine repository with your name and email. By configuring
 it, all commits that you make will be signed with this information.
 ```bash
-cd ~/Workspace/GameEngine
+cd ~/Libraries/game-engine
 git config user.name "YOUR NAME HERE"
 git config user.email "YOUR EMAIL HERE"
 ```
 
-There will be three GameEngine repositories that are important to you: your
-local copy, the copy on gitlab, and the original MediationLayerStudent
-repository. The three of these interact as follows: Tucker will push patches and
-changes to the original MediationLayerStudent repository. Your local copy will
+There will be three Game Engine repositories that are important to you: your
+local copy, the copy on gitlab, and the original game-engine-student
+repository. The three of these interact as follows: Dan and Nick will push patches and
+changes to the original game-engine-student repository. Your local copy will
 have to pull in and merge these changes. Then you will have to push changes in
 your local copy to gitlab so they are safe and accessible to your teammates.
 These three repositories will be referred to as:
-- Local Copy -> local
-- Gitlab copy -> origin
-- Original MediationLayerStudent -> source
+- Your Local Copy -> local
+- Your Gitlab copy -> origin
+- Original game-engine-student -> source
 
 Configure these in the git settings. Note that the lines begining with '#' below
 are comments
 ```
-cd ~/Workspace/GameEngine
+cd ~/Libraries/
 git remote rename origin source
-git remote add origin https://gitlab.com/YOUR_GITLAB_USERNAME/GameEngine.git
+git remote add origin https://gitlab.com/YOUR_GITLAB_USERNAME/YOUR_REPOSITORY_NAME.git
 # For example:
-#   git remote add origin https://gitlab.com/tuckerhaydon/GameEngine.git
+#   git remote add origin https://gitlab.com/todd.humphreys/game-engine-student.git
 ```
 
 Now that your repository is configured, push your local copy to gitlab. You will
 push to 'origin' if you want to push to gitlab.
 ```bash
-cd ~/Workspace/GameEngine
+cd ~/Libraries/game-engine
 git push -u origin --all
 git push -u origin --tags
 ```
@@ -94,16 +94,16 @@ git push origin master
 
 ## Pulling changes
 Any time a change is made to a remote repository (your teammate has pushed to
-gitlab or Tucker has changed the original MediationLayerStudent repository), you
+gitlab or Dan has changed the original game-engine-student repository), you
 will want to pull in and merge these changes. The steps below assume that you
 have already committed any changes in your local repository.
 
-If the remote source is changed, pull from source.
+If the remote source (instructor code) is changed, pull from source.
 ```bash
 git pull source master
 ```
 
-If the remote origin is changed, pull from origin.
+If the remote origin (your team's code) is changed, pull from origin.
 ```bash
 git pull origin master
 ```
