@@ -22,13 +22,13 @@ as Reporter to the code. We need the ability to audit your code. Our handles
 are: @dmlachap @nickMont
 
 ## Clone `game-engine`
-In the `~/Libraries` directory, either clone a fresh copy of the
+In the `~/Workspace` directory, either clone a fresh copy of the
 `game-engine-student` repository (if you want to start with a clean slate), or
 update your existing local `game-engine` repository (if one already exists at
 that location and you want to keep it).  Name your local repository
 `game-engine`.  To clone a fresh copy:
 ```bash
-cd ~/Libraries/
+cd ~/Workspace/
 git clone https://gitlab.com/todd.humphreys/game-engine-student.git game-engine
 cd game-engine
 git submodule update --init --recursive
@@ -36,7 +36,7 @@ git submodule update --init --recursive
 To update an existing copy (assuming `origin` refers to
 `https://gitlab.com/todd.humphreys/game-engine-student.git`)
 ```bash
-cd ~/Libraries/game-engine
+cd ~/Workspace/game-engine
 git pull origin master
 git submodule update --init --recursive
 ```
@@ -45,7 +45,7 @@ git submodule update --init --recursive
 Configure your `game-engine` repository with your name and email. By configuring
 it, all commits that you make will be signed with this information.
 ```bash
-cd ~/Libraries/game-engine
+cd ~/Workspace/game-engine
 git config user.name "YOUR NAME HERE"
 git config user.email "YOUR EMAIL HERE"
 ```
@@ -69,7 +69,7 @@ These three repositories will be referred to as
 Configure these in the git settings as follows. Note that the lines begining
 with '#' below are comments.
 ```
-cd ~/Libraries/
+cd ~/Workspace/
 git remote rename origin source
 git remote add origin https://gitlab.com/YOUR_GITLAB_USERNAME/YOUR_REPOSITORY_NAME.git
 # For example:
@@ -78,7 +78,7 @@ git remote add origin https://gitlab.com/YOUR_GITLAB_USERNAME/YOUR_REPOSITORY_NA
 
 Now that your repository is configured, push your local copy to gitlab:
 ```bash
-cd ~/Libraries/game-engine
+cd ~/Workspace/game-engine
 git push -u origin --all
 git push -u origin --tags
 ```
