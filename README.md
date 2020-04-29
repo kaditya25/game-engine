@@ -1,5 +1,5 @@
 # Game Engine
-## Project Structure
+## Structure
 The Game Engine has four interacting components: the Mediation Layer (ML),
 Physics Simulator (PS), Visualizer (VZ), and the Autonomy Protocol (AP). 
 
