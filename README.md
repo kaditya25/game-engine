@@ -89,8 +89,8 @@ to RVIZ for display.
 cd game-engine/bin
 ./visualizer
 ```
-Note that it may take some time for all the elements of the arena to get
-populated in RVIZ.
+Note that it may take some time (a few 10s of seconds) for all the elements of
+the arena to get populated in RVIZ.
 
 ### Autonomy Protocol
 The autonomy protocol takes the current quadcopter state and publishes a
