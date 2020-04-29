@@ -32,10 +32,11 @@ cmake ..
 make -j4
 ```
 
-## Running the Mediation Layer
-The ML is composed of a couple of executables. After building, you must ensure
-that the following programs are running. It may be helpful to use a terminal
-multiplexer like tmux and start each program in a separate pane.
+## Running the Game Engine
+The Game Engine is composed of several interacting executables. After
+building, you must ensure that the following programs are running. You are
+encouraged to use a terminal multiplexer like tmux and start each program in a
+separate pane.
 
 ### ROS Core
 ```bash
@@ -82,7 +83,7 @@ cd game-engine/bin
 ```
 
 ### Visualizer
-The visualizer executable sends arena, obstacle, balloon, and quadcopter data
+The visualizer sends arena, obstacle, balloon, and quadcopter data
 to RVIZ for display.
 ```
 cd game-engine/bin
