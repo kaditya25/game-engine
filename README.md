@@ -1,7 +1,7 @@
 # Game Engine
 ## Structure
 The Game Engine has four interacting components: the Mediation Layer (ML),
-Physics Simulator (PS), Visualizer (VZ), and the Autonomy Protocol (AP). 
+Physics Simulator (PS), Visualizer (VZ), and Autonomy Protocol (AP). 
 
 AP maps the quadcopter's state to an intended trajectory. ML mediates the
 intended trajectories, altering them if necessary to impose boundaries,
