@@ -7,8 +7,9 @@ together to form the Game Engine (GE).
 AP maps the quadcopter's state to an intended trajectory. ML mediates the
 intended trajectories, altering them if necessary to impose boundaries,
 simulate interaction with other objects, etc.  PS forward-simulates the
-mediated trajectory, injecting disturbances, and returns the quadcopter's state
-at a future time point.
+mediated trajectory, injecting disturbances and applying
+proportional-derivative control to track the trajectory, and returns the
+quadcopter's state at a subsequent time point.
 
 ## Installation
 ### Prerequisites 
@@ -34,7 +35,7 @@ make -j4
 ## Running the Mediation Layer
 The ML is composed of a couple of executables. After building, you must ensure
 that the following programs are running. It may be helpful to use a terminal
-multiplexer like tmux or terminator and start each program in a separate pane.
+multiplexer like tmux and start each program in a separate pane.
 
 ### ROS Core
 ```bash
@@ -42,23 +43,28 @@ roscore
 ```
 
 ### Load ROS params
-ROS params need only be loaded once. This must be run after roscore has been
-started or re-run if any of the parameters have been changed
+The ROS parameters found in `game-engine/run/params.yaml` must be loaded after
+roscore has been started or re-loaded if any of the parameters have changed
+since loading.
+
+First, modify the file paths in `/game-engine/run/params.yaml` (e.g.,
+`map_file_path`) so that they are correct for your system.  Then load the
+parameters into the `game_engine` namespace as follows:
 ```bash
 cd game-engine/run
-rosparam load params.yaml /mediation_layer/
+rosparam load params.yaml /game_engine/
 ```
 
 ### ROS Visualizer
-The ROS visualizer manages a 3D environment that the simulation will provides
-displays for.
+The ROS visualizer manages a 3D visualization environment in which the
+GE will display an arena, obstacles, and quadcopters.
 ```
 cd game-engine/run
 rosrun rviz rviz -d config.rviz
 ```
 
 ### Mediation Layer
-The mediation layer mediates proposed trajectories and ensures that they won't
+The mediation layer mediates proposed trajectories, ensuring they won't
 cause a quadcopter to crash.
 ```
 cd game-engine/bin
@@ -66,8 +72,10 @@ cd game-engine/bin
 ```
 
 ### Physics Simulator
-The physics simulator forward-integrates proposed quadcopter trajectories a
-small period in the future and publishes the resulting state.
+The physics simulator forward-integrates proposed quadcopter trajectories over
+a short interval into the future and publishes the resulting state.  It
+applies proportional-derivative control to track the trajectories.  It also
+introduces disturbance forces, e.g., due to wind.
 ```
 cd game-engine/bin
 ./physics_simulator

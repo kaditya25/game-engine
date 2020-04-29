@@ -25,7 +25,7 @@ For this project, students are provided with little 3D support. It is completely
 up to them to determine how they will tackle this problem.
 
 Students are allowed to add any additional files, functions, or enhancements to
-their GameEngine code base. However, students are not allowed to modify or
+their Game Engine code base. However, students are not allowed to modify or
 delete current functionality without the explicit permission of one of the TAs.
 
 ## Code Restrictions
@@ -35,8 +35,8 @@ delete current functionality without the explicit permission of one of the TAs.
 without explicit permission of one of the TAs.
 
 ## Running the final project
-To run the final project, follow the build/run instructions in README in the
-top-level GameEngine directory. Student autonomy protocols are compiled into an
-executable called, "student_autonomy_protocol". Instead of running
-example_autonomy_protocol, run the student_autonomy_protocol.
+To run the final project, follow the build/run instructions in `README.md` in
+the top-level `game-engine` directory. Student autonomy protocols are compiled
+into an executable called `student_autonomy_protocol`. Instead of running
+`example_autonomy_protocol`, run `student_autonomy_protocol`.
 
