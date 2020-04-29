@@ -1,15 +1,15 @@
 # Game Engine
 ## Project Structure
-The Game Engine has three main components: the Mediation Layer (ML), the Physics
-Simulator (PS), and the Autonomy Protocol (AP). These three programs interact
-together to form the Game Engine (GE).
+The Game Engine has four interacting components: the Mediation Layer (ML),
+Physics Simulator (PS), Visualizer (VZ), and the Autonomy Protocol (AP). 
 
 AP maps the quadcopter's state to an intended trajectory. ML mediates the
 intended trajectories, altering them if necessary to impose boundaries,
 simulate interaction with other objects, etc.  PS forward-simulates the
 mediated trajectory, injecting disturbances and applying
 proportional-derivative control to track the trajectory, and returns the
-quadcopter's state at a subsequent time point.
+quadcopter's state at a subsequent time point. VZ pushes visualization data to
+ROS's RVIZ program.
 
 ## Installation
 ### Prerequisites 
