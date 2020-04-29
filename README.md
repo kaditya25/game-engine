@@ -56,8 +56,8 @@ rosparam load params.yaml /game_engine/
 ```
 
 ### ROS Visualizer
-The ROS visualizer manages a 3D visualization environment in which the
-GE will display an arena, obstacles, and quadcopters.
+The ROS visualizer (RVIZ) manages a 3D visualization environment in which the
+arena, obstacles, balloons, and quadcopters are displayed.
 ```
 cd game-engine/run
 rosrun rviz rviz -d config.rviz
@@ -79,6 +79,14 @@ introduces disturbance forces, e.g., due to wind.
 ```
 cd game-engine/bin
 ./physics_simulator
+```
+
+### Visualizer
+The visualizer executable sends arena, obstacle, balloon, and quadcopter data
+to RVIZ for display.
+```
+cd game-engine/bin
+./visualizer
 ```
 
 ### Autonomy Protocol

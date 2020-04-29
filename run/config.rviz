@@ -75,7 +75,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /mediation_layer/balloons
+      Marker Topic: /game_engine/balloons
       Name: Marker
       Namespaces:
         {}
