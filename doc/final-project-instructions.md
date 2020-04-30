@@ -4,8 +4,8 @@ The goal is simple: the teams must command a quadcopter to find and pop two
 balloons and return to the start position as quickly as possible.
 
 ## Interface
-Students must complete the function StudentAutonomyProtocol::UpdateTrajectories
-located in the file src/autonomy_protocol/student_autonomy_protocol.h. This
+Students must complete the function `StudentAutonomyProtocol::UpdateTrajectories`
+located in the file `src/autonomy_protocol/student_autonomy_protocol.h`. This
 function provides access to map data, balloon data, and the current state of the
 quadcopter and requires students to specify trajectories for the quadcopters. 
 
@@ -39,4 +39,35 @@ To run the final project, follow the build/run instructions in `README.md` in
 the top-level `game-engine` directory. Student autonomy protocols are compiled
 into an executable called `student_autonomy_protocol`. Instead of running
 `example_autonomy_protocol`, run `student_autonomy_protocol`.
+
+## Tagging releases
+During the pre-tournament and tournament, you'll want the TA only to evaluate
+your *approved* `student_autonomy_protocol` binary, which may not be the one
+in the master branch of your team's gitlab repository.  You'll want to *tag*
+an approved release so that the TA knows which one to test.  The TA will test
+whichever revision is tagged as `release`.
+
+Suppose you're happy with the way your autonomy protocol is running on your
+local machine and you'd like to tag the current version as `release`.  Then
+perform the following steps.
+
+First, commit your current version and push to `origin` on branch `master`:
+```bash
+git commit -am "WRITE A COMMIT MESSAGE"
+git push origin master
+```
+
+Second, if you already have a tag named `release`, then delete this
+tag locally and at `origin`:
+```bash
+cd ~/Workspace/game-engine
+git tag -d release
+git push origin --delete release
+```
+
+Third, tag your current commit and push to `origin`:
+```bash
+git tag release
+git push origin release
+```
 
