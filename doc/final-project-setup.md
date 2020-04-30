@@ -129,8 +129,8 @@ To make it easy for the TA to evaluate your team's autonomy protocol, add the
 cd ~/Workspace/game-engine/bin/
 git add student_autonomy_protocol
 ```
-This way, each time you push to `origin` the latest
-`student_autonomy_protocol` also gets pushed, permitting the TA to pull it for
+This way, each time you push to `origin`, the latest
+`student_autonomy_protocol` gets automatically pushed, permitting the TA to pull it for
 evaluation.  Note that it's normally bad form to add binaries to a repository
 because they take up unnecessary space: it's the source code that matters!
 But in this case convenience is the main consideration.
