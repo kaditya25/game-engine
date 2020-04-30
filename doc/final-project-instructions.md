@@ -41,7 +41,7 @@ into an executable called `student_autonomy_protocol`. Instead of running
 `example_autonomy_protocol`, run `student_autonomy_protocol`.
 
 ## Tagging releases
-During the pre-tournament and tournament, you'll want the TA only to evaluate
+During the pre-tournament and tournament, you'll want the TA to evaluate only
 your *approved* `student_autonomy_protocol` binary, which may not be the one
 in the master branch of your team's gitlab repository.  You'll want to *tag*
 an approved release so that the TA knows which one to test.  The TA will test
@@ -65,7 +65,7 @@ git tag -d release
 git push origin --delete release
 ```
 
-Third, tag your current commit and push to `origin`:
+Third, tag your current commit as `release` and push to `origin`:
 ```bash
 git tag release
 git push origin release
