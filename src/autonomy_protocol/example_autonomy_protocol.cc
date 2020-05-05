@@ -5,13 +5,15 @@
 #include "example_autonomy_protocol.h"
 
 namespace game_engine {
-  std::unordered_map<std::string, Trajectory> ExampleAutonomyProtocol::UpdateTrajectories() {
+  std::unordered_map<std::string, Trajectory>
+  ExampleAutonomyProtocol::UpdateTrajectories() {
 
     // Always use the chrono::system_clock for time. Trajectories require time
     // points measured in floating point seconds from the unix epoch.
     const std::chrono::milliseconds T_chrono = std::chrono::seconds(30);
     const std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(15);
-    const double dt = std::chrono::duration_cast<std::chrono::duration<double>>(dt_chrono).count();
+    const double dt =
+      std::chrono::duration_cast<std::chrono::duration<double>>(dt_chrono).count();
 
     // Use a static function variable to log the first time this function was
     // called. The static function variable acts like a matlab persistent
@@ -24,14 +26,24 @@ namespace game_engine {
     const std::chrono::time_point<std::chrono::system_clock> current_chrono_time 
       = std::chrono::system_clock::now();
 
-    // If at the end, return an empty map
+    // If beyond the end time, return an empty map
     std::unordered_map<std::string, Trajectory> trajectory_map;
     if(current_chrono_time > end_chrono_time) {
       return trajectory_map;
     }
 
+    // The following code generates and returns a new trajectory each time it
+    // runs.  The new trajectory starts at the location on the original circle
+    // that is closest to the current location of the quad and it creates a
+    // trajectory of N position, velocity, and acceleration (PVA) points
+    // spaced by dt seconds.  Thus, the code below responds to the actual
+    // position of the quad and adjusts the newly generated trajectory
+    // accordingly.  But note that its strategy is not optimal for covering
+    // the greatest distance in the allotted time in the presence of
+    // disturbance accelerations.
 
-    const std::chrono::duration<double> remaining_chrono_time = end_chrono_time - current_chrono_time;
+    const std::chrono::duration<double> remaining_chrono_time =
+      end_chrono_time - current_chrono_time;
 
     // Number of samples
     const size_t N = remaining_chrono_time/dt_chrono;
@@ -50,7 +62,8 @@ namespace game_engine {
 
     // Place the center of the circle 1 radius in the y-direction from the
     // starting position
-    static Eigen::Vector3d circle_center = current_pos + Eigen::Vector3d(0, radius, 0);
+    static Eigen::Vector3d circle_center =
+      current_pos + Eigen::Vector3d(0, radius, 0);
 
     // Transform the current position into an angle
     const Eigen::Vector3d r = current_pos - circle_center;
@@ -60,8 +73,8 @@ namespace game_engine {
     // file. It's aliased for convenience.
     TrajectoryVector3D trajectory_vector;
     for(size_t idx = 0; idx < N; ++idx) {
-      // chrono::duration<double> maintains high-precision floating point time in seconds
-      // use the count function to cast into floating point
+      // chrono::duration<double> maintains high-precision floating point time
+      // in seconds use the count function to cast into floating point
       const std::chrono::duration<double> flight_chrono_time 
         = current_chrono_time.time_since_epoch() + idx * dt_chrono;
       const double flight_time = flight_chrono_time.count();

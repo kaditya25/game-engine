@@ -47,13 +47,11 @@ namespace game_engine {
         // Number of intermediate RK4 integration steps
         size_t integration_steps = 20;
 
-        // From linear system analysis, kp < 0, kd < 0, kp < -0.25 * kd^2
+        // From linear system analysis, kp < 0, kd < 0, kp <= -0.25 * kd^2
         // Proportional constant
-        // double kp = -25.0;
         double kp = -1.0;
 
         // Derivative constant
-        // double kd = -10.0;
         double kd = -2.0;
 
         // Time in seconds to calculate wind history
@@ -63,9 +61,6 @@ namespace game_engine {
         double max_frequency = 1.0;
 
         // Standard deviation of VonKarman model
-        // double sigma_u_x = 0.3;
-        // double sigma_u_y = 0.3;
-        // double sigma_u_z = 0.2;
         double sigma_u_x = 0.1;
         double sigma_u_y = 0.1;
         double sigma_u_z = 0.05;
