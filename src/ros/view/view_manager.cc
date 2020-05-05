@@ -118,22 +118,21 @@ namespace game_engine {
       for(const auto& view: balloon_views) {
         for(visualization_msgs::Marker& marker: view.Markers()) {
           if (marker.color.r == 1.0f) {
-            //std::cout << "Red" << "\n";
-            //std::cout << red_balloon_status_subscriber_node->balloon_status_->popped << "\n";
             if (red_balloon_status_subscriber_node->balloon_status_->popped){
+              // "pop" balloon
               marker.action = visualization_msgs::Marker::DELETE;
-              //marker.color.a = 0.0f;
-              //marker.mesh_use_e=mbedded_materials = false;
-              std::cout << "Red balloon popped" << "\n";
+              balloons_publisher->Publish(marker);
+            } else {
+              marker.action = visualization_msgs::Marker::ADD;
               balloons_publisher->Publish(marker);
             }
           } else if (marker.color.b == 1.0f) {
-            //std::cout << "Blue" << "\n";
             if (blue_balloon_status_subscriber_node->balloon_status_->popped){
+              // "pop" balloon
               marker.action = visualization_msgs::Marker::DELETE;
-              //marker.color.a = 0.0f;
-              //marker.mesh_use_embedded_materials = false;
-              std::cout << "Blue balloon popped" << "\n";
+              balloons_publisher->Publish(marker);
+            } else {
+              marker.action = visualization_msgs::Marker::ADD;
               balloons_publisher->Publish(marker);
             }
           } else {
