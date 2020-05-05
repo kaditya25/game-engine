@@ -13,9 +13,6 @@
 namespace game_engine {
   class BalloonStatusSubscriberNode {
     private:
-      // Pointer to balloon status. No guarantees on read/write threading access
-      std::shared_ptr<BalloonStatus> balloon_status_;
-
       // ROS node handle
       ros::NodeHandle node_handle_;
 
@@ -27,6 +24,8 @@ namespace game_engine {
       void SubscriberCallback(const mg_msgs::BalloonStatus& msg);
       
     public:
+      // Pointer to balloon status. No guarantees on read/write threading access
+      std::shared_ptr<BalloonStatus> balloon_status_;
       // Constructor.
       //
       // Note parameters are intentionally copied.

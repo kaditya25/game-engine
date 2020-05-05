@@ -94,12 +94,52 @@ namespace game_engine {
 
     auto balloons_publisher = std::make_shared<MarkerPublisherNode>("balloons");
 
+    // Code to get balloons to "pop" in visualizer
+    // Balloon Status
+    ros::NodeHandle nh("/game_engine/");
+    std::map<std::string, std::string> balloon_status_topics;
+    if(false == nh.getParam("balloon_status_topics", balloon_status_topics)) {
+      std::cerr << "Required parameter not found on server: balloon_status_topics" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    auto red_balloon_status = std::make_shared<BalloonStatus>();
+    auto blue_balloon_status = std::make_shared<BalloonStatus>();
+
+    auto red_balloon_status_subscriber_node 
+      = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
+    auto blue_balloon_status_subscriber_node 
+      = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["blue"], blue_balloon_status);
+
+
     // Main loop
     // 50 Hz. 
     while(this->ok_) {
       for(const auto& view: balloon_views) {
-        for(const visualization_msgs::Marker& marker: view.Markers()) {
-          balloons_publisher->Publish(marker);
+        for(visualization_msgs::Marker& marker: view.Markers()) {
+          if (marker.color.r == 1.0f) {
+            //std::cout << "Red" << "\n";
+            //std::cout << red_balloon_status_subscriber_node->balloon_status_->popped << "\n";
+            if (red_balloon_status_subscriber_node->balloon_status_->popped){
+              marker.action = visualization_msgs::Marker::DELETE;
+              //marker.color.a = 0.0f;
+              //marker.mesh_use_e=mbedded_materials = false;
+              std::cout << "Red balloon popped" << "\n";
+              balloons_publisher->Publish(marker);
+            }
+          } else if (marker.color.b == 1.0f) {
+            //std::cout << "Blue" << "\n";
+            if (blue_balloon_status_subscriber_node->balloon_status_->popped){
+              marker.action = visualization_msgs::Marker::DELETE;
+              //marker.color.a = 0.0f;
+              //marker.mesh_use_embedded_materials = false;
+              std::cout << "Blue balloon popped" << "\n";
+              balloons_publisher->Publish(marker);
+            }
+          } else {
+            balloons_publisher->Publish(marker);
+          }
+          
         }
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(20));

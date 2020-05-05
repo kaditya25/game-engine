@@ -16,6 +16,10 @@
 #include "quad_view.h"
 #include "balloon_view.h"
 
+#include <ros/ros.h>
+#include "balloon_status.h"
+#include "balloon_status_subscriber_node.h"
+
 namespace game_engine {
   // The ViewManager is a convenience object that encapsulates all of the code
   // used to publish views to RViz. 
