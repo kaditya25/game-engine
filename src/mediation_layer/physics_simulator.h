@@ -20,9 +20,9 @@
 namespace game_engine {
   // The physics simulator alters the path of mediated trajectories to create
   // stochastic variations in a manner that mirrors conditions seen in real
-  // life. After introducing the variations, the simulator selects the perturbed state of
-  // the quadcopter some time in the future and publishes that as the 'current
-  // state' of the quad.
+  // life. After introducing the variations, the simulator selects the
+  // perturbed state of the quadcopter some time in the future and publishes
+  // that as the 'current state' of the quad.
   //
   // The model used for the physics simulator is described in the following
   // section. x_m denotes the mediated (intended) trajectory and x_p denotes the
