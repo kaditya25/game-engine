@@ -291,7 +291,7 @@ namespace game_engine {
 
         // A trajectory may not have been updated between simulation periods.
         // Must find the index in the trajectory that most closely aligns with
-        // the current time. Assuming a zero-order-hold for intended trajectory
+        // the current time. Assume a zero-order-hold for intended trajectory
         // inputs. Always round down.
         size_t trajectory_idx = 0;
         if(trajectory.Time(trajectory_size-1) < current_time_float) {
@@ -378,25 +378,24 @@ namespace game_engine {
           Eigen::Matrix<double, 9, 3> B2 = Eigen::Matrix<double, 9, 3>::Zero();
           B2.block(3,0,3,3) = Eigen::Matrix<double, 3, 3>::Identity();
 
-          auto DynamicsFunction = [&](
-              double time, 
-              const Eigen::Matrix<double, 9, 1>& pva_intermediate) {
-						WindInstance disturbance_instance;
-						for(size_t wind_idx = 0; wind_idx < wind_vector_size; ++wind_idx) {
-							WindInstance wind_instance = wind_instances[wind_idx];
-							if(wind_instance.time > time) {
-								disturbance_instance = wind_instance;
-								break;
-							}
-						}
+          auto DynamicsFunction = [&](double time, 
+                                      const Eigen::Matrix<double, 9, 1>& pva_intermediate) {
+            WindInstance disturbance_instance;
+            for(size_t wind_idx = 0; wind_idx < wind_vector_size; ++wind_idx) {
+              WindInstance wind_instance = wind_instances[wind_idx];
+              if(wind_instance.time > time) {
+                disturbance_instance = wind_instance;
+                break;
+              }
+            }
 
             // Input constrain the max acceleration of the PD loop
             Eigen::Matrix<double, 9, 1> t1 = A * pva_intermediate + B1 * pva_intended;
             t1.block(3,0,3,1) = t1.block(3,0,3,1).unaryExpr([](double x){
-               if(x < -0.8) { return -0.8; }
-               if(x >  0.8) { return  0.8; }
-               return x;
-                }).cast<double>();
+                if(x < -0.8) { return -0.8; }
+                if(x >  0.8) { return  0.8; }
+                return x;
+              }).cast<double>();
 
             Eigen::Vector3d input = disturbance_instance.acceleration;
             const Eigen::Matrix<double, 9, 1> t2 = B2 * input;
@@ -436,7 +435,6 @@ namespace game_engine {
         quad_state_publishers[quad_name]->Publish(quad_state);
       }
     }
-
   }
 
   void PhysicsSimulator::Stop() {
