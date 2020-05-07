@@ -61,9 +61,28 @@ namespace game_engine {
         double max_frequency = 1.0;
 
         // Standard deviation of VonKarman model
+#define WIND_INTENSITY 2
+#if WIND_INTENSITY<=1
+        // Slight breeze
         double sigma_u_x = 0.1;
         double sigma_u_y = 0.1;
         double sigma_u_z = 0.05;
+#elif WIND_INTENSITY == 2
+        // Stiff wind
+        double sigma_u_x = 0.2;
+        double sigma_u_y = 0.2;
+        double sigma_u_z = 0.1;
+#elif WIND_INTENSITY == 3
+        // Intense wind
+        double sigma_u_x = 0.4;
+        double sigma_u_y = 0.4;
+        double sigma_u_z = 0.2;
+#else
+        // Ludicrous wind
+        double sigma_u_x = 0.8;
+        double sigma_u_y = 0.8;
+        double sigma_u_z = 0.4;
+#endif
 
         // Scale length of VonKarman model
         double L_u_x = 1.5;
@@ -73,11 +92,10 @@ namespace game_engine {
         // Quad speed for VonKarman model
         double V = 1.0;
 
-        std::map<
-          std::string, 
-          Eigen::Vector3d, 
-          std::less<std::string>, 
-          Eigen::aligned_allocator<std::pair<const std::string, Eigen::Vector3d>>> initial_quad_positions;
+        std::map<std::string, Eigen::Vector3d, std::less<std::string>, 
+                 Eigen::aligned_allocator<std::pair<const std::string,
+                                                    Eigen::Vector3d>>>
+                    initial_quad_positions;
 
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
