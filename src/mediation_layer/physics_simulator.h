@@ -110,7 +110,8 @@ namespace game_engine {
 
       void Run(std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
                std::unordered_map<std::string,
-               std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers);
+               std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers,
+               unsigned int seed);
 
       void Stop();
 

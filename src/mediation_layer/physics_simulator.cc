@@ -187,14 +187,16 @@ namespace game_engine {
 
   void PhysicsSimulator::Run(
       std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
-      std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers) {
+      std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers,
+      unsigned int seed) {
     
     // System time
     const auto start_time = std::chrono::system_clock::now();
 
     // Generate wind
-    std::mt19937 gen{ std::random_device{}() };
+    //std::mt19937 gen{ std::random_device{}() };
     // std::mt19937 gen{ 0 };
+    std::mt19937 gen{ seed };
 
     const auto x_wind_samples = GenerateWindAccelerationVector(
         this->options_.max_time,
