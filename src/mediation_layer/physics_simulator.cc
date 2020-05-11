@@ -221,7 +221,7 @@ namespace game_engine {
         gen);
 
     const size_t wind_vector_size = x_wind_samples.first.size();
-
+    
     std::vector<WindInstance> wind_instances;
     for(size_t wind_idx = 0; wind_idx < wind_vector_size; ++wind_idx) {
       WindInstance wind_instance;
@@ -377,7 +377,7 @@ namespace game_engine {
           //| j_z |    | 0.00 0.00 0.00 |
           Eigen::Matrix<double, 9, 3> B2 = Eigen::Matrix<double, 9, 3>::Zero();
           B2.block(3,0,3,3) = Eigen::Matrix<double, 3, 3>::Identity();
-
+        
           auto DynamicsFunction = [&](double time, 
                                       const Eigen::Matrix<double, 9, 1>& pva_intermediate) {
             WindInstance disturbance_instance;
@@ -391,12 +391,16 @@ namespace game_engine {
 
             // Input constrain the max acceleration of the PD loop
             Eigen::Matrix<double, 9, 1> t1 = A * pva_intermediate + B1 * pva_intended;
-            t1.block(3,0,3,1) = t1.block(3,0,3,1).unaryExpr([](double x){
-                if(x < -0.8) { return -0.8; }
-                if(x >  0.8) { return  0.8; }
+            t1.block(3,0,3,1) = t1.block(3,0,3,1).unaryExpr([this](double x){
+                if(x < -this->options_.max_acceleration_x_p) {
+                  return -this->options_.max_acceleration_x_p;
+                }
+                if(x > this->options_.max_acceleration_x_p) {
+                  return this->options_.max_acceleration_x_p;
+                }
                 return x;
               }).cast<double>();
-
+            
             Eigen::Vector3d input = disturbance_instance.acceleration;
             const Eigen::Matrix<double, 9, 1> t2 = B2 * input;
 

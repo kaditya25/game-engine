@@ -37,7 +37,6 @@ namespace game_engine {
   // exactly the mediated trajectory (provided the mediation trajectory is
   // smooth).
   //
-  // TODO: Change the starting location of the quadcopter
   class PhysicsSimulator {
     public:
       struct Options {
@@ -92,6 +91,11 @@ namespace game_engine {
         // Quad speed for VonKarman model
         double V = 1.0;
 
+        // Maximum allowed l-infinity norm of acceleration in x_p, in m/s^2.
+        // Note that this should be greater than the maximum l-infinity
+        // acceleration in x_m to ensure tracking of x_m despite disturbances.
+        double max_acceleration_x_p = 0.8;
+
         std::map<std::string, Eigen::Vector3d, std::less<std::string>, 
                  Eigen::aligned_allocator<std::pair<const std::string,
                                                     Eigen::Vector3d>>>
@@ -102,13 +106,11 @@ namespace game_engine {
         Options() {}
       };
 
-      PhysicsSimulator(
-          const Options& options)
-        : options_(options) {}
+      PhysicsSimulator(const Options& options) : options_(options) {}
 
-      void Run(
-          std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
-          std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers);
+      void Run(std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
+               std::unordered_map<std::string,
+               std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers);
 
       void Stop();
 
