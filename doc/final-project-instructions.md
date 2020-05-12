@@ -65,9 +65,11 @@ git tag -d release
 git push origin --delete release
 ```
 
-Third, tag your current commit as `release` and push to `origin`:
+Third, tag your current commit as `release` and push the tag to `origin`.  In
+the example below, the annotated tag is labeled with example message
+"pre-tournament day 3."
 ```bash
-git tag release
+git tag -a release -m "pre-tournament day 3"
 git push origin release
 ```
 

@@ -32,7 +32,7 @@ namespace game_engine {
         // Maximum allowed velocity in any direction in m/s
         double max_velocity_magnitude = 2.0;
 
-        // Maximum allowed acceleration in any direction in m/s^2
+        // Maximum allowed l2 norm of acceleration, in m/s^2
         double max_acceleration_magnitude = 0.4;
 
         // The maximum distance from a quad's current position that a
