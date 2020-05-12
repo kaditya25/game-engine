@@ -106,12 +106,18 @@ int main(int argc, char** argv) {
     initial_quad_positions[quad_name] = Eigen::Vector3d(x,y,z);
   }
 
+  int seed;
+  if(false == nh.getParam("seed", seed)) {
+    std::cerr << "Required parameter not found on server: seed" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
   PhysicsSimulator::Options physics_simulator_options;
   physics_simulator_options.initial_quad_positions = initial_quad_positions;
   auto physics_simulator = std::make_shared<PhysicsSimulator>(physics_simulator_options);
   std::thread physics_simulator_thread(
       [&]() {
-        physics_simulator->Run(trajectory_warden_in, quad_state_publishers);
+        physics_simulator->Run(trajectory_warden_in, quad_state_publishers, seed);
       });
 
   // Kill program thread. This thread sleeps for a second and then checks if the
