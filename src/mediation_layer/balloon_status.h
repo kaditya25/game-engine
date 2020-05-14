@@ -20,5 +20,7 @@ namespace game_engine {
     double pop_time;
 
     Eigen::Vector3d position = Eigen::Matrix<double, 3, 1>::Zero();
+
+    bool set_start = false;
   };
 }
