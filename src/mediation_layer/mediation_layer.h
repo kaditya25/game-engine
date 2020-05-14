@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <string>
+#include <random>
 
 #include "trajectory_warden.h"
 #include "quad_state_warden.h"

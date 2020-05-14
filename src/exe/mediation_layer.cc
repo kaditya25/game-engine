@@ -190,7 +190,7 @@ int main(int argc, char** argv) {
     std::cerr << "Required parameter not found on server: blue_balloon_position" << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  const Eigen::Vector3d blue_balloon_position(
+  Eigen::Vector3d blue_balloon_position(
       blue_balloon_position_vector[0],
       blue_balloon_position_vector[1],
       blue_balloon_position_vector[2]);
@@ -200,11 +200,43 @@ int main(int argc, char** argv) {
     std::cerr << "Required parameter not found on server: red_balloon_position" << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  const Eigen::Vector3d red_balloon_position(
+  Eigen::Vector3d red_balloon_position(
       red_balloon_position_vector[0],
       red_balloon_position_vector[1],
       red_balloon_position_vector[2]);
 
+  // new position vectors
+  std::vector<double> blue_balloon_position_vector_new;
+  if(false == nh.getParam("blue_balloon_position_new", blue_balloon_position_vector_new)) {
+    std::cerr << "Required parameter not found on server: blue_balloon_position_new" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+  Eigen::Vector3d blue_balloon_position_new(
+      blue_balloon_position_vector_new[0],
+      blue_balloon_position_vector_new[1],
+      blue_balloon_position_vector_new[2]);
+
+  double blue_balloon_max_move_time;
+  if(false == nh.getParam("blue_balloon_max_move_time", blue_balloon_max_move_time)) {
+    std::cerr << "Required parameter not found on server: blue_balloon_max_move_time" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  std::vector<double> red_balloon_position_vector_new;  
+  if(false == nh.getParam("red_balloon_position_new", red_balloon_position_vector_new)) {
+    std::cerr << "Required parameter not found on server: red_balloon_position_new" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+  Eigen::Vector3d red_balloon_position_new(
+      red_balloon_position_vector_new[0],
+      red_balloon_position_vector_new[1],
+      red_balloon_position_vector_new[2]);
+
+  double red_balloon_max_move_time;
+  if(false == nh.getParam("red_balloon_max_move_time", red_balloon_max_move_time)) {
+    std::cerr << "Required parameter not found on server: red_balloon_max_move_time" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
 
   // Balloon Status
   std::map<std::string, std::string> balloon_status_topics;
@@ -212,6 +244,15 @@ int main(int argc, char** argv) {
     std::cerr << "Required parameter not found on server: balloon_status_topics" << std::endl;
     std::exit(EXIT_FAILURE);
   }
+
+  // seed for balloon position change
+  int seed;
+  if(false == nh.getParam("seed", seed)) {
+    std::cerr << "Required parameter not found on server: seed" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  std::mt19937 gen{ seed };
 
   auto red_balloon_status_publisher_node 
     = std::make_shared<BalloonStatusPublisherNode>(balloon_status_topics["red"]);
@@ -227,8 +268,10 @@ int main(int argc, char** argv) {
             red_balloon_status_publisher_node,
             quad_state_warden,
             quad_names,
-            red_balloon_position
-            );
+            red_balloon_position,
+            red_balloon_position_new,
+            red_balloon_max_move_time,
+            gen);
       }
   );
 
@@ -238,8 +281,10 @@ int main(int argc, char** argv) {
             blue_balloon_status_publisher_node,
             quad_state_warden,
             quad_names,
-            blue_balloon_position
-            );
+            blue_balloon_position,
+            blue_balloon_position_new,
+            blue_balloon_max_move_time,
+            gen);
       }
   );
 

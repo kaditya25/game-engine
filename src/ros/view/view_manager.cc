@@ -38,17 +38,19 @@ namespace game_engine {
       if(p.first == "red") {
         QuadView::Options view_options;
         view_options.mesh_resource = quad_view_options.quad_mesh_file_path;
-        view_options.r = 1.0f;
-        view_options.g = 0.0f;
-        view_options.b = 0.0f;
+        // UT blue-grey
+        view_options.r = 0.2f;
+        view_options.g = 0.247f;
+        view_options.b = 0.28f;
         quad_views.emplace_back(p.second, view_options);
       }
       else if(p.first == "blue") {
         QuadView::Options view_options;
         view_options.mesh_resource = quad_view_options.quad_mesh_file_path;
-        view_options.r = 0.0f;
-        view_options.g = 0.0f;
-        view_options.b = 1.0f;
+        // burnt orange
+        view_options.r = 0.75f;
+        view_options.g = 0.34;
+        view_options.b = 0.0f;
         quad_views.emplace_back(p.second, view_options);
       }
     }
@@ -73,7 +75,7 @@ namespace game_engine {
     // Setup
     std::vector<BalloonView> balloon_views;
 
-    for(const auto p: balloon_view_options.balloons) {
+    for(auto p: balloon_view_options.balloons) {
       if(p.first == "red") {
         BalloonView::Options view_options;
         view_options.mesh_resource = balloon_view_options.balloon_mesh_file_path;
@@ -115,11 +117,24 @@ namespace game_engine {
     // Main loop
     // 50 Hz. 
     while(this->ok_) {
-      for(const auto& view: balloon_views) {
+      for(auto& view: balloon_views) {
+        // check for balloon motion
+        // if balloon view position is not approx equal to balloon status position,
+        // set balloon view position to balloon status position
+        if (view.options_.r == 1.0f){ // red balloon
+          if (!view.balloon_position_.isApprox(red_balloon_status_subscriber_node->balloon_status_->position)) {
+            view.balloon_position_ = red_balloon_status_subscriber_node->balloon_status_->position;
+          }
+        } else if (view.options_.b == 1.0f) { // blue balloon{
+          if (!view.balloon_position_.isApprox(blue_balloon_status_subscriber_node->balloon_status_->position)) {
+            view.balloon_position_ = blue_balloon_status_subscriber_node->balloon_status_->position;
+          }
+        }
+        
         for(visualization_msgs::Marker& marker: view.Markers()) {
           if (marker.color.r == 1.0f) {
             if (red_balloon_status_subscriber_node->balloon_status_->popped){
-              // "pop" balloon
+              // "pop" red balloon
               marker.action = visualization_msgs::Marker::DELETE;
               balloons_publisher->Publish(marker);
             } else {
@@ -128,7 +143,7 @@ namespace game_engine {
             }
           } else if (marker.color.b == 1.0f) {
             if (blue_balloon_status_subscriber_node->balloon_status_->popped){
-              // "pop" balloon
+              // "pop" blue balloon
               marker.action = visualization_msgs::Marker::DELETE;
               balloons_publisher->Publish(marker);
             } else {

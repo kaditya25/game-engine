@@ -16,10 +16,16 @@ namespace game_engine {
   }
 
   void BalloonStatusSubscriberNode::SubscriberCallback(const mg_msgs::BalloonStatus& msg) {
+    Eigen::Vector3d position;
+    position[0] = msg.pos.x;
+    position[1] = msg.pos.y;
+    position[2] = msg.pos.z;
+
     BalloonStatus balloon_status {
       .popped = msg.popped.data,
       .popper = msg.popper.data,
-      .pop_time = std::chrono::system_clock::now() 
+      .pop_time = msg.pop_time.data,
+      .position = position
     };
     *(this->balloon_status_) = balloon_status;
   }

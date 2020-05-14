@@ -45,7 +45,7 @@ namespace game_engine {
       };
 
       BalloonView(
-          const Eigen::Vector3d& balloon_position,
+          Eigen::Vector3d& balloon_position,
           const Options& options = Options())
         : balloon_position_(balloon_position),
           options_(options),
@@ -53,9 +53,11 @@ namespace game_engine {
 
       std::vector<visualization_msgs::Marker> Markers() const override;
 
-    private: 
-      Options options_;
       Eigen::Vector3d balloon_position_;
+      
+      Options options_;
+
+    private: 
       uint32_t unique_id_;
 
       static uint32_t GenerateUniqueId();

@@ -6,6 +6,7 @@
 #include <string>
 #include <Eigen/Core>
 #include <vector>
+#include <random>
 
 #include "quad_state_warden.h"
 #include "balloon_status_publisher_node.h"
@@ -34,7 +35,10 @@ namespace game_engine {
           std::shared_ptr<BalloonStatusPublisherNode> balloon_status_publisher,
           std::shared_ptr<QuadStateWarden> quad_state_warden,
           const std::vector<std::string>& quad_names,
-          const Eigen::Vector3d& balloon_position);
+          Eigen::Vector3d& balloon_position,
+          Eigen::Vector3d& new_balloon_position,
+          double max_move_time,
+          std::mt19937& gen);
 
       // Stop this thread
       void Stop();

@@ -22,9 +22,9 @@ blue_balloon_position: [-16.0, 19.0, -4.0]
 red_balloon_position:  [-26.0, 15.0, 0.0]
 
 blue_balloon_position_new: [-21.0, 19.0, -4.0]
-blue_balloon_max_move_time: 60
+blue_balloon_max_move_time: 60.0
 red_balloon_position_new:  [-24.0, 20.0, -3.5]
-red_balloon_max_move_time: 60
+red_balloon_max_move_time: 60.0
 
 seed: 0
 
