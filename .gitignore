@@ -1,4 +1,6 @@
 build
+debug
+*~
 *.swp
 tags
 bin

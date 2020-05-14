@@ -1,10 +1,10 @@
 # Final Project Rules
 ## Goal
-The goal is simple: the teams must command a quadcopter to find and pop two
-balloons and return to the start position as quickly as possible.
+The goal is simple: command a quadcopter to find and pop two balloons and
+return to the start position as quickly as possible.
 
 ## Scoring
-Tournament scoring is determined as follows:
+Pre-tournament and tournament scoring is determined as follows:
 1) Team scores are first ordered by the number of balloons they pop. The greater
 the number of balloons popped, the greater the score.
 2) Team scores are secondly ordered by the time it took for both balloons to be
@@ -22,8 +22,8 @@ them ever faster.
 
 ## Number of Attempts
 Each team will have a single attempt to pop both the red and blue balloons on
-game day. If the instructors determine that a team's attempt failed due a
-failure of course materials (ex: balloon gets sucked into quadcopter's motor),
+tournament day. If the instructors determine that a team's attempt failed due a
+failure of course materials (e.g., balloon gets sucked into quadcopter's motor),
 the attempt is refunded and the team is permitted to try again.
 
 ## Path Constraints
@@ -40,28 +40,30 @@ and the quadcopter will continue to follow the most recent, valid trajectory.
 2) If the Mediation Layer determines that a quadcopter has intersected or
 touched an obstacle during the flight as a result of disturbances, the
 quadcopter is frozen, forced to land, and the balloon-popping attempt is
-forfeit. This constraint has a strict punishment because violations imperil the
-quadcopters. Teams should take care not to fly too close to obstacles in case
-the wind or another disturbance forces the quadcopter into the obstacle. A
-quadcopter is considered to be touching a boundary or obstacle if the
-center-of-mass position of the quadcopter has an L-Infinity distance of **20
-cm** less from any point on any boundary of obstacle.
+forfeit. This constraint has a strict punishment because violations imperil
+the quadcopters. Teams should take care not to fly too close to obstacles in
+case the wind or another disturbance forces the quadcopter into the
+obstacle. A quadcopter is considered to be touching a boundary or obstacle if
+the center-of-mass position of the quadcopter has an L-Infinity distance of
+**20 cm** less from any point on any boundary of an obstacle.
 
 ### Maximum Velocity
-Quadcopters must not fly in any direction with a velocity magnitude greater than
-or equal to **2.0 m/s**. If the Mediation Layer determines that a proposed
-trajectory will exceed the above bound, the proposed trajectory is rejected and
-the quadcopter will continue to follow the most recent, valid trajectory.
+Proposed trajectories must not specify flight in any direction with a velocity
+magnitude greater than or equal to **2.0 m/s**. If the Mediation Layer
+determines that a proposed trajectory will exceed this bound, the trajectory
+is rejected and the quadcopter will continue to follow the most recent valid
+trajectory.
 
 ### Maximum Acceleration
-Quadcopters must not fly in any direction with an acceleration magnitude greater
-than **0.4 m/s^2**. If the Mediation Layer determines that a proposed trajectory
-will exceed the above bound, the proposed trajectory is rejected and the
-quadcopter will continue to follow the most recent, valid trajectory.
+Proposed trajectories must not specify flight in any direction with an
+acceleration magnitude greater than **0.4 m/s^2**. If the Mediation Layer
+determines that a proposed trajectory will exceed this bound, the trajectory
+is rejected and the quadcopter will continue to follow the most recent, valid
+trajectory.
 
-### Time
-Teams will have up to seven (7) minutes to complete their balloon-popping
-mission. The timer starts as soon as a team's AutonomyProtocol is engaged. At
-the end of the time period, the quadcopter is frozen and forced to land. The
-attempt will be scored normally.
+### Maximum Time
+Teams will have up to 5 minutes (300 seconds) to complete their
+balloon-popping mission. The timer starts as soon as a team's autonomy
+protocol is engaged. At the end of the time period, the quadcopter is frozen
+and forced to land. The attempt will be scored normally.
 

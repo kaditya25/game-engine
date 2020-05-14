@@ -1,7 +1,7 @@
 # Final Project Instructions
 ## Goal
-The goal is simple: the teams must command a quadcopter to find and pop two
-balloons and return to the start position as quickly as possible.
+The goal is simple: command a quadcopter to find and pop two balloons and
+return to the start position as quickly as possible.
 
 ## Interface
 Students must complete the function `StudentAutonomyProtocol::UpdateTrajectories`
@@ -9,9 +9,9 @@ located in the file `src/autonomy_protocol/student_autonomy_protocol.h`. This
 function provides access to map data, balloon data, and the current state of the
 quadcopter and requires students to specify trajectories for the quadcopters. 
 
-Note that the interface only specifies the input and output (quad state -> quad
-trajectory), but not how to accomplish it. It is up to students' discretion how
-they want to complete the function.
+Note that the interface only specifies the input and output (quad state ->
+quad trajectory), but not how to accomplish it. It is up to students'
+discretion how to complete the function.
 
 While the entire project boils down to one function in one file, understand that
 the problem set before you is not trivial. You will find that the problem of
