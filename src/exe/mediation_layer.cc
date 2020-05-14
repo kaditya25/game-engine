@@ -205,39 +205,63 @@ int main(int argc, char** argv) {
       red_balloon_position_vector[1],
       red_balloon_position_vector[2]);
 
-  // new position vectors
-  std::vector<double> blue_balloon_position_vector_new;
-  if(false == nh.getParam("blue_balloon_position_new", blue_balloon_position_vector_new)) {
-    std::cerr << "Required parameter not found on server: blue_balloon_position_new" << std::endl;
+  bool move_blue;
+  if(false == nh.getParam("move_blue", move_blue)) {
+    std::cerr << "Required parameter not found on server: move_blue" << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  Eigen::Vector3d blue_balloon_position_new(
-      blue_balloon_position_vector_new[0],
-      blue_balloon_position_vector_new[1],
-      blue_balloon_position_vector_new[2]);
 
   double blue_balloon_max_move_time;
-  if(false == nh.getParam("blue_balloon_max_move_time", blue_balloon_max_move_time)) {
-    std::cerr << "Required parameter not found on server: blue_balloon_max_move_time" << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
+  Eigen::Vector3d blue_balloon_position_new;
+  if (move_blue) {
+    // new position vectors
+    std::vector<double> blue_balloon_position_vector_new;
+    if(false == nh.getParam("blue_balloon_position_new", blue_balloon_position_vector_new)) {
+      std::cerr << "Required parameter not found on server: blue_balloon_position_new" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+    blue_balloon_position_new <<
+        blue_balloon_position_vector_new[0],
+        blue_balloon_position_vector_new[1],
+        blue_balloon_position_vector_new[2];
 
-  std::vector<double> red_balloon_position_vector_new;  
-  if(false == nh.getParam("red_balloon_position_new", red_balloon_position_vector_new)) {
-    std::cerr << "Required parameter not found on server: red_balloon_position_new" << std::endl;
+    if(false == nh.getParam("blue_balloon_max_move_time", blue_balloon_max_move_time)) {
+      std::cerr << "Required parameter not found on server: blue_balloon_max_move_time" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  } else {
+    blue_balloon_max_move_time = 600.0;
+    blue_balloon_position_new = blue_balloon_position;
+  }
+  
+  bool move_red;
+  if(false == nh.getParam("move_red", move_red)) {
+    std::cerr << "Required parameter not found on server: move_red" << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  Eigen::Vector3d red_balloon_position_new(
-      red_balloon_position_vector_new[0],
-      red_balloon_position_vector_new[1],
-      red_balloon_position_vector_new[2]);
 
   double red_balloon_max_move_time;
-  if(false == nh.getParam("red_balloon_max_move_time", red_balloon_max_move_time)) {
-    std::cerr << "Required parameter not found on server: red_balloon_max_move_time" << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
+  Eigen::Vector3d red_balloon_position_new;
+  if (move_red) {
+    std::vector<double> red_balloon_position_vector_new;  
+    if(false == nh.getParam("red_balloon_position_new", red_balloon_position_vector_new)) {
+      std::cerr << "Required parameter not found on server: red_balloon_position_new" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+    red_balloon_position_new <<
+        red_balloon_position_vector_new[0],
+        red_balloon_position_vector_new[1],
+        red_balloon_position_vector_new[2];
 
+    if(false == nh.getParam("red_balloon_max_move_time", red_balloon_max_move_time)) {
+      std::cerr << "Required parameter not found on server: red_balloon_max_move_time" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  } else {
+    red_balloon_max_move_time = 600.0;
+    red_balloon_position_new = red_balloon_position;
+  }
+  
   // Balloon Status
   std::map<std::string, std::string> balloon_status_topics;
   if(false == nh.getParam("balloon_status_topics", balloon_status_topics)) {
@@ -246,12 +270,22 @@ int main(int argc, char** argv) {
   }
 
   // seed for balloon position change
-  int seed;
-  if(false == nh.getParam("seed", seed)) {
-    std::cerr << "Required parameter not found on server: seed" << std::endl;
+  bool use_seed;
+  if(false == nh.getParam("use_seed", use_seed)) {
+    std::cerr << "Required parameter not found on server: use_seed" << std::endl;
     std::exit(EXIT_FAILURE);
   }
 
+  int seed;
+  if (use_seed) {
+    if(false == nh.getParam("seed", seed)) {
+      std::cerr << "Required parameter not found on server: seed" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  } else {
+    seed = std::random_device{}();
+  }
+  
   std::mt19937 gen{ seed };
 
   auto red_balloon_status_publisher_node 
