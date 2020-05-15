@@ -35,6 +35,7 @@ namespace game_engine {
 
       // move balloon if enough time has passed
       if (elapsed_sec >= move_time) {
+        balloon_position = new_balloon_position;
       }
 
       for(const std::string& quad_name: quad_names) {
