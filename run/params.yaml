@@ -14,9 +14,9 @@ balloon_status_topics:
   "red": "/game_engine/red_balloon_status"
   "blue": "/game_engine/blue_balloon_status"
 
-map_file_path: "/home/aerial-robotics/Libraries/game-engine/resources/maps/forest.map"
-quad_mesh_file_path: "file:///home/aerial-robotics/Libraries/game-engine/resources/meshes/quad.stl"
-balloon_mesh_file_path: "file:///home/aerial-robotics/Libraries/game-engine/resources/meshes/balloon.stl"
+map_file_path: "/home/aerial-robotics/Workspace/game-engine/resources/maps/forest.map"
+quad_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/quad.stl"
+balloon_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/balloon.stl"
 
 blue_balloon_position: [-16.0, 19.0, -4.0]
 red_balloon_position:  [-26.0, 15.0, 0.0]
