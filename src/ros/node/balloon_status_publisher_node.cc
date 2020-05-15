@@ -25,6 +25,10 @@ namespace game_engine {
     msg.header.stamp.nsec = 0;
     msg.popped.data = balloon_status.popped;
     msg.popper.data = balloon_status.popper;
+    msg.pop_time.data = balloon_status.pop_time;
+    msg.pos.x = balloon_status.position.x();
+    msg.pos.y = balloon_status.position.y();
+    msg.pos.z = balloon_status.position.z();
 
     this->publisher_guard_->Publish(msg);
   }

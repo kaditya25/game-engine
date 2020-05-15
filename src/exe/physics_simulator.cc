@@ -106,10 +106,21 @@ int main(int argc, char** argv) {
     initial_quad_positions[quad_name] = Eigen::Vector3d(x,y,z);
   }
 
-  int seed;
-  if(false == nh.getParam("seed", seed)) {
-    std::cerr << "Required parameter not found on server: seed" << std::endl;
+  // seed for balloon position change
+  bool use_seed;
+  if(false == nh.getParam("use_seed", use_seed)) {
+    std::cerr << "Required parameter not found on server: use_seed" << std::endl;
     std::exit(EXIT_FAILURE);
+  }
+
+  int seed;
+  if (use_seed) {
+    if(false == nh.getParam("seed", seed)) {
+      std::cerr << "Required parameter not found on server: seed" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  } else {
+    seed = std::random_device{}();
   }
 
   PhysicsSimulator::Options physics_simulator_options;

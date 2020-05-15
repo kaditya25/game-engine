@@ -4,6 +4,7 @@
 
 #include <string>
 #include <chrono>
+#include <Eigen/Dense>
 
 namespace game_engine {
   // Plain-old-data structure containing information regarding a balloon's
@@ -16,6 +17,10 @@ namespace game_engine {
     std::string popper = "null";
 
     // The time the balloon was popped at
-    std::chrono::system_clock::time_point pop_time;
+    double pop_time;
+
+    Eigen::Vector3d position = Eigen::Matrix<double, 3, 1>::Zero();
+
+    bool set_start = false;
   };
 }
