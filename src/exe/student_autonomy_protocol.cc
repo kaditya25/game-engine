@@ -20,6 +20,7 @@
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
 
+#include "balloon_status_publisher_node.h"
 #include "balloon_status_subscriber_node.h"
 #include "balloon_status.h"
 
@@ -201,6 +202,24 @@ int main(int argc, char** argv) {
     = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
   auto blue_balloon_status_subscriber_node 
     = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["blue"], blue_balloon_status);
+
+  // start balloon status clock
+  auto red_balloon_status_publisher_node 
+    = std::make_shared<BalloonStatusPublisherNode>(balloon_status_topics["red"]);
+  auto blue_balloon_status_publisher_node 
+    = std::make_shared<BalloonStatusPublisherNode>(balloon_status_topics["blue"]);
+
+  BalloonStatus setStartStatusRed = *(red_balloon_status_subscriber_node->balloon_status_);
+  setStartStatusRed.set_start = true;
+
+  BalloonStatus setStartStatusBlue = *(blue_balloon_status_subscriber_node->balloon_status_);
+  setStartStatusBlue.set_start = true;
+
+  // wait for 1 sec
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  red_balloon_status_publisher_node->Publish(setStartStatusRed);
+  blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
 
   // The AutonomyProtocol
   std::shared_ptr<AutonomyProtocol> autonomy_protocol 

@@ -288,6 +288,14 @@ int main(int argc, char** argv) {
   
   std::mt19937 gen{ seed };
 
+  auto red_balloon_status = std::make_shared<BalloonStatus>();
+  auto blue_balloon_status = std::make_shared<BalloonStatus>();
+
+  auto red_balloon_status_subscriber_node 
+    = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
+  auto blue_balloon_status_subscriber_node 
+    = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["blue"], blue_balloon_status);
+
   auto red_balloon_status_publisher_node 
     = std::make_shared<BalloonStatusPublisherNode>(balloon_status_topics["red"]);
   auto blue_balloon_status_publisher_node 
@@ -300,6 +308,7 @@ int main(int argc, char** argv) {
       [&]() {
         red_balloon_watchdog->Run(
             red_balloon_status_publisher_node,
+            red_balloon_status_subscriber_node,
             quad_state_warden,
             quad_names,
             red_balloon_position,
@@ -313,6 +322,7 @@ int main(int argc, char** argv) {
       [&]() {
         blue_balloon_watchdog->Run(
             blue_balloon_status_publisher_node,
+            blue_balloon_status_subscriber_node,
             quad_state_warden,
             quad_names,
             blue_balloon_position,
