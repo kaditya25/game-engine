@@ -59,12 +59,7 @@ namespace game_engine {
         .popped = balloon_popped,
         .popper = quad_popper,
         .pop_time = balloon_pop_time,
-<<<<<<< HEAD
-        .position = balloon_position,
-        .set_start = set_start // only set to true from AP
-=======
         .position = balloon_position
->>>>>>> move-balloon
       };
 
       balloon_status_publisher->Publish(balloon_status);
