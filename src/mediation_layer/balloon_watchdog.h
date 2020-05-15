@@ -10,7 +10,6 @@
 
 #include "quad_state_warden.h"
 #include "balloon_status_publisher_node.h"
-#include "balloon_status_subscriber_node.h"
 
 namespace game_engine {
   // The BalloonWatchdog watches the position of quadcopters and determines if
@@ -34,7 +33,6 @@ namespace game_engine {
       // Main thread function
       void Run(
           std::shared_ptr<BalloonStatusPublisherNode> balloon_status_publisher,
-          std::shared_ptr<BalloonStatusSubscriberNode> balloon_status_subscriber,
           std::shared_ptr<QuadStateWarden> quad_state_warden,
           const std::vector<std::string>& quad_names,
           Eigen::Vector3d& balloon_position,
