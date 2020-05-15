@@ -25,7 +25,8 @@ namespace game_engine {
       .popped = msg.popped.data,
       .popper = msg.popper.data,
       .pop_time = msg.pop_time.data,
-      .position = position
+      .position = position,
+      .set_start = msg.set_start.data
     };
     *(this->balloon_status_) = balloon_status;
   }

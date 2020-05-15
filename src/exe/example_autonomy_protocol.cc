@@ -21,6 +21,7 @@
 #include "quad_state_subscriber_node.h"
 
 #include "balloon_status_subscriber_node.h"
+#include "balloon_status_publisher_node.h"
 #include "balloon_status.h"
 
 #include "trajectory_dispatcher.h"
@@ -201,6 +202,40 @@ int main(int argc, char** argv) {
     = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
   auto blue_balloon_status_subscriber_node 
     = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["blue"], blue_balloon_status);
+
+  // start balloon status clock
+  auto red_balloon_status_publisher_node 
+    = std::make_shared<BalloonStatusPublisherNode>(balloon_status_topics["red"]);
+  auto blue_balloon_status_publisher_node 
+    = std::make_shared<BalloonStatusPublisherNode>(balloon_status_topics["blue"]);
+
+  std::cout << red_balloon_status_subscriber_node->balloon_status_->set_start << std::endl;
+  std::cout << blue_balloon_status_subscriber_node->balloon_status_->set_start << std::endl;
+
+  BalloonStatus setStartStatusRed = *(red_balloon_status_subscriber_node->balloon_status_);
+  setStartStatusRed.set_start = true;
+
+  BalloonStatus setStartStatusBlue = *(blue_balloon_status_subscriber_node->balloon_status_);
+  setStartStatusBlue.set_start = true;
+
+  std::cout << "Publishing set_start=true." << std::endl;
+
+
+  red_balloon_status_publisher_node->Publish(setStartStatusRed);
+  blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
+
+  // wait for start signal to publish before continuing
+  while (!red_balloon_status_subscriber_node->balloon_status_->set_start &&
+         !blue_balloon_status_subscriber_node->balloon_status_->set_start) {
+    red_balloon_status_publisher_node->Publish(setStartStatusRed);
+    blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
+    ros::spinOnce();
+  }
+  //ros::spinOnce();
+  //ros::spinOnce();
+
+  std::cout << red_balloon_status_subscriber_node->balloon_status_->set_start << std::endl;
+  std::cout << blue_balloon_status_subscriber_node->balloon_status_->set_start << std::endl;
 
   // The AutonomyProtocol
   std::shared_ptr<AutonomyProtocol> autonomy_protocol 

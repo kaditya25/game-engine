@@ -29,6 +29,7 @@ namespace game_engine {
     msg.pos.x = balloon_status.position.x();
     msg.pos.y = balloon_status.position.y();
     msg.pos.z = balloon_status.position.z();
+    msg.set_start.data = balloon_status.set_start;
 
     this->publisher_guard_->Publish(msg);
   }

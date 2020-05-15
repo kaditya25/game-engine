@@ -28,13 +28,17 @@ namespace game_engine {
     double balloon_pop_time = -1.0; // initial (invalid) time before popping
     std::string quad_popper = "null";
 
+    bool set_start;
     bool started = false; // set to true after SAP starts
 
     // Main loop
     while(true == this->ok_) {
       // read start time from existing balloon_status
-      if (balloon_status_subscriber->balloon_status_->set_start){
+      set_start = balloon_status_subscriber->balloon_status_->set_start;
+      std::cout << set_start << std::endl;
+      if (set_start && !started){
         // resets clock after SAP starts
+        std::cout << "Starting clock." << std::endl;
         start_time = std::chrono::system_clock::now();
         started = true;
       }
@@ -73,13 +77,15 @@ namespace game_engine {
         .popper = quad_popper,
         .pop_time = balloon_pop_time,
         .position = balloon_position,
-        .set_start = false // only set to true from SAP
+        .set_start = set_start // only set to true from AP
       };
 
       balloon_status_publisher->Publish(balloon_status);
 
       // 50 Hz
-      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+      //std::this_thread::sleep_for(std::chrono::milliseconds(20));
+      // 10 Hz
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
   }
 

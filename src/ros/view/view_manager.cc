@@ -123,10 +123,14 @@ namespace game_engine {
         // set balloon view position to balloon status position
         if (view.options_.r == 1.0f){ // red balloon
           if (!view.balloon_position_.isApprox(red_balloon_status_subscriber_node->balloon_status_->position)) {
+            std::cout << "Updating red balloon position in visualization." << std::endl;
+            std::cout << "Old: " << view.balloon_position_ << std::endl;
+            std::cout << "New: " << red_balloon_status_subscriber_node->balloon_status_->position << std::endl;
             view.balloon_position_ = red_balloon_status_subscriber_node->balloon_status_->position;
           }
         } else if (view.options_.b == 1.0f) { // blue balloon{
           if (!view.balloon_position_.isApprox(blue_balloon_status_subscriber_node->balloon_status_->position)) {
+            std::cout << "Updating blue balloon position in visualization." << std::endl;
             view.balloon_position_ = blue_balloon_status_subscriber_node->balloon_status_->position;
           }
         }
