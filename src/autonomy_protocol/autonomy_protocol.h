@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <Eigen/Dense>
+#include <stdexcept> // std::out_of_range
 
 #include "trajectory_warden.h"
 #include "game_snapshot.h"
