@@ -308,7 +308,7 @@ int main(int argc, char** argv) {
 
   auto red_balloon_status = std::make_shared<BalloonStatus>();
   auto blue_balloon_status = std::make_shared<BalloonStatus>();
-
+ 
   auto red_balloon_status_subscriber_node 
     = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
   auto blue_balloon_status_subscriber_node 

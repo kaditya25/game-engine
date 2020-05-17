@@ -222,6 +222,7 @@ int main(int argc, char** argv) {
 
   BalloonStatus setStartStatusRed = *(red_balloon_status_subscriber_node->balloon_status_);
   setStartStatusRed.set_start = true;
+  //std::cout << setStartStatusRed.position << std::endl;
 
   BalloonStatus setStartStatusBlue = *(blue_balloon_status_subscriber_node->balloon_status_);
   setStartStatusBlue.set_start = true;
@@ -235,12 +236,14 @@ int main(int argc, char** argv) {
   GoalStatus setStartStatusGoal = *(goal_status_subscriber_node->goal_status_);
   setStartStatusGoal.set_start = true;
 
-  // wait for 1 sec
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  // wait for .5 sec
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   red_balloon_status_publisher_node->Publish(setStartStatusRed);
   blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
   goal_status_publisher_node->Publish(setStartStatusGoal);
+
+  //std::cout << red_balloon_status_subscriber_node->balloon_status_->position << std::endl;
 
   // The AutonomyProtocol
   std::shared_ptr<AutonomyProtocol> autonomy_protocol 

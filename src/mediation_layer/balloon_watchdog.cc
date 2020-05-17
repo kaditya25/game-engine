@@ -21,7 +21,6 @@ namespace game_engine {
     bool balloon_popped = false;
     std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
       
-
     std::uniform_int_distribution<int> distribution(0.0, max_move_time);
     double move_time = distribution(gen);
 
@@ -30,6 +29,8 @@ namespace game_engine {
 
     bool set_start;
     bool started = false; // set to true after SAP starts
+
+    Eigen::Vector3d position = balloon_position;
 
     // Main loop
     while(true == this->ok_) {
@@ -48,7 +49,7 @@ namespace game_engine {
 
         // move balloon if enough time has passed
         if (elapsed_sec >= move_time) {
-          balloon_position = new_balloon_position;
+          position = new_balloon_position;
         }
       
         for(const std::string& quad_name: quad_names) {
@@ -56,7 +57,7 @@ namespace game_engine {
           quad_state_warden->Read(quad_name, quad_state);
 
           const Eigen::Vector3d quad_pos = quad_state.Position();
-          const double distance_to_balloon = (quad_pos - balloon_position).norm();
+          const double distance_to_balloon = (quad_pos - position).norm();
 
           if(this->options_.pop_distance >= distance_to_balloon) {
             if(false == balloon_popped) {
@@ -74,7 +75,7 @@ namespace game_engine {
         .popped = balloon_popped,
         .popper = quad_popper,
         .pop_time = balloon_pop_time,
-        .position = balloon_position,
+        .position = position,
         .set_start = set_start // only set to true from SAP
       };
 

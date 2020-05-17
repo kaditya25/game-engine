@@ -236,7 +236,7 @@ int main(int argc, char** argv) {
   setStartStatusGoal.set_start = true;
 
   // wait for 1 sec
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   red_balloon_status_publisher_node->Publish(setStartStatusRed);
   blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
