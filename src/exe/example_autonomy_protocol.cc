@@ -24,6 +24,10 @@
 #include "balloon_status_publisher_node.h"
 #include "balloon_status.h"
 
+#include "goal_status_publisher_node.h"
+#include "goal_status_subscriber_node.h"
+#include "goal_status.h"
+
 #include "trajectory_dispatcher.h"
 
 #include "quad_state_guard.h"
@@ -195,6 +199,13 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
+  // Goal Status
+  std::map<std::string, std::string> goal_status_topics;
+  if(false == nh.getParam("goal_status_topics", goal_status_topics)) {
+    std::cerr << "Required parameter not found on server: goal_status_topics" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
   auto red_balloon_status = std::make_shared<BalloonStatus>();
   auto blue_balloon_status = std::make_shared<BalloonStatus>();
 
@@ -215,11 +226,21 @@ int main(int argc, char** argv) {
   BalloonStatus setStartStatusBlue = *(blue_balloon_status_subscriber_node->balloon_status_);
   setStartStatusBlue.set_start = true;
 
+  // goal status
+  auto goal_status = std::make_shared<GoalStatus>();
+  auto goal_status_subscriber_node 
+    = std::make_shared<GoalStatusSubscriberNode>(goal_status_topics["home"], goal_status);
+  auto goal_status_publisher_node 
+    = std::make_shared<GoalStatusPublisherNode>(goal_status_topics["home"]);
+  GoalStatus setStartStatusGoal = *(goal_status_subscriber_node->goal_status_);
+  setStartStatusGoal.set_start = true;
+
   // wait for 1 sec
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   red_balloon_status_publisher_node->Publish(setStartStatusRed);
   blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
+  goal_status_publisher_node->Publish(setStartStatusGoal);
 
   // The AutonomyProtocol
   std::shared_ptr<AutonomyProtocol> autonomy_protocol 

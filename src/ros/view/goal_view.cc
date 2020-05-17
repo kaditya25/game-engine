@@ -1,21 +1,21 @@
-// Author: Tucker Haydon
+// Author: Dan LaChapelle
 
-#include "balloon_view.h"
+#include "goal_view.h"
 
 namespace game_engine {
-  std::vector<visualization_msgs::Marker> BalloonView::Markers() const {
+  std::vector<visualization_msgs::Marker> GoalView::Markers() const {
     visualization_msgs::Marker marker;
     marker.header.frame_id = this->options_.frame_id;
     marker.id = this->unique_id_;
-    marker.ns = "Balloon";
+    marker.ns = "Goal";
     marker.type = visualization_msgs::Marker::MESH_RESOURCE;
     marker.action = visualization_msgs::Marker::ADD;
-    marker.scale.x = 1.0f;
-    marker.scale.y = 1.0f;
-    marker.scale.z = 1.0f;
-    marker.pose.position.x = this->balloon_position_.x();
-    marker.pose.position.y= this->balloon_position_.y();
-    marker.pose.position.z = this->balloon_position_.z() - 0.5; // Heuristic offset
+    marker.scale.x = 0.05f;
+    marker.scale.y = 0.05f;
+    marker.scale.z = 0.05f;
+    marker.pose.position.x = this->goal_position_.x();
+    marker.pose.position.y= this->goal_position_.y();
+    marker.pose.position.z = this->goal_position_.z(); // Heuristic offset
     marker.color.r = this->options_.r;
     marker.color.g = this->options_.g;
     marker.color.b = this->options_.b;
@@ -26,7 +26,7 @@ namespace game_engine {
     return {marker};
   }
 
-  uint32_t BalloonView::GenerateUniqueId() {
+  uint32_t GoalView::GenerateUniqueId() {
     static std::mutex mtx;
     static uint32_t id = 0;
 

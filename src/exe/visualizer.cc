@@ -33,6 +33,7 @@
 #include "view_manager.h"
 
 #include "balloon_watchdog.h"
+#include "goal_watchdog.h"
 #include "quad_state_watchdog.h"
 
 using namespace game_engine;
@@ -161,6 +162,12 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
+  std::string goal_mesh_file_path;
+  if(false == nh.getParam("goal_mesh_file_path", goal_mesh_file_path)) {
+    std::cerr << "Required parameter not found on server: goal_mesh_file_path" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
   std::vector<double> blue_balloon_position_vector;
   if(false == nh.getParam("blue_balloon_position", blue_balloon_position_vector)) {
     std::cerr << "Required parameter not found on server: blue_balloon_position" << std::endl;
@@ -181,6 +188,16 @@ int main(int argc, char** argv) {
       red_balloon_position_vector[1],
       red_balloon_position_vector[2]);
 
+  std::vector<double> goal_position_vector;
+  if(false == nh.getParam("goal_position", goal_position_vector)) {
+    std::cerr << "Required parameter not found on server: red_balloon_position" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+  const Eigen::Vector3d goal_position(
+      goal_position_vector[0],
+      goal_position_vector[1],
+      goal_position_vector[2]);
+
   std::map<std::string, std::string> team_assignments;
   if(false == nh.getParam("team_assignments", team_assignments)) {
     std::cerr << "Required parameter not found on server: team_assignments" << std::endl;
@@ -200,6 +217,10 @@ int main(int argc, char** argv) {
   balloon_view_options.balloons.push_back(std::make_pair("red", red_balloon_position));
   balloon_view_options.balloons.push_back(std::make_pair("blue", blue_balloon_position));
 
+  ViewManager::GoalViewOptions goal_view_options;
+  goal_view_options.goal_mesh_file_path = goal_mesh_file_path;
+  goal_view_options.goals.push_back(std::make_pair("home", goal_position));
+
   ViewManager::EnvironmentViewOptions environment_view_options;
   environment_view_options.map = map;
 
@@ -209,6 +230,7 @@ int main(int argc, char** argv) {
         view_manager->Run(
             quad_view_options,
             balloon_view_options,
+            goal_view_options,
             environment_view_options);
       });
 

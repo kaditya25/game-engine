@@ -6,6 +6,7 @@ namespace game_engine {
   void ViewManager::Run(
       const QuadViewOptions quad_view_options,
       const BalloonViewOptions balloon_view_options,
+      const GoalViewOptions goal_view_options,
       const EnvironmentViewOptions environment_view_options) {
 
     std::thread quad_publisher_thread(
@@ -18,6 +19,11 @@ namespace game_engine {
           RunBalloonPublisher(balloon_view_options);
         });
 
+    std::thread goal_publisher_thread(
+        [&]() {
+          RunGoalPublisher(goal_view_options);
+        });
+
     std::thread environment_publisher_thread(
         [&]() {
           RunEnvironmentPublisher(environment_view_options);
@@ -25,6 +31,7 @@ namespace game_engine {
 
     quad_publisher_thread.join();
     balloon_publisher_thread.join();
+    goal_publisher_thread.join();
     environment_publisher_thread.join();
   }
 
@@ -152,6 +159,64 @@ namespace game_engine {
             }
           } else {
             balloons_publisher->Publish(marker);
+          }
+          
+        }
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+  }
+
+  void ViewManager::RunGoalPublisher(
+      const GoalViewOptions goal_view_options) {
+
+    // Setup
+    std::vector<GoalView> goal_views;
+
+    for(auto p: goal_view_options.goals) {
+      if(p.first == "home") {
+        GoalView::Options view_options;
+        view_options.mesh_resource = goal_view_options.goal_mesh_file_path;
+        view_options.r = 1.0f;
+        view_options.g = 0.0f;
+        view_options.b = 1.0f;
+        goal_views.emplace_back(p.second, view_options);
+      }
+    }
+
+    auto goal_publisher = std::make_shared<MarkerPublisherNode>("goal");
+
+    ros::NodeHandle nh("/game_engine/");
+    std::map<std::string, std::string> goal_status_topics;
+    if(false == nh.getParam("goal_status_topics", goal_status_topics)) {
+      std::cerr << "Required parameter not found on server: goal_status_topics" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    auto goal_status = std::make_shared<GoalStatus>();
+
+    auto goal_status_subscriber_node 
+      = std::make_shared<GoalStatusSubscriberNode>(goal_status_topics["home"], goal_status);
+
+    // Main loop
+    // 50 Hz. 
+    while(this->ok_) {
+      for(auto& view: goal_views) {
+        for(visualization_msgs::Marker& marker: view.Markers()) {
+          bool active = goal_status_subscriber_node->goal_status_->active;
+          bool reached = goal_status_subscriber_node->goal_status_->reached;
+          if (active){
+            marker.color.a = 1.0;
+            marker.action = visualization_msgs::Marker::ADD;
+            goal_publisher->Publish(marker);
+          } else if (reached && !active) {
+            marker.color.a = 0.3;
+            //marker.action = visualization_msgs::Marker::ADD;
+            marker.action = visualization_msgs::Marker::DELETE;
+            goal_publisher->Publish(marker);
+          } else {
+            marker.action = visualization_msgs::Marker::DELETE;
+            goal_publisher->Publish(marker);
           }
           
         }

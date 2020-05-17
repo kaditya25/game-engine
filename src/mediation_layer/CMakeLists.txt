@@ -16,6 +16,7 @@ set(SOURCE_FILES
   trajectory_warden.cc
   trajectory_vetter.cc
   balloon_watchdog.cc
+  goal_watchdog.cc
   quad_state_watchdog.cc
   quad_state_watchdog_status.cc
 )

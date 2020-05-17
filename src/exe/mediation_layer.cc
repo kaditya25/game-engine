@@ -34,6 +34,7 @@
 
 #include "balloon_watchdog.h"
 #include "quad_state_watchdog.h"
+#include "goal_watchdog.h"
 
 using namespace game_engine;
 
@@ -205,6 +206,16 @@ int main(int argc, char** argv) {
       red_balloon_position_vector[1],
       red_balloon_position_vector[2]);
 
+  std::vector<double> goal_position_vector;
+  if(false == nh.getParam("goal_position", goal_position_vector)) {
+    std::cerr << "Required parameter not found on server: goal_position" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+  Eigen::Vector3d goal_position(
+      goal_position_vector[0],
+      goal_position_vector[1],
+      goal_position_vector[2]);
+
   bool move_blue;
   if(false == nh.getParam("move_blue", move_blue)) {
     std::cerr << "Required parameter not found on server: move_blue" << std::endl;
@@ -266,6 +277,13 @@ int main(int argc, char** argv) {
   std::map<std::string, std::string> balloon_status_topics;
   if(false == nh.getParam("balloon_status_topics", balloon_status_topics)) {
     std::cerr << "Required parameter not found on server: balloon_status_topics" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  // Goal Status
+  std::map<std::string, std::string> goal_status_topics;
+  if(false == nh.getParam("goal_status_topics", goal_status_topics)) {
+    std::cerr << "Required parameter not found on server: goal_status_topics" << std::endl;
     std::exit(EXIT_FAILURE);
   }
 
@@ -351,6 +369,25 @@ int main(int argc, char** argv) {
       }
   );
 
+  auto goal_status = std::make_shared<GoalStatus>();
+
+  auto goal_status_subscriber_node 
+    = std::make_shared<GoalStatusSubscriberNode>(goal_status_topics["home"], goal_status);
+  auto goal_status_publisher_node 
+    = std::make_shared<GoalStatusPublisherNode>(goal_status_topics["home"]);
+  auto goal_watchdog = std::make_shared<GoalWatchdog>();
+
+  std::thread goal_watchdog_thread(
+      [&]() {
+        goal_watchdog->Run(
+            goal_status_publisher_node,
+            goal_status_subscriber_node,
+            quad_state_warden,
+            quad_names,
+            goal_position);
+      }
+  );
+
   // Mediation layer thread. The mediation layer runs continuously, forward
   // integrating the proposed trajectories and modifying them so that the
   // various agents will not crash into each other. Data is asynchonously read
@@ -388,6 +425,7 @@ int main(int argc, char** argv) {
         quad_state_warden->Stop();
         red_balloon_watchdog->Stop();
         blue_balloon_watchdog->Stop();
+        goal_watchdog->Stop();
         quad_state_watchdog->Stop();
       });
 
@@ -402,6 +440,7 @@ int main(int argc, char** argv) {
   mediation_layer_thread.join();
   red_balloon_watchdog_thread.join();
   blue_balloon_watchdog_thread.join();
+  goal_watchdog_thread.join();
   quad_state_watchdog_thread.join();
 
   return EXIT_SUCCESS;

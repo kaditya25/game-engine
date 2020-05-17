@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 set(SOURCE_FILES
   balloon_view.cc
+  goal_view.cc
   polyhedron_view.cc
   view_manager.cc
   plane3d_view.cc

@@ -15,10 +15,14 @@
 
 #include "quad_view.h"
 #include "balloon_view.h"
+#include "goal_view.h"
 
 #include <ros/ros.h>
 #include "balloon_status.h"
 #include "balloon_status_subscriber_node.h"
+
+#include "goal_status.h"
+#include "goal_status_subscriber_node.h"
 
 namespace game_engine {
   // The ViewManager is a convenience object that encapsulates all of the code
@@ -32,6 +36,13 @@ namespace game_engine {
         std::vector<std::pair<std::string, Eigen::Vector3d>> balloons;
 
         BalloonViewOptions() {}
+      }; 
+
+      struct GoalViewOptions {
+        std::string goal_mesh_file_path;
+        std::vector<std::pair<std::string, Eigen::Vector3d>> goals;
+
+        GoalViewOptions() {}
       }; 
 
       struct QuadViewOptions {
@@ -58,6 +69,7 @@ namespace game_engine {
       void Run(
           const QuadViewOptions quad_view_options,
           const BalloonViewOptions balloon_view_options,
+          const GoalViewOptions goal_view_options,
           const EnvironmentViewOptions environment_view_options);
 
       void Stop();
@@ -67,6 +79,8 @@ namespace game_engine {
           const QuadViewOptions quad_view_options);
       void RunBalloonPublisher(
           const BalloonViewOptions balloon_view_options);
+      void RunGoalPublisher(
+          const GoalViewOptions goal_view_options);
       void RunEnvironmentPublisher(
           const EnvironmentViewOptions environment_view_options);
 
