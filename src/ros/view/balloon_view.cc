@@ -10,9 +10,9 @@ namespace game_engine {
     marker.ns = "Balloon";
     marker.type = visualization_msgs::Marker::MESH_RESOURCE;
     marker.action = visualization_msgs::Marker::ADD;
-    marker.scale.x = 1.0f;
-    marker.scale.y = 1.0f;
-    marker.scale.z = 1.0f;
+    marker.scale.x = 12.0f;
+    marker.scale.y = 12.0f;
+    marker.scale.z = 12.0f;
     marker.pose.position.x = this->balloon_position_.x();
     marker.pose.position.y= this->balloon_position_.y();
     marker.pose.position.z = this->balloon_position_.z() - 0.5; // Heuristic offset
