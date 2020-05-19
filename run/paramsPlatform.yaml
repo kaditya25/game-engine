@@ -10,9 +10,6 @@ proposed_trajectory_topics:
 updated_trajectory_topics:
   "phoenix": "/phoenix/updated_trajectory"
 
-visualization_trajectory_topics:
-  "phoenix": "/phoenix/visualization_trajectory"
-
 balloon_status_topics:
   "red": "/game_engine/red_balloon_status"
   "blue": "/game_engine/blue_balloon_status"
@@ -20,28 +17,28 @@ balloon_status_topics:
 goal_status_topics:
   "home": "/game_engine/home_status"
 
-map_file_path: "/home/aerial-robotics/Libraries/game-engine/resources/maps/forest.map"
+map_file_path: "/home/aerial-robotics/Libraries/game-engine/resources/maps/platform.map"
 quad_mesh_file_path: "file:///home/aerial-robotics/Libraries/game-engine/resources/meshes/quad.stl"
 balloon_mesh_file_path: "file:///home/aerial-robotics/Libraries/game-engine/resources/meshes/balloon.stl"
 goal_mesh_file_path: "file:///home/aerial-robotics/Libraries/game-engine/resources/meshes/torus.stl"
 
-blue_balloon_position: [-16.0, 19.0, -4.0]
-red_balloon_position:  [-26.0, 15.0, 0.0]
+blue_balloon_position: [-20.0, 19.0, 1.0]
+red_balloon_position:  [-25.0, 16.0, -2.0]
 
 move_blue: true
-blue_balloon_position_new: [-21.0, 19.0, -4.0]
-blue_balloon_max_move_time: 60.0
+blue_balloon_position_new: [-20.0, 19.0, 1.0]
+blue_balloon_max_move_time: 0.5
 
 move_red: true
-red_balloon_position_new:  [-24.0, 20.0, -3.5]
-red_balloon_max_move_time: 60.0
+red_balloon_position_new:  [-25.0, 16.0, -2.0]
+red_balloon_max_move_time: 0.5
 
 use_seed: true
-seed: 0
+seed: 57
 
-goal_position: [-12.0, 14.0, -4.0]
+goal_position: [-13.0, 18.0, -4.0]
 
 initial_quad_positions:
-  "phoenix": "-12.0 14.0 -4.0"
+  "phoenix": "-13.0 18.0 -4.0"
 
 
