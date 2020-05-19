@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -21,6 +19,8 @@
 #include "quad_state_subscriber_node.h"
 #include "quad_state_dispatcher.h"
 #include "quad_state_guard.h"
+
+#include "trajectory_visualizer_node.h"
 
 #include "view_manager.h"
 
@@ -56,6 +56,18 @@ int main(int argc, char** argv) {
 
   const YAML::Node node = YAML::LoadFile(map_file_path);
   const Map3D map = node["map"].as<Map3D>();
+
+  std::map<std::string, std::string> updated_trajectory_topics;
+  if(false == nh.getParam("updated_trajectory_topics", updated_trajectory_topics)) {
+    std::cerr << "Required parameter not found on server: updated_trajectory_topics" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  std::map<std::string, std::string> visualization_trajectory_topics;
+  if(false == nh.getParam("visualization_trajectory_topics", visualization_trajectory_topics)) {
+    std::cerr << "Required parameter not found on server: visualization_trajectory_topics" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
 
   std::map<std::string, std::string> quad_state_topics;
   if(false == nh.getParam("quad_state_topics", quad_state_topics)) {
@@ -139,7 +151,21 @@ int main(int argc, char** argv) {
   auto quad_state_dispatcher = std::make_shared<QuadStateDispatcher>();
   std::thread quad_state_dispatcher_thread([&](){
       quad_state_dispatcher->Run(quad_state_warden, quad_state_guards);
-      });
+    });
+
+  // Set up trajectory visualization
+  std::unordered_map<std::string, std::shared_ptr<TrajectoryVisualizerNode>> trajectory_visualizers;
+  for(const auto& kv: updated_trajectory_topics) {
+    const std::string& quad_name = kv.first;  
+    const std::string& topic_subscribe = kv.second;
+    for(const auto& kp: visualization_trajectory_topics) {
+      if(kp.first == quad_name) {
+        const std::string& topic_publish = kp.second;
+        trajectory_visualizers[quad_name] =
+          std::make_shared<TrajectoryVisualizerNode>(topic_subscribe, topic_publish);
+      }
+    }
+  }
 
   // Views
   std::string quad_mesh_file_path;
@@ -216,6 +242,13 @@ int main(int argc, char** argv) {
   ViewManager::EnvironmentViewOptions environment_view_options;
   environment_view_options.map = map;
 
+  ViewManager::TrajectoryViewOptions trajectory_view_options;
+  for(const auto& kv: team_assignments) {
+    const std::string& quad_name = kv.first;
+    trajectory_view_options.trajectories.
+      push_back(std::make_pair<>(quad_name, trajectory_visualizers[quad_name]));
+  }
+
   auto view_manager = std::make_shared<ViewManager>();
   std::thread view_manager_thread(
       [&]() {
@@ -223,7 +256,8 @@ int main(int argc, char** argv) {
             quad_view_options,
             balloon_view_options,
             goal_view_options,
-            environment_view_options);
+            environment_view_options,
+            trajectory_view_options);
       });
 
 

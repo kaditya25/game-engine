@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #pragma once
 
 #include <memory>
@@ -23,6 +21,8 @@
 
 #include "goal_status.h"
 #include "goal_status_subscriber_node.h"
+
+#include "trajectory_visualizer_node.h"
 
 namespace game_engine {
   // The ViewManager is a convenience object that encapsulates all of the code
@@ -64,13 +64,20 @@ namespace game_engine {
         EnvironmentViewOptions() {}
       };
 
+    struct TrajectoryViewOptions {
+      std::vector<std::pair<std::string,
+                            std::shared_ptr<TrajectoryVisualizerNode>>> trajectories;
+      
+      TrajectoryViewOptions() {}
+    }; 
+
       ViewManager() {};
 
-      void Run(
-          const QuadViewOptions quad_view_options,
-          const BalloonViewOptions balloon_view_options,
-          const GoalViewOptions goal_view_options,
-          const EnvironmentViewOptions environment_view_options);
+      void Run(const QuadViewOptions quad_view_options,
+               const BalloonViewOptions balloon_view_options,
+               const GoalViewOptions goal_view_options,
+               const EnvironmentViewOptions environment_view_options,
+               const TrajectoryViewOptions trajectory_view_options);
 
       void Stop();
 
@@ -83,7 +90,9 @@ namespace game_engine {
           const GoalViewOptions goal_view_options);
       void RunEnvironmentPublisher(
           const EnvironmentViewOptions environment_view_options);
-
+      void RunTrajectoryPublisher(
+          const TrajectoryViewOptions trajectory_view_options);
+    
       volatile std::atomic<bool> ok_{true};
   };
 }

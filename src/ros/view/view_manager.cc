@@ -1,13 +1,11 @@
-// Author: Tucker Haydon
-
 #include "view_manager.h"
 
 namespace game_engine {
-  void ViewManager::Run(
-      const QuadViewOptions quad_view_options,
-      const BalloonViewOptions balloon_view_options,
-      const GoalViewOptions goal_view_options,
-      const EnvironmentViewOptions environment_view_options) {
+  void ViewManager::Run(const QuadViewOptions quad_view_options,
+                        const BalloonViewOptions balloon_view_options,
+                        const GoalViewOptions goal_view_options,
+                        const EnvironmentViewOptions environment_view_options,
+                        const TrajectoryViewOptions trajectory_view_options) {
 
     std::thread quad_publisher_thread(
         [&]() {
@@ -29,10 +27,16 @@ namespace game_engine {
           RunEnvironmentPublisher(environment_view_options);
         });
 
+    std::thread trajectory_publisher_thread(
+        [&]() {
+          RunTrajectoryPublisher(trajectory_view_options);
+        });
+
     quad_publisher_thread.join();
     balloon_publisher_thread.join();
     goal_publisher_thread.join();
     environment_publisher_thread.join();
+    trajectory_publisher_thread.join();
   }
 
   void ViewManager::RunQuadPublisher(
@@ -266,6 +270,17 @@ namespace game_engine {
     }
   }
 
+  void ViewManager::
+  RunTrajectoryPublisher(const TrajectoryViewOptions trajectory_view_options) {
+    
+    // Main loop @ 5 Hz to keep up with quickly-updating trajectories
+    while(this->ok_) {
+      for(const auto& tr : trajectory_view_options.trajectories) {
+        tr.second->Publish();
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+  }
 
   void ViewManager::Stop() {
     this->ok_ = false;
