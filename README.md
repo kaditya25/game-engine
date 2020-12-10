@@ -24,6 +24,66 @@ cd game-engine
 git submodule update --init --recursive
 ```
 
+### Building Dependencies
+
+If you are cloning or using the repository for the first time, you will need to build the dependencies (the submodules). They all use the same build process, included below.
+
+<p>
+<details>
+
+#### Eigen
+
+```bash
+cd src/dependencies/P4/dependencies/eigen
+mkdir build 
+cd build
+cmake ..
+make -j4
+```
+
+#### osqp
+
+```bash
+cd src/dependencies/P4/dependencies/osqp
+mkdir build 
+cd build
+cmake ..
+make -j4
+```
+
+#### p4
+
+```bash
+cd src/dependencies/P4/
+mkdir build 
+cd build
+cmake ..
+make -j4
+```
+
+#### mg-msgs
+
+```bash
+cd src/dependencies/mg-msgs/
+mkdir build 
+cd build
+cmake ..
+make -j4
+```
+
+#### yaml-cpp
+
+```bash
+cd src/dependencies/yaml-cpp/
+mkdir build 
+cd build
+cmake ..
+make -j4
+```
+
+</details>
+</p>
+
 ### Build
 ```bash
 mkdir build 
