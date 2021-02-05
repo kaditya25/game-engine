@@ -50,6 +50,7 @@ mkdir build
 cd build
 cmake ..
 make -j4
+sudo make install
 ```
 
 #### p4
@@ -92,6 +93,7 @@ Note: you may need to tell CMake where to find the OSQP dependency.
 <p>
 <details>
 To do this, open the cmake curses interface:
+
 ```bash
 mkdir build # (if the build directory hasn't already been created)
 cd build
