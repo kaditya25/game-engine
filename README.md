@@ -19,7 +19,7 @@ ROS's RVIZ program.
 
 ### Clone
 ```bash
-git clone git@gitlab.com:radionavlab/machine-games/game-engine.git
+git clone https://gitlab.com/todd.humphreys/game-engine-student.git
 cd game-engine
 git submodule update --init --recursive
 ```
