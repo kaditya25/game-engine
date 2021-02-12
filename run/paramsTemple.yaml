@@ -10,6 +10,9 @@ proposed_trajectory_topics:
 updated_trajectory_topics:
   "phoenix": "/phoenix/updated_trajectory"
 
+visualization_trajectory_topics:
+  "phoenix": "/phoenix/visualization_trajectory"
+
 balloon_status_topics:
   "red": "/game_engine/red_balloon_status"
   "blue": "/game_engine/blue_balloon_status"
