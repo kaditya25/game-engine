@@ -15,6 +15,7 @@
 #include "trajectory_warden.h"
 #include "trajectory.h"
 #include "trajectory_publisher_node.h"
+#include "trajectory_client.h"
 
 #include "quad_state_warden.h"
 #include "quad_state.h"
@@ -38,7 +39,7 @@
 
 using namespace game_engine;
 
-namespace { 
+namespace {
   // Signal variable and handler
   volatile std::sig_atomic_t kill_program;
   void SigIntHandler(int sig) {
@@ -122,9 +123,9 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
   std::map<
-    std::string, 
-    Eigen::Vector3d, 
-    std::less<std::string>, 
+    std::string,
+    Eigen::Vector3d,
+    std::less<std::string>,
     Eigen::aligned_allocator<std::pair<const std::string, Eigen::Vector3d>>> initial_quad_positions;
   for(const auto& kv: initial_quad_positions_string) {
     const std::string& quad_name = kv.first;
@@ -138,12 +139,12 @@ int main(int argc, char** argv) {
   // Initialize the QuadStateWarden
   auto quad_state_warden  = std::make_shared<QuadStateWarden>();
   for(const auto& kv: quad_state_topics) {
-    const std::string& quad_name = kv.first;  
+    const std::string& quad_name = kv.first;
     quad_state_warden->Register(quad_name);
 
     const Eigen::Vector3d initial_quad_pos = initial_quad_positions[quad_name];
     const QuadState initial_quad_state(
-        (Eigen::Matrix<double, 13, 1>() << 
+        (Eigen::Matrix<double, 13, 1>() <<
           initial_quad_pos(0), initial_quad_pos(1), initial_quad_pos(2),
           0,0,0,
           1,0,0,0,
@@ -154,12 +155,12 @@ int main(int argc, char** argv) {
   // Pipe ROS data into the QuadStateWarden
   std::vector<std::shared_ptr<QuadStateSubscriberNode>> quad_state_subscribers;
   for(const auto& kv: quad_state_topics) {
-    const std::string& quad_name = kv.first;  
-    const std::string& topic = kv.second;  
+    const std::string& quad_name = kv.first;
+    const std::string& topic = kv.second;
     quad_state_subscribers.push_back(
         std::make_shared<QuadStateSubscriberNode>(
-            topic, 
-            quad_name, 
+            topic,
+            quad_name,
             quad_state_warden));
   }
 
@@ -171,25 +172,25 @@ int main(int argc, char** argv) {
       GameSnapshot::Options());
 
   // Initialize the TrajectoryPublishers
-  std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> proposed_trajectory_publishers;
+  // Initialize the TrajectoryPublishers
+  std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients;
   for(const auto& kv: proposed_trajectory_topics) {
-    const std::string& quad_name = kv.first;  
-    const std::string& topic = kv.second;  
-    proposed_trajectory_publishers[quad_name] = 
-      std::make_shared<TrajectoryPublisherNode>(topic);
+    const std::string& quad_name = kv.first;
+    const std::string& topic = kv.second;
+    proposed_trajectory_clients[quad_name] =
+      std::make_shared<TrajectoryClientNode>(topic);
   }
-
   // Initialize the TrajectoryWarden
   auto trajectory_warden_out = std::make_shared<TrajectoryWarden>();
   for(const auto& kv: proposed_trajectory_topics) {
-    const std::string& quad_name = kv.first;  
+    const std::string& quad_name = kv.first;
     trajectory_warden_out->Register(quad_name);
   }
 
   // Pipe the TrajectoryWarden to the TrajectoryPublishers
   auto trajectory_dispatcher = std::make_shared<TrajectoryDispatcher>();
   std::thread trajectory_dispatcher_thread([&](){
-      trajectory_dispatcher->Run(trajectory_warden_out, proposed_trajectory_publishers);
+      trajectory_dispatcher->Run(trajectory_warden_out, proposed_trajectory_clients);
       });
 
   // Balloon Status
@@ -209,15 +210,15 @@ int main(int argc, char** argv) {
   auto red_balloon_status = std::make_shared<BalloonStatus>();
   auto blue_balloon_status = std::make_shared<BalloonStatus>();
 
-  auto red_balloon_status_subscriber_node 
+  auto red_balloon_status_subscriber_node
     = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
-  auto blue_balloon_status_subscriber_node 
+  auto blue_balloon_status_subscriber_node
     = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["blue"], blue_balloon_status);
 
   // start balloon status clock
-  auto red_balloon_status_publisher_node 
+  auto red_balloon_status_publisher_node
     = std::make_shared<BalloonStatusPublisherNode>(balloon_status_topics["red"]);
-  auto blue_balloon_status_publisher_node 
+  auto blue_balloon_status_publisher_node
     = std::make_shared<BalloonStatusPublisherNode>(balloon_status_topics["blue"]);
 
   BalloonStatus setStartStatusRed = *(red_balloon_status_subscriber_node->balloon_status_);
@@ -228,9 +229,9 @@ int main(int argc, char** argv) {
 
   // goal status
   auto goal_status = std::make_shared<GoalStatus>();
-  auto goal_status_subscriber_node 
+  auto goal_status_subscriber_node
     = std::make_shared<GoalStatusSubscriberNode>(goal_status_topics["home"], goal_status);
-  auto goal_status_publisher_node 
+  auto goal_status_publisher_node
     = std::make_shared<GoalStatusPublisherNode>(goal_status_topics["home"]);
   GoalStatus setStartStatusGoal = *(goal_status_subscriber_node->goal_status_);
   setStartStatusGoal.set_start = true;
@@ -243,9 +244,9 @@ int main(int argc, char** argv) {
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
   // The AutonomyProtocol
-  std::shared_ptr<AutonomyProtocol> autonomy_protocol 
+  std::shared_ptr<AutonomyProtocol> autonomy_protocol
     = std::make_shared<StudentAutonomyProtocol>(
-      blue_quad_names, 
+      blue_quad_names,
       red_quad_names,
       game_snapshot,
       trajectory_warden_out,
@@ -260,7 +261,7 @@ int main(int argc, char** argv) {
       [&]() {
         autonomy_protocol->Run();
       });
-  
+
   // Start the kill thread
   std::thread kill_thread(
       [&]() {
