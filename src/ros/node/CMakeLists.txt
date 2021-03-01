@@ -16,11 +16,13 @@ set(SOURCE_FILES
   quad_state_publisher_node.cc
   trajectory_publisher_node.cc
   trajectory_subscriber_node.cc
-  trajectory_visualizer_node.cc       
+  trajectory_visualizer_node.cc
   balloon_status_publisher_node.cc
   balloon_status_subscriber_node.cc
   goal_status_publisher_node.cc
   goal_status_subscriber_node.cc
+  trajectory_client.cc
+  trajectory_server.cc
 )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})
@@ -47,6 +49,6 @@ set_target_properties(${TARGET} PROPERTIES
   CXX_EXTENSIONS NO
 )
 
-target_compile_options(${TARGET} PRIVATE 
+target_compile_options(${TARGET} PRIVATE
   -Wfatal-errors
 )
