@@ -7,9 +7,7 @@
 #include <functional>
 
 #include "trajectory.h"
-//#include "publisher_guard.h"
 #include "mg_msgs/PVAYT.h"
-
 
 namespace game_engine {
   class TrajectoryClientNode {
@@ -17,7 +15,7 @@ namespace game_engine {
       // ROS node handle
       ros::NodeHandle node_handle_;
 
-      // ROS subscriebr
+      // ROS subscriber
       ros::ServiceClient client_;
 
     public:

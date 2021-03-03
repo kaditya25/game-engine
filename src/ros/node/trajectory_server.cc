@@ -6,9 +6,11 @@ namespace game_engine {
   TrajectoryServerNode::TrajectoryServerNode(
       const std::string& topic,
       const std::string& key,
-      std::shared_ptr<TrajectoryWarden> warden) {
+      std::shared_ptr<TrajectoryWarden> warden,
+      std::shared_ptr<bool> success_flag) {
         this->key_ = key;
         this->warden_ = warden;
+        this->success_flag_ = success_flag;
         this->node_handle_ = ros::NodeHandle("/game_engine/");
         this->service_ = node_handle_.advertiseService(
           topic,
@@ -40,8 +42,13 @@ namespace game_engine {
   }
 
   this->warden_->Write(this->key_, Trajectory(data));
-  res.accept = true;
-  ROS_INFO("Response sent back: %d", res.accept);
+  if(*success_flag_ == true) {
+    res.accept = true;
+    ROS_INFO("Response sent back: %d", res.accept);
+  } else {
+    res.accept = false;
+    ROS_INFO("Response sent back: %d", res.accept);
+  }
   return true;
   }
 }

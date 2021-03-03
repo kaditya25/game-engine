@@ -17,6 +17,8 @@ namespace game_engine {
       // Trajectory warden manages multi-threaded access to trajectory data
       std::shared_ptr<TrajectoryWarden> warden_;
 
+      std::shared_ptr<bool> success_flag_;
+
       // ROS node handle
       ros::NodeHandle node_handle_;
 
@@ -25,6 +27,7 @@ namespace game_engine {
 
       // Key to be passed on to the trajectory warden
       std::string key_;
+
 
       //static TrajectoryServerNode self;
       // Subscriber callback. Extracts ROS data and converts it into a
@@ -38,6 +41,7 @@ namespace game_engine {
       TrajectoryServerNode(
           const std::string& topic,
           const std::string& key,
-          std::shared_ptr<TrajectoryWarden> warden);
+          std::shared_ptr<TrajectoryWarden> warden,
+          std::shared_ptr<bool> flag);
   };
 }

@@ -13,7 +13,8 @@ namespace game_engine {
        std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
        std::shared_ptr<TrajectoryWarden> trajectory_warden_out,
        std::shared_ptr<QuadStateWarden> quad_state_warden,
-       std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status) {
+       std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
+       std::shared_ptr<bool> success_flag) {
 
       TrajectoryVetter trajectory_vetter;
       while(true == this->ok_) {
@@ -27,7 +28,7 @@ namespace game_engine {
 
           static const Eigen::Vector3d freeze_quad_position = current_quad_state.Position();
 
-          const double current_time = 
+          const double current_time =
             std::chrono::duration_cast<std::chrono::duration<double>>(
               std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -58,9 +59,10 @@ namespace game_engine {
               quad_state_warden,
               key)) {
           std::cerr << "Trajectory did not pass vetting. Rejected." << std::endl;
+          success_flag = false;
+          std::cerr << "Value for flag: " << success_flag << std::endl;
           continue;
         }
-
         trajectory_warden_out->Write(key, trajectory);
       }
   }
@@ -70,9 +72,10 @@ namespace game_engine {
       std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
       std::shared_ptr<TrajectoryWarden> trajectory_warden_out,
       std::shared_ptr<QuadStateWarden> quad_state_warden,
-      std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status) {
+      std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
+      std::shared_ptr<bool> flag) {
 
-    // Local thread pool 
+    // Local thread pool
     std::vector<std::thread> thread_pool;
 
     // Get all registered trajectories
@@ -83,7 +86,7 @@ namespace game_engine {
       thread_pool.push_back(
           std::move(
             std::thread([&](){
-              this->TransferData(key, map, trajectory_warden_in, trajectory_warden_out, quad_state_warden, quad_state_watchdog_status);
+              this->TransferData(key, map, trajectory_warden_in, trajectory_warden_out, quad_state_warden, quad_state_watchdog_status, flag);
               })));
     }
 
@@ -104,11 +107,10 @@ namespace game_engine {
     // Wait for thread pool to terminate
     for(std::thread& t: thread_pool) {
       t.join();
-    } 
+    }
   }
 
   void MediationLayer::Stop() {
     this->ok_ = false;
   }
 }
-

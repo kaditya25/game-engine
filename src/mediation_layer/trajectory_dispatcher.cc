@@ -50,6 +50,7 @@ namespace game_engine {
     while(this->ok_) {
       Trajectory trajectory;
       if(true == warden->Await(key, trajectory)) {
+        std::cout << "TrajectoryDispatcher: Publishing trajectory onto client: " << trajectory.Size() << std::endl;
         client->Publish(trajectory);
       }
     }

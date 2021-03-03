@@ -10,7 +10,7 @@ namespace game_engine {
       return false;
     }
 
-    this->map_[key] = std::make_shared<TrajectoryContainer>(Trajectory()); 
+    this->map_[key] = std::make_shared<TrajectoryContainer>(Trajectory());
     keys_.insert(key);
     return true;
   }
@@ -22,7 +22,7 @@ namespace game_engine {
       return false;
     }
     std::shared_ptr<TrajectoryContainer>& container = this->map_[key];
-    
+
     { // Lock mutex for modification
       std::lock_guard<std::mutex> lock(container->access_mtx_);
       container->trajectory_ = trajectory;
@@ -50,7 +50,7 @@ namespace game_engine {
     }
     return true;
   }
-  
+
   bool TrajectoryWarden::Await(const std::string& key, Trajectory& trajectory) {
     if(this->map_.end() == this->map_.find(key)) {
       std::cerr << "TrajectoryWarden::Await -- Key does not exist." << std::endl;
@@ -60,7 +60,7 @@ namespace game_engine {
 
     { // Lock mutex, wait cv, copy, set cv, release mutex
       std::unique_lock<std::mutex> lock(container->modified_mtx_);
-      container->modified_cv_.wait(lock, [&]{  
+      container->modified_cv_.wait(lock, [&]{
           return (true == container->modified_) || (false == this->ok_); });
       { // Lock mutex for copy
         // Termination
@@ -76,7 +76,7 @@ namespace game_engine {
     }
     return true;
   }
-  
+
   const std::set<std::string>& TrajectoryWarden::Keys() const {
     return this->keys_;
   }
@@ -91,4 +91,3 @@ namespace game_engine {
     }
   }
 }
-

@@ -19,8 +19,8 @@
 
 #include "trajectory_warden.h"
 #include "trajectory.h"
-#include "trajectory_subscriber_node.h"
-#include "trajectory_publisher_node.h"
+//#include "trajectory_subscriber_node.h"
+//#include "trajectory_publisher_node.h"
 #include "trajectory_dispatcher.h"
 
 #include "quad_state_warden.h"
@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
   }
 
   // For every quad, subscribe to its corresponding proposed_trajectory topic
+  auto success_flag = std::make_shared<bool>();
   std::unordered_map<std::string, std::shared_ptr<TrajectoryServerNode>> trajectory_servers;
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
@@ -97,7 +98,8 @@ int main(int argc, char** argv) {
         std::make_shared<TrajectoryServerNode>(
             topic,
             quad_name,
-            trajectory_warden_in);
+            trajectory_warden_in,
+            success_flag);
   }
 
   // Initialize publishers
@@ -391,6 +393,7 @@ int main(int argc, char** argv) {
       }
   );
 
+
   // Mediation layer thread. The mediation layer runs continuously, forward
   // integrating the proposed trajectories and modifying them so that the
   // various agents will not crash into each other. Data is asynchonously read
@@ -403,7 +406,8 @@ int main(int argc, char** argv) {
             trajectory_warden_in,
             trajectory_warden_out,
             quad_state_warden,
-            quad_state_watchdog_status);
+            quad_state_watchdog_status,
+            success_flag);
       });
 
   // Kill program thread. This thread sleeps for a second and then checks if the
