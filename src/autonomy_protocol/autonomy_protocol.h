@@ -29,8 +29,8 @@ namespace game_engine {
   //
   // UpdateTrajectories is called every 200ms (5 hz). A protocol may either
   // specify a new trajectory, overwriting the last trajectory, or return an
-  // empty trajectory, implicitly instructing the quadcopter to continue following 
-  // the previous trajectory or holding the final position. 
+  // empty trajectory, implicitly instructing the quadcopter to continue following
+  // the previous trajectory or holding the final position.
   //
   // Warning: sometimes ROS drops the first couple of messages in a stream. It's
   // busy connecting publishers and subscribers together and does not properly
@@ -50,6 +50,7 @@ namespace game_engine {
       Eigen::Vector3d blue_balloon_position_;
       std::shared_ptr<BalloonStatus> red_balloon_status_;
       std::shared_ptr<BalloonStatus> blue_balloon_status_;
+      bool trajectory_flag_;
 
       volatile std::atomic<bool> ok_{true};
 
@@ -65,7 +66,8 @@ namespace game_engine {
           const Eigen::Vector3d& red_balloon_position,
           const Eigen::Vector3d& blue_balloon_position,
           const std::shared_ptr<BalloonStatus> red_balloon_status,
-          const std::shared_ptr<BalloonStatus> blue_balloon_status)
+          const std::shared_ptr<BalloonStatus> blue_balloon_status,
+          const bool& trajectory_flag)
         : friendly_names_(friendly_names),
           enemy_names_(enemy_names),
           snapshot_(snapshot),
@@ -74,7 +76,8 @@ namespace game_engine {
           red_balloon_position_(red_balloon_position),
           blue_balloon_position_(blue_balloon_position),
           red_balloon_status_(red_balloon_status),
-          blue_balloon_status_(blue_balloon_status) {}
+          blue_balloon_status_(blue_balloon_status),
+          trajectory_flag_(trajectory_flag) {}
 
 
       virtual ~AutonomyProtocol(){}
@@ -98,7 +101,7 @@ namespace game_engine {
     while(this->ok_) {
 
       // Request trajectory updates from the virtual function
-      const std::unordered_map<std::string, Trajectory> trajectories = 
+      const std::unordered_map<std::string, Trajectory> trajectories =
         this->UpdateTrajectories();
 
 
@@ -107,7 +110,7 @@ namespace game_engine {
       for(const std::string& quad_name: this->friendly_names_) {
         try {
           const Trajectory trajectory = trajectories.at(quad_name);
-          this->trajectory_warden_out_->Write(quad_name, trajectory);
+          this->trajectory_flag_ = this->trajectory_warden_out_->Write(quad_name, trajectory);
         } catch(const std::out_of_range& e) {
           continue;
         }
