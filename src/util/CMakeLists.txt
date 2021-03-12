@@ -4,6 +4,7 @@ set(TARGET lib_util)
 
 set(SOURCE_FILES
   timer.cc
+  semaphore.cc
 )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})
@@ -18,6 +19,6 @@ set_target_properties(${TARGET} PROPERTIES
   CXX_EXTENSIONS NO
 )
 
-target_compile_options(${TARGET} PRIVATE 
+target_compile_options(${TARGET} PRIVATE
   -Wfatal-errors
 )
