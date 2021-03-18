@@ -38,7 +38,6 @@ namespace game_engine {
     StatusCode status = this->GetLastTrajectoryStatus(blocking);
 
     if(status != Success) {
-        std::cerr << "TrajectoryWarden::Write -- Trajectory rejected. Error Code: " << status << std::endl;
         return status;
     }
     return Success;
