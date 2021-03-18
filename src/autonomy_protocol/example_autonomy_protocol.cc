@@ -7,11 +7,10 @@
 namespace game_engine {
   std::unordered_map<std::string, Trajectory>
   ExampleAutonomyProtocol::UpdateTrajectories() {
-    std::cout << "Submitted status: " << this->submittedStatus_ << std::endl;
-
-    //  ------------ Error Codes --------------
+    //  ========== Error Codes ==========
     // If any of these are not successful (1), the trajectory will be rejected.
     // Success = 1,
+    // ------- Error codes for TrajectoryVetter -------
     // NotEnoughTrajectoryPoints = 2
     // StartPointFarFromCurrentPosition = 3
     // PointExceedsMapBounds = 4
@@ -22,15 +21,22 @@ namespace game_engine {
     // MeanValueExceedsMaxAcceleration = 9
     // TimestampsNotIncreasing = 10
     // TimeBetweenPointsExceedsMaxTime = 11
+    //------- Error codes for TrajectoryWarden -------
     // KeyAlreadyExists = 12
     // KeyDoesNotExist = 13
     // ThreadStopped = 14
+    //------- Error codes for TrajectoryClient -------
     // FailedToCallService = 15
+
+    std::cout << "Submitted status: " << this->submittedStatus_ << std::endl;
+    if (this->submittedStatus_ > 1) {
+      std::cout << "Replan trajectory!" << std::endl;
+    }
 
     // Always use the chrono::system_clock for time. Trajectories require time
     // points measured in floating point seconds from the unix epoch.
     const std::chrono::milliseconds T_chrono = std::chrono::seconds(30);
-    const std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(50);
+    const std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(15);
     const double dt =
       std::chrono::duration_cast<std::chrono::duration<double>>(dt_chrono).count();
 
