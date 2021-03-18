@@ -11,7 +11,6 @@
 
 #include "trajectory_warden.h"
 #include "trajectory_client.h"
-#include "trajectory_server.h"
 
 namespace game_engine {
   // Class that manages data transfer between a TrajectoryWarden and a

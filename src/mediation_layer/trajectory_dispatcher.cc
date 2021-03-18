@@ -49,12 +49,15 @@ namespace game_engine {
       std::shared_ptr<TrajectoryClientNode> client) {
     while(this->ok_) {
       Trajectory trajectory;
-      if(true == warden->Await(key, trajectory)) {
-        std::cout << "TrajectoryDispatcher: Publishing trajectory onto client: " << trajectory.Size() << std::endl;
-        client->Publish(trajectory);
+      if(Success == warden->Await(key, trajectory)) {
+        // Check the value of the response from the client-server
+        unsigned int status = client->Call(trajectory);
+        // Update the status in the warden
+        warden->SetTrajectoryStatus(status);
       }
     }
   }
+
 
   void TrajectoryDispatcher::Stop() {
     this->ok_ = false;
