@@ -13,8 +13,7 @@ namespace game_engine {
        std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
        std::shared_ptr<TrajectoryWarden> trajectory_warden_out,
        std::shared_ptr<QuadStateWarden> quad_state_warden,
-       std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-       std::shared_ptr<bool> success_flag) {
+       std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status) {
 
       TrajectoryVetter trajectory_vetter;
       while(true == this->ok_) {
@@ -53,16 +52,14 @@ namespace game_engine {
         // Determine if trajectory has violated constraints
         Trajectory trajectory;
         trajectory_warden_in->Await(key, trajectory);
-        if(false == trajectory_vetter.Vet(
-              trajectory,
-              map,
-              quad_state_warden,
-              key)) {
-          std::cerr << "Trajectory did not pass vetting. Rejected." << std::endl;
-          success_flag = false;
-          std::cerr << "Value for flag: " << success_flag << std::endl;
+        StatusCode vetter = trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
+        trajectory_warden_in->SetTrajectoryStatus(vetter);
+        if (vetter != Success) {
+          std::cerr << "Trajectory did not pass vetting. Rejected with error code: " << vetter << std::endl;
           continue;
         }
+
+        trajectory_warden_out->SetTrajectoryStatus(vetter);
         trajectory_warden_out->Write(key, trajectory);
       }
   }
@@ -72,8 +69,7 @@ namespace game_engine {
       std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
       std::shared_ptr<TrajectoryWarden> trajectory_warden_out,
       std::shared_ptr<QuadStateWarden> quad_state_warden,
-      std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-      std::shared_ptr<bool> flag) {
+      std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status) {
 
     // Local thread pool
     std::vector<std::thread> thread_pool;
@@ -86,7 +82,7 @@ namespace game_engine {
       thread_pool.push_back(
           std::move(
             std::thread([&](){
-              this->TransferData(key, map, trajectory_warden_in, trajectory_warden_out, quad_state_warden, quad_state_watchdog_status, flag);
+              this->TransferData(key, map, trajectory_warden_in, trajectory_warden_out, quad_state_warden, quad_state_watchdog_status);
               })));
     }
 

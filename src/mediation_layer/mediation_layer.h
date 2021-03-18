@@ -33,8 +33,7 @@ namespace game_engine {
           std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
           std::shared_ptr<TrajectoryWarden> trajectory_warden_out,
           std::shared_ptr<QuadStateWarden> quad_state_warden,
-          std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-          std::shared_ptr<bool> success_flag);
+          std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status);
 
     public:
       MediationLayer() {}
@@ -47,8 +46,7 @@ namespace game_engine {
           std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
           std::shared_ptr<TrajectoryWarden> trajectory_warden_out,
           std::shared_ptr<QuadStateWarden> state_warden,
-          std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-          std::shared_ptr<bool> success_flag);
+          std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status);
 
       // Stop this thread and all sub-threads
       void Stop();
