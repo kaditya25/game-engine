@@ -29,9 +29,15 @@ namespace game_engine {
     //------- Error codes for TrajectoryClient -------
     // FailedToCallService = 15
 
-    // The first time this is called it will be initialized to zero.
+    // The first time this->submittedStatus_ is called it will be initialized
+    // to zero. Check the value of this to see which error you may be receiving
+    // upon submitting a trajectory.
     std::cout << "Submitted status: " << this->submittedStatus_ << std::endl;
-    if (this->submittedStatus_ > 1) {
+    // For example: We can check the AP initially submits a trajectory with a
+    // time that exceeds the max time between points. We can apply a
+    // conditional statement that checks the error associated with the
+    // submitted trajectory and fix it from there.
+    if (this->submittedStatus_ == TimeBetweenPointsExceedsMaxTime) {
       std::cout << "Replanning trajectory. Shortening time between trajectory points." << std::endl;
       dt_chrono = dt_chrono - std::chrono::milliseconds(15);
     }
