@@ -19,9 +19,8 @@
 
 #include "trajectory_warden.h"
 #include "trajectory.h"
-//#include "trajectory_subscriber_node.h"
-//#include "trajectory_publisher_node.h"
 #include "trajectory_dispatcher.h"
+#include "trajectory_server.h"
 
 #include "quad_state_warden.h"
 #include "quad_state.h"
@@ -36,8 +35,7 @@
 #include "quad_state_watchdog.h"
 #include "goal_watchdog.h"
 
-#include "trajectory_client.h"
-#include "trajectory_server.h"
+
 
 using namespace game_engine;
 
@@ -89,7 +87,6 @@ int main(int argc, char** argv) {
   }
 
   // For every quad, subscribe to its corresponding proposed_trajectory topic
-  auto success_flag = std::make_shared<bool>();
   std::unordered_map<std::string, std::shared_ptr<TrajectoryServerNode>> trajectory_servers;
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
@@ -98,8 +95,7 @@ int main(int argc, char** argv) {
         std::make_shared<TrajectoryServerNode>(
             topic,
             quad_name,
-            trajectory_warden_in,
-            success_flag);
+            trajectory_warden_in);
   }
 
   // Initialize publishers
@@ -110,7 +106,7 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  // For every quad, publish to its corresponding updated_trajectory topic
+  //For every quad, publish to its corresponding updated_trajectory topic
   std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> trajectory_clients;
   for(const auto& kv: updated_trajectory_topics) {
     const std::string& quad_name = kv.first;
@@ -406,8 +402,7 @@ int main(int argc, char** argv) {
             trajectory_warden_in,
             trajectory_warden_out,
             quad_state_warden,
-            quad_state_watchdog_status,
-            success_flag);
+            quad_state_watchdog_status);
       });
 
   // Kill program thread. This thread sleeps for a second and then checks if the

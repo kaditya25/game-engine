@@ -14,7 +14,6 @@
 
 #include "trajectory_warden.h"
 #include "trajectory.h"
-//#include "trajectory_publisher_node.h"
 #include "trajectory_client.h"
 
 #include "quad_state_warden.h"
@@ -243,7 +242,6 @@ int main(int argc, char** argv) {
   blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
-  bool trajectory_flag;
   // The AutonomyProtocol
   std::shared_ptr<AutonomyProtocol> autonomy_protocol
     = std::make_shared<StudentAutonomyProtocol>(
@@ -255,8 +253,7 @@ int main(int argc, char** argv) {
       red_balloon_position,
       blue_balloon_position,
       red_balloon_status,
-      blue_balloon_status,
-      trajectory_flag);
+      blue_balloon_status);
 
   // Start the autonomy protocol
   std::thread ap_thread(

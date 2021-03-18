@@ -14,7 +14,7 @@
 
 #include "trajectory_warden.h"
 #include "trajectory.h"
-//#include "trajectory_publisher_node.h"
+#include "trajectory_client.h"
 
 #include "quad_state_warden.h"
 #include "quad_state.h"
@@ -36,8 +36,7 @@
 #include "example_autonomy_protocol.h"
 #include "map3d.h"
 
-#include "trajectory_server.h"
-#include "trajectory_client.h"
+
 
 using namespace game_engine;
 
@@ -173,16 +172,7 @@ int main(int argc, char** argv) {
       quad_state_warden,
       GameSnapshot::Options());
 
-  // // Initialize the TrajectoryPublishers
-  // std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> proposed_trajectory_publishers;
-  // for(const auto& kv: proposed_trajectory_topics) {
-  //   const std::string& quad_name = kv.first;
-  //   const std::string& topic = kv.second;
-  //   proposed_trajectory_publishers[quad_name] =
-  //     std::make_shared<TrajectoryPublisherNode>(topic);
-  // }
-
-  // Initialize the TrajectoryPublishers
+  // Initialize the Trajectory Client
   std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients;
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
@@ -198,7 +188,7 @@ int main(int argc, char** argv) {
     trajectory_warden_out->Register(quad_name);
   }
 
-  // Pipe the TrajectoryWarden to the TrajectoryPublishers
+  // Pipe the TrajectoryWarden to the TrajectoryClients
   auto trajectory_dispatcher = std::make_shared<TrajectoryDispatcher>();
   std::thread trajectory_dispatcher_thread([&](){
       trajectory_dispatcher->Run(trajectory_warden_out, proposed_trajectory_clients);
@@ -256,7 +246,6 @@ int main(int argc, char** argv) {
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
   //std::cout << red_balloon_status_subscriber_node->balloon_status_->position << std::endl;
-  bool trajectory_flag;
   // The AutonomyProtocol
   std::shared_ptr<AutonomyProtocol> autonomy_protocol
     = std::make_shared<ExampleAutonomyProtocol>(
@@ -268,8 +257,7 @@ int main(int argc, char** argv) {
       red_balloon_position,
       blue_balloon_position,
       red_balloon_status,
-      blue_balloon_status,
-      trajectory_flag);
+      blue_balloon_status);
 
   // Start the autonomy protocol
   std::thread ap_thread(
