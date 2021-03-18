@@ -9,7 +9,6 @@ namespace game_engine {
       std::shared_ptr<TrajectoryWarden> warden) {
         this->key_ = key;
         this->warden_ = warden;
-        // this->success_flag_ = success_flag;
         this->node_handle_ = ros::NodeHandle("/game_engine/");
         this->service_ = node_handle_.advertiseService(
           topic,
@@ -40,14 +39,13 @@ namespace game_engine {
     data.push_back(local_instant);
   }
 
-  StatusCode status = this->warden_->Write(this->key_, Trajectory(data));
-  ROS_INFO("Status code: %d", status);
+  StatusCode status = this->warden_->Write(this->key_, Trajectory(data), true);
   if(status == Success) {
     res.status = Success;
-    ROS_INFO("Server: Trajectory accepted. Response server is sending back: %d ", res.status);
+    ROS_INFO("Server: ACCEPTED trajectory. Response: %d ", res.status);
   } else {
     res.status = status;
-    ROS_INFO("Server: Trajectory rejected. Response server is sending back: %d ", res.status);
+    ROS_INFO("Server: REJECTED trajectory. Response: %d ", res.status);
   }
   return true;
   }
