@@ -37,10 +37,7 @@ namespace game_engine {
 
     StatusCode status = this->GetLastTrajectoryStatus(blocking);
 
-    if(status != Success) {
-        return status;
-    }
-    return Success;
+    return status;
   }
 
   StatusCode TrajectoryWarden::Read(const std::string& key, Trajectory& trajectory) {
