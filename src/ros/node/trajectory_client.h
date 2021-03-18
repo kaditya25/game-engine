@@ -8,6 +8,7 @@
 
 #include "trajectory.h"
 #include "mg_msgs/PVAYT.h"
+#include "error_codes.h"
 
 namespace game_engine {
   class TrajectoryClientNode {
@@ -23,6 +24,7 @@ namespace game_engine {
       TrajectoryClientNode(const std::string& topic);
 
       // Publishes the message
-      void Publish(const Trajectory& trajectory);
+      unsigned int Call(const Trajectory& trajectory);
+
   };
 }

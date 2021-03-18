@@ -9,7 +9,7 @@
          = node_handle_.serviceClient<mg_msgs::PVAYT>(topic);
    }
 
-   void TrajectoryClientNode::Publish(const Trajectory& trajectory) {
+   unsigned int TrajectoryClientNode::Call(const Trajectory& trajectory) {
      mg_msgs::PVAYT srv;
      for(size_t idx = 0; idx < trajectory.Size(); ++idx) {
        mg_msgs::PVAYStamped instant;
@@ -31,11 +31,12 @@
 
        srv.request.trajectory.push_back(instant);
        }
-
        if (client_.call(srv)) {
-         ROS_INFO("Return value of service %d", srv.response.accept);
+         ROS_INFO("Successfully called service. Response: %d ", srv.response.status);
+         return srv.response.status;
        } else {
-         ROS_ERROR("Failed to call service");
+         ROS_ERROR("Failed to call service.");
+         return FailedToCallService;
        }
     }
  }
