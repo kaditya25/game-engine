@@ -14,8 +14,8 @@ set(SOURCE_FILES
   marker_publisher_node.cc
   quad_state_subscriber_node.cc
   quad_state_publisher_node.cc
-  trajectory_publisher_node.cc
-  trajectory_subscriber_node.cc
+  #trajectory_publisher_node.cc
+  #trajectory_subscriber_node.cc
   trajectory_visualizer_node.cc
   balloon_status_publisher_node.cc
   balloon_status_subscriber_node.cc
@@ -32,7 +32,7 @@ target_include_directories(${TARGET} PUBLIC
   ${catkin_INCLUDE_DIRS}
 )
 
-target_link_libraries(${TARGET} PUBLIC 
+target_link_libraries(${TARGET} PUBLIC
   lib_mediation_layer
   ${catkin_LIBRARIES}
 )
