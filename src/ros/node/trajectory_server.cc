@@ -40,13 +40,14 @@ namespace game_engine {
   }
 
   StatusCode status = this->warden_->Write(this->key_, Trajectory(data), true);
-  if(status == Success) {
-    res.status = Success;
-    ROS_INFO("Server: ACCEPTED trajectory. Response: %d ", res.status);
-  } else {
-    res.status = status;
-    ROS_INFO("Server: REJECTED trajectory. Response: %d ", res.status);
-  }
+  res.status = status;
+  // if(status == Success) {
+  //   res.status = Success;
+  //   ROS_INFO("Server: ACCEPTED trajectory. Response: %d ", res.status);
+  // } else {
+  //   res.status = status;
+  //   ROS_INFO("Server: REJECTED trajectory. Response: %d ", res.status);
+  // }
   return true;
   }
 }

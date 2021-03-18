@@ -32,7 +32,7 @@
        srv.request.trajectory.push_back(instant);
        }
        if (client_.call(srv)) {
-         ROS_INFO("Client: Successfully called service. Response: %d ", srv.response.status);
+         //ROS_INFO("Client: Successfully called service. Response: %d ", srv.response.status);
          return srv.response.status;
        } else {
          ROS_ERROR("Client: Failed to call service.");
