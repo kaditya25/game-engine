@@ -9,37 +9,37 @@ namespace game_engine {
   namespace{
     // Generates a multivariate gaussian sample.
     // mu:     mean
-    // sigma:  covariance 
+    // sigma:  covariance
     // gen:    random number generator
     Eigen::VectorXd mvnrnd(
-        const Eigen::VectorXd& mu, 
+        const Eigen::VectorXd& mu,
         const Eigen::MatrixXd& sigma,
         std::mt19937& gen) {
-      
+
       // Normal distribution
       std::normal_distribution<double> dist(0.0, 1.0);
-      
+
       // Find the square root of the covariance matrix. Based off of
       // diagonalization decomposition (VDV'). Multiply V sqrt(D).
       Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigen_solver(sigma);
-      Eigen::MatrixXd sqrt_sigma = eigen_solver.eigenvectors() * 
+      Eigen::MatrixXd sqrt_sigma = eigen_solver.eigenvectors() *
         eigen_solver.eigenvalues().cwiseSqrt().asDiagonal();
-    
+
       // Conjour a multivariate gaussian sample. Generate a vector with three
       // unit gaussian samples. Multiply it by the square root of the
       // covariance matrix and add it to the mean.
-      return mu + 
-        sqrt_sigma * 
+      return mu +
+        sqrt_sigma *
         Eigen::MatrixXd(mu.rows(), mu.cols()).unaryExpr(
           [&](auto x) { return dist(gen); });
-    } 
+    }
 
     // Samples a VonKarman PSD at a given spatial frequency, Omega
-    // Reference: 
+    // Reference:
     // https://en.wikipedia.org/wiki/Von_Kármán_wind_turbulence_model
     Eigen::VectorXd VonKarman(
-        const Eigen::VectorXd& Omega, 
-        const double& sigma_u, 
+        const Eigen::VectorXd& Omega,
+        const double& sigma_u,
         const double& L_u) {
       return
         (2 * L_u * std::pow(sigma_u, 2) / M_PI) *
@@ -92,7 +92,7 @@ namespace game_engine {
         out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
         p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
-        // Calculate white noise 
+        // Calculate white noise
         for(size_t idx = 0; idx < N; ++idx) {
           Eigen::VectorXd mu;
           mu.resize(N,1);
@@ -117,7 +117,7 @@ namespace game_engine {
         }
 
         // Free fft
-        fftw_free(in); 
+        fftw_free(in);
         fftw_free(out);
       }
 
@@ -125,7 +125,7 @@ namespace game_engine {
       const Eigen::VectorXcd A = S.array().sqrt();
 
       // Push white noise through amplitude filter
-      const Eigen::VectorXcd wind_freq 
+      const Eigen::VectorXcd wind_freq
         = A.cwiseProduct(noise_freq);
 
       // Take the inverse fourier transform
@@ -158,7 +158,7 @@ namespace game_engine {
         wind_complex_time = wind_complex_time/N;
 
         // Free fft
-        fftw_free(in); 
+        fftw_free(in);
         fftw_free(out);
       }
 
@@ -189,7 +189,7 @@ namespace game_engine {
       std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
       std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers,
       unsigned int seed) {
-    
+
     // System time
     const auto start_time = std::chrono::system_clock::now();
 
@@ -223,11 +223,11 @@ namespace game_engine {
         gen);
 
     const size_t wind_vector_size = x_wind_samples.first.size();
-    
+
     std::vector<WindInstance> wind_instances;
     for(size_t wind_idx = 0; wind_idx < wind_vector_size; ++wind_idx) {
       WindInstance wind_instance;
-      wind_instance.time = 
+      wind_instance.time =
         std::chrono::duration_cast<std::chrono::duration<double>>(start_time.time_since_epoch()).count()
         + x_wind_samples.first[wind_idx];
       wind_instance.acceleration = Eigen::Vector3d(
@@ -250,9 +250,9 @@ namespace game_engine {
 
     // Store the last location of the quads
     std::map<
-      std::string, 
-      Eigen::Matrix<double, 9, 1>, 
-      std::less<std::string>, 
+      std::string,
+      Eigen::Matrix<double, 9, 1>,
+      std::less<std::string>,
       Eigen::aligned_allocator<std::pair<const std::string, Eigen::Matrix<double, 9, 1>>>> pva_perturbed_register;
 
     // Initially, the quads are in their current state
@@ -283,6 +283,7 @@ namespace game_engine {
         // Read the most current trajectory
         Trajectory trajectory;
         trajectory_warden_in->Read(quad_name, trajectory);
+        trajectory_warden_in->SetTrajectoryStatus(1);
 
         // Require a trajectory to be published
         const size_t trajectory_size = trajectory.Size();
@@ -309,7 +310,7 @@ namespace game_engine {
 
         // Forward simulate
         // If simulation window extends beyond the provided trajectory window,
-        // hold the last position. 
+        // hold the last position.
         Eigen::Matrix<double, 9, 1> pva_intended = trajectory.PVA(trajectory_idx);
         Eigen::Matrix<double, 9, 1> pva_perturbed = pva_perturbed_register[quad_name];
         TimeSpan ts(0,1,0.5);
@@ -324,7 +325,7 @@ namespace game_engine {
             ts = TimeSpan(t0, tf, dt);
           } else {
             // Hold final position
-            pva_intended = (Eigen::Matrix<double, 9, 1>() << 
+            pva_intended = (Eigen::Matrix<double, 9, 1>() <<
               trajectory.Position(trajectory_size - 1),
               Eigen::Vector3d::Zero(),
               Eigen::Vector3d::Zero()).finished();
@@ -379,8 +380,8 @@ namespace game_engine {
           //| j_z |    | 0.00 0.00 0.00 |
           Eigen::Matrix<double, 9, 3> B2 = Eigen::Matrix<double, 9, 3>::Zero();
           B2.block(3,0,3,3) = Eigen::Matrix<double, 3, 3>::Identity();
-        
-          auto DynamicsFunction = [&](double time, 
+
+          auto DynamicsFunction = [&](double time,
                                       const Eigen::Matrix<double, 9, 1>& pva_intermediate) {
             WindInstance disturbance_instance;
             for(size_t wind_idx = 0; wind_idx < wind_vector_size; ++wind_idx) {
@@ -402,7 +403,7 @@ namespace game_engine {
                 }
                 return x;
               }).cast<double>();
-            
+
             Eigen::Vector3d input = disturbance_instance.acceleration;
             const Eigen::Matrix<double, 9, 1> t2 = B2 * input;
 
@@ -413,7 +414,7 @@ namespace game_engine {
 
           // The pva_perturbed is determined by forward integrating the dynamics
           // from the previous pva_perturbed
-          pva_perturbed = rk4.ForwardIntegrate(DynamicsFunction, pva_perturbed, ts);  
+          pva_perturbed = rk4.ForwardIntegrate(DynamicsFunction, pva_perturbed, ts);
 
           trajectory_idx++;
 
@@ -436,7 +437,7 @@ namespace game_engine {
               pva_perturbed(0), pva_perturbed(1), pva_perturbed(2),
               pva_perturbed(3), pva_perturbed(4), pva_perturbed(5),
               1,0,0,0,
-              0,0,0 
+              0,0,0
               ).finished());
         quad_state_publishers[quad_name]->Publish(quad_state);
       }
