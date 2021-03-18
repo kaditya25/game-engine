@@ -12,6 +12,7 @@
 #include <atomic>
 
 #include "trajectory.h"
+#include "error_codes.h"
 
 namespace game_engine {
   // TrajectoryWarden is a thread-safe abstraction around an unordered map
@@ -37,26 +38,33 @@ namespace game_engine {
       std::set<std::string> keys_;
       volatile std::atomic<bool> ok_{true};
 
+      volatile std::atomic<bool> statusUpdated_{false};
+      unsigned int trajectoryStatus_{1};
+
+      StatusCode GetLastTrajectoryStatus(bool blocking);
+
     public:
       // Constructor
       TrajectoryWarden(){};
 
       // Add a key-value pair to the map
-      bool Register(const std::string& key);
+      StatusCode Register(const std::string& key);
 
       // Write a new trajectory
-      bool Write(const std::string& key,  const Trajectory& trajectory);
+      StatusCode Write(const std::string& key,  const Trajectory& trajectory, bool blocking = false);
 
       // Copy the latest trajectory associated with a key
-      bool Read(const std::string& key, Trajectory& trajectory);
+      StatusCode Read(const std::string& key, Trajectory& trajectory);
 
       // Await a change to the trajectory associated with the key
-      bool Await(const std::string& key, Trajectory& trajectory);
+      StatusCode Await(const std::string& key, Trajectory& trajectory);
 
       // Getter
       const std::set<std::string>& Keys() const;
 
+      // Setter
+      void SetTrajectoryStatus(unsigned int status);
+
       void Stop();
   };
 }
-
