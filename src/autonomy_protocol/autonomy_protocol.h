@@ -16,6 +16,7 @@
 #include "game_snapshot.h"
 #include "map3d.h"
 #include "balloon_status.h"
+#include "error_codes.h"
 
 namespace game_engine {
   // The AutonomyProtocol interfaces with the GameSimulator and enables an
@@ -50,9 +51,9 @@ namespace game_engine {
       Eigen::Vector3d blue_balloon_position_;
       std::shared_ptr<BalloonStatus> red_balloon_status_;
       std::shared_ptr<BalloonStatus> blue_balloon_status_;
-      bool trajectory_flag_;
 
       volatile std::atomic<bool> ok_{true};
+      StatusCode submittedStatus_;
 
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -66,8 +67,7 @@ namespace game_engine {
           const Eigen::Vector3d& red_balloon_position,
           const Eigen::Vector3d& blue_balloon_position,
           const std::shared_ptr<BalloonStatus> red_balloon_status,
-          const std::shared_ptr<BalloonStatus> blue_balloon_status,
-          const bool& trajectory_flag)
+          const std::shared_ptr<BalloonStatus> blue_balloon_status)
         : friendly_names_(friendly_names),
           enemy_names_(enemy_names),
           snapshot_(snapshot),
@@ -76,8 +76,7 @@ namespace game_engine {
           red_balloon_position_(red_balloon_position),
           blue_balloon_position_(blue_balloon_position),
           red_balloon_status_(red_balloon_status),
-          blue_balloon_status_(blue_balloon_status),
-          trajectory_flag_(trajectory_flag) {}
+          blue_balloon_status_(blue_balloon_status) {}
 
 
       virtual ~AutonomyProtocol(){}
@@ -104,13 +103,13 @@ namespace game_engine {
       const std::unordered_map<std::string, Trajectory> trajectories =
         this->UpdateTrajectories();
 
-
       // For every friendly quad, push the intended trajectory to the trajectory
       // warden
       for(const std::string& quad_name: this->friendly_names_) {
         try {
           const Trajectory trajectory = trajectories.at(quad_name);
-          this->trajectory_flag_ = this->trajectory_warden_out_->Write(quad_name, trajectory);
+          StatusCode submittedStatus = this->trajectory_warden_out_->Write(quad_name, trajectory, true);
+          this->submittedStatus_ = submittedStatus;
         } catch(const std::out_of_range& e) {
           continue;
         }
