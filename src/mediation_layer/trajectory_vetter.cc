@@ -7,7 +7,7 @@
 
 namespace game_engine {
 
-  bool TrajectoryVetter::Vet(
+  StatusCode TrajectoryVetter::Vet(
       const Trajectory& trajectory,
       const Map3D& map,
       const std::shared_ptr<QuadStateWarden> quad_state_warden,
@@ -15,14 +15,14 @@ namespace game_engine {
       ) const {
 
     const size_t trajectory_size = trajectory.Size();
-    if(trajectory_size < 2) { 
+    if(trajectory_size < 2) {
       std::cerr << "Specified trajectory for "
-        << quad_name 
+        << quad_name
         << " has a size of "
-        << trajectory_size 
-        << ". Trajectories must have a size of 2 or greater. Rejecting." 
-        << std::endl;                                                                                                                                     
-      return false;
+        << trajectory_size
+        << ". Trajectories must have a size of 2 or greater. Rejecting."
+        << std::endl;
+      return NotEnoughTrajectoryPoints;
     }
 
     // Initial position constraints
@@ -33,51 +33,51 @@ namespace game_engine {
     const Eigen::Vector3d current_position = current_quad_state.Position();
     if(this->options_.max_distance_from_current_position
         < (initial_position - current_position).norm()) {
-      std::cerr 
+      std::cerr
         << "Specified trajectory start point ["
-        << initial_position.transpose() 
+        << initial_position.transpose()
         << "] deviates from the current quad position ["
         << current_position.transpose()
         << "] by more than the maximum distance of "
         << this->options_.max_distance_from_current_position
-        << " meters" 
+        << " meters"
         << std::endl;
-      return false;
+      return StartPointFarFromCurrentPosition;
     }
 
-    // Position constraints 
+    // Position constraints
     for(size_t idx = 0; idx < trajectory_size; ++idx) {
       const Eigen::Vector3d point = trajectory.Position(idx);
       if(false == map.Contains(point)) {
-        std::cerr 
-          << "Specified trajectory point [" 
-          << point.transpose() 
-          << "] exceeded map bounds" 
-          << std::endl; 
-        return false;
+        std::cerr
+          << "Specified trajectory point ["
+          << point.transpose()
+          << "] exceeded map bounds"
+          << std::endl;
+        return PointExceedsMapBounds;
       }
       if(false == map.IsFreeSpace(point)) {
-        std::cerr 
-          << "Specified trajectory point [" 
-          << point.transpose() 
-          << "] is contained within an obstacle" 
-          << std::endl; 
-        return false;
-      }   
+        std::cerr
+          << "Specified trajectory point ["
+          << point.transpose()
+          << "] is contained within an obstacle"
+          << std::endl;
+        return PointWithinObstacle;
+      }
     }
 
     // Velocity constraints
     for(size_t idx = 0; idx < trajectory_size; ++idx) {
       const Eigen::Vector3d vel = trajectory.Velocity(idx);
       if(this->options_.max_velocity_magnitude < vel.norm()) {
-        std::cerr 
-          << "Specified trajectory velocity" 
+        std::cerr
+          << "Specified trajectory velocity"
           << " exceeds maximum velocity constraint of "
-          << this->options_.max_velocity_magnitude 
-          << " m/s" 
-          << std::endl; 
-        return false;
-      }   
+          << this->options_.max_velocity_magnitude
+          << " m/s"
+          << std::endl;
+        return ExceedsMaxVelocity;
+      }
     }
 
     // Mean value theorem for velocity constraints
@@ -86,17 +86,17 @@ namespace game_engine {
       const Eigen::Vector3d next_pos = trajectory.Position(idx+1);
       const double current_time = trajectory.Time(idx);
       const double next_time = trajectory.Time(idx+1);
-      const double mean_value_velocity 
+      const double mean_value_velocity
         = ((next_pos - current_pos) / (next_time - current_time)).norm();
       if(this->options_.max_velocity_magnitude < mean_value_velocity) {
-        std::cerr 
-          << "Specified mean-value trajectory velocity " 
+        std::cerr
+          << "Specified mean-value trajectory velocity "
           << " exceeds maximum velocity constraint of "
-          << this->options_.max_velocity_magnitude 
-          << " m/s" 
-          << std::endl; 
-        return false;
-      }   
+          << this->options_.max_velocity_magnitude
+          << " m/s"
+          << std::endl;
+        return MeanValueExceedsMaxVelocity;
+      }
     }
 
 
@@ -104,16 +104,16 @@ namespace game_engine {
     for(size_t idx = 0; idx < trajectory_size; ++idx) {
       const Eigen::Vector3d acc = trajectory.Acceleration(idx);
       if(this->options_.max_acceleration_magnitude < acc.norm()) {
-        std::cerr 
-          << "Specified trajectory acceleration " 
+        std::cerr
+          << "Specified trajectory acceleration "
           << " exceeds maximum acceleration constraint of "
-          << this->options_.max_acceleration_magnitude 
-          << " m/s^2" 
-          << std::endl; 
+          << this->options_.max_acceleration_magnitude
+          << " m/s^2"
+          << std::endl;
         std::cout << acc.transpose() << std::endl;
         std::cout << acc.norm() << std::endl;
-        return false;
-      }   
+        return ExceedsMaxAcceleration;
+      }
     }
 
     // Mean value theorem for acceleration constraints
@@ -122,17 +122,17 @@ namespace game_engine {
       const Eigen::Vector3d next_vel = trajectory.Velocity(idx+1);
       const double current_time = trajectory.Time(idx);
       const double next_time = trajectory.Time(idx+1);
-      const double mean_value_acceleration 
+      const double mean_value_acceleration
         = ((next_vel - current_vel) / (next_time - current_time)).norm();
       if(this->options_.max_acceleration_magnitude < mean_value_acceleration) {
-        std::cerr 
-          << "Specified mean-value trajectory acceleration" 
+        std::cerr
+          << "Specified mean-value trajectory acceleration"
           << " exceeds maximum acceleration constraint of "
-          << this->options_.max_acceleration_magnitude 
-          << " m/s" 
-          << std::endl; 
-        return false;
-      }   
+          << this->options_.max_acceleration_magnitude
+          << " m/s"
+          << std::endl;
+        return MeanValueExceedsMaxAcceleration;
+      }
     }
 
     // Time constraints
@@ -145,20 +145,20 @@ namespace game_engine {
         std::cerr
           << "Trajectory timestamps must be monotonically increasing"
           << std::endl;
-        return false;
+        return TimestampsNotIncreasing;
       }
 
       if(this->options_.max_delta_t < delta_time) {
         std::cerr
           << "Time between adjacent trajectory samples"
           << " exceeds maximum time of "
-          << this->options_.max_delta_t 
+          << this->options_.max_delta_t
           << " seconds."
           << std::endl;
-        return false;
+        return TimeBetweenPointsExceedsMaxTime;
       }
     }
 
-    return true;
+    return Success;
   }
 }

@@ -16,6 +16,7 @@
 #include "game_snapshot.h"
 #include "map3d.h"
 #include "balloon_status.h"
+#include "error_codes.h"
 
 namespace game_engine {
   // The AutonomyProtocol interfaces with the GameSimulator and enables an
@@ -29,8 +30,8 @@ namespace game_engine {
   //
   // UpdateTrajectories is called every 200ms (5 hz). A protocol may either
   // specify a new trajectory, overwriting the last trajectory, or return an
-  // empty trajectory, implicitly instructing the quadcopter to continue following 
-  // the previous trajectory or holding the final position. 
+  // empty trajectory, implicitly instructing the quadcopter to continue following
+  // the previous trajectory or holding the final position.
   //
   // Warning: sometimes ROS drops the first couple of messages in a stream. It's
   // busy connecting publishers and subscribers together and does not properly
@@ -52,6 +53,7 @@ namespace game_engine {
       std::shared_ptr<BalloonStatus> blue_balloon_status_;
 
       volatile std::atomic<bool> ok_{true};
+      StatusCode submittedStatus_;
 
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -98,16 +100,16 @@ namespace game_engine {
     while(this->ok_) {
 
       // Request trajectory updates from the virtual function
-      const std::unordered_map<std::string, Trajectory> trajectories = 
+      const std::unordered_map<std::string, Trajectory> trajectories =
         this->UpdateTrajectories();
-
 
       // For every friendly quad, push the intended trajectory to the trajectory
       // warden
       for(const std::string& quad_name: this->friendly_names_) {
         try {
           const Trajectory trajectory = trajectories.at(quad_name);
-          this->trajectory_warden_out_->Write(quad_name, trajectory);
+          StatusCode submittedStatus = this->trajectory_warden_out_->Write(quad_name, trajectory, true);
+          this->submittedStatus_ = submittedStatus;
         } catch(const std::out_of_range& e) {
           continue;
         }

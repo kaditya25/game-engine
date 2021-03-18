@@ -10,7 +10,7 @@
 #include <map>
 
 #include "trajectory_warden.h"
-#include "trajectory_publisher_node.h"
+#include "trajectory_client.h"
 
 namespace game_engine {
   // Class that manages data transfer between a TrajectoryWarden and a
@@ -26,9 +26,9 @@ namespace game_engine {
       //
       // Note that values are intentionally copied
       void AwaitTrajectoryChange(
-          const std::string key, 
-          std::shared_ptr<TrajectoryWarden> warden, 
-          std::shared_ptr<TrajectoryPublisherNode> publisher);
+          const std::string key,
+          std::shared_ptr<TrajectoryWarden> warden,
+          std::shared_ptr<TrajectoryClientNode> client);
 
     public:
       // Start all the threads in the pool and wait for them to finish. This
@@ -38,10 +38,10 @@ namespace game_engine {
       //
       // Note that values are intentionally copied
       void Run(
-          std::shared_ptr<TrajectoryWarden> warden, 
+          std::shared_ptr<TrajectoryWarden> warden,
           std::unordered_map<
-            std::string, 
-            std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers);
+            std::string,
+            std::shared_ptr<TrajectoryClientNode>> trajectory_clients);
 
       // Stop this thread and all the sub-threads
       void Stop();

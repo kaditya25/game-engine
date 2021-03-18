@@ -18,6 +18,6 @@ set_target_properties(${TARGET} PROPERTIES
   CXX_EXTENSIONS NO
 )
 
-target_compile_options(${TARGET} PRIVATE 
+target_compile_options(${TARGET} PRIVATE
   -Wfatal-errors
 )

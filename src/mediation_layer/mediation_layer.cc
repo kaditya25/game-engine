@@ -27,7 +27,7 @@ namespace game_engine {
 
           static const Eigen::Vector3d freeze_quad_position = current_quad_state.Position();
 
-          const double current_time = 
+          const double current_time =
             std::chrono::duration_cast<std::chrono::duration<double>>(
               std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -52,15 +52,14 @@ namespace game_engine {
         // Determine if trajectory has violated constraints
         Trajectory trajectory;
         trajectory_warden_in->Await(key, trajectory);
-        if(false == trajectory_vetter.Vet(
-              trajectory,
-              map,
-              quad_state_warden,
-              key)) {
-          std::cerr << "Trajectory did not pass vetting. Rejected." << std::endl;
+        StatusCode vetter = trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
+        trajectory_warden_in->SetTrajectoryStatus(vetter);
+        if (vetter != Success) {
+          std::cerr << "Trajectory did not pass vetting. Rejected with error code: " << vetter << std::endl;
           continue;
         }
 
+        trajectory_warden_out->SetTrajectoryStatus(vetter);
         trajectory_warden_out->Write(key, trajectory);
       }
   }
@@ -72,7 +71,7 @@ namespace game_engine {
       std::shared_ptr<QuadStateWarden> quad_state_warden,
       std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status) {
 
-    // Local thread pool 
+    // Local thread pool
     std::vector<std::thread> thread_pool;
 
     // Get all registered trajectories
@@ -104,11 +103,10 @@ namespace game_engine {
     // Wait for thread pool to terminate
     for(std::thread& t: thread_pool) {
       t.join();
-    } 
+    }
   }
 
   void MediationLayer::Stop() {
     this->ok_ = false;
   }
 }
-

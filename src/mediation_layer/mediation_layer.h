@@ -11,13 +11,13 @@
 #include "quad_state_watchdog_status.h"
 #include "map3d.h"
 
-namespace game_engine { 
+namespace game_engine {
   // The mediation layer is a software layer that mediates user input to ensure
   // that the trajectories provided to quadcopters are safe. During the
   // machine games, two user are allowed to specify trajectories for
   // quadcopters. The user-provided trajectories may not be safe --- the
   // trajetories might cause quads to fly into each other, walls, or other
-  // obstacles in the environment. 
+  // obstacles in the environment.
   //
   // TODO: Modify trajectories to prevent quads from flying into obstacles
   // TODO: Vet trajectories and ensure that they do not exceed prescribed bounds

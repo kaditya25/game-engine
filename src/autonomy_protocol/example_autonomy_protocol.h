@@ -10,7 +10,7 @@ namespace game_engine {
   // quadcopter to fly in a circle of radius two at an altitude of one meter.
   //
   // The trajectory with be specified by parameterizing the circle with time.
-  // The quadcopter must complete a revolution every five seconds. 
+  // The quadcopter must complete a revolution every five seconds.
   class ExampleAutonomyProtocol : public AutonomyProtocol {
     private:
 
@@ -35,7 +35,7 @@ namespace game_engine {
             blue_balloon_position,
             red_balloon_status,
             blue_balloon_status) {}
-
+            
       std::unordered_map<std::string, Trajectory> UpdateTrajectories() override;
   };
 }

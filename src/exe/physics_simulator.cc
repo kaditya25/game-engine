@@ -19,7 +19,7 @@
 
 #include "trajectory_warden.h"
 #include "trajectory.h"
-#include "trajectory_subscriber_node.h"
+#include "trajectory_server.h"
 
 #include "quad_state_warden.h"
 #include "quad_state.h"
@@ -33,7 +33,7 @@
 
 using namespace game_engine;
 
-namespace { 
+namespace {
   // Signal variable and handler
   volatile std::sig_atomic_t kill_program;
   void SigIntHandler(int sig) {
@@ -63,25 +63,25 @@ int main(int argc, char** argv) {
 
   auto trajectory_warden_in  = std::make_shared<TrajectoryWarden>();
   for(const auto& kv: updated_trajectory_topics) {
-    const std::string& quad_name = kv.first;  
+    const std::string& quad_name = kv.first;
     trajectory_warden_in->Register(quad_name);
   }
 
-  std::unordered_map<std::string, std::shared_ptr<TrajectorySubscriberNode>> trajectory_subscribers;
+  std::unordered_map<std::string, std::shared_ptr<TrajectoryServerNode>> trajectory_servers;
   for(const auto& kv: updated_trajectory_topics) {
-    const std::string& quad_name = kv.first;  
-    const std::string& topic = kv.second;  
-    trajectory_subscribers[quad_name] = 
-        std::make_shared<TrajectorySubscriberNode>(
-            topic, 
-            quad_name, 
+    const std::string& quad_name = kv.first;
+    const std::string& topic = kv.second;
+    trajectory_servers[quad_name] =
+        std::make_shared<TrajectoryServerNode>(
+            topic,
+            quad_name,
             trajectory_warden_in);
   }
 
   std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers;
   for(const auto& kv: quad_state_topics) {
-    const std::string& quad_name = kv.first;  
-    const std::string& topic = kv.second;  
+    const std::string& quad_name = kv.first;
+    const std::string& topic = kv.second;
     quad_state_publishers[quad_name]
         = std::make_shared<QuadStatePublisherNode>(topic);
   }
@@ -93,9 +93,9 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
   std::map<
-    std::string, 
-    Eigen::Vector3d, 
-    std::less<std::string>, 
+    std::string,
+    Eigen::Vector3d,
+    std::less<std::string>,
     Eigen::aligned_allocator<std::pair<const std::string, Eigen::Vector3d>>> initial_quad_positions;
   for(const auto& kv: initial_quad_positions_string) {
     const std::string& quad_name = kv.first;

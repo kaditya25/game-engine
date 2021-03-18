@@ -6,9 +6,9 @@ namespace game_engine {
   void TrajectoryDispatcher::Run(
       std::shared_ptr<TrajectoryWarden> warden,
       std::unordered_map<
-        std::string, 
-        std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers) {
-    // Local thread pool 
+        std::string,
+        std::shared_ptr<TrajectoryClientNode>> trajectory_clients) {
+    // Local thread pool
     std::vector<std::thread> thread_pool;
 
     // Get all registered trajectories
@@ -19,7 +19,7 @@ namespace game_engine {
       thread_pool.push_back(
           std::move(
             std::thread([&](){
-              this->AwaitTrajectoryChange(key, warden, trajectory_publishers[key]);
+              this->AwaitTrajectoryChange(key, warden, trajectory_clients[key]);
               })));
     }
 
@@ -40,23 +40,26 @@ namespace game_engine {
     // Wait for thread pool to terminate
     for(std::thread& t: thread_pool) {
       t.join();
-    } 
+    }
   }
 
   void TrajectoryDispatcher::AwaitTrajectoryChange(
-      const std::string key, 
-      std::shared_ptr<TrajectoryWarden> warden, 
-      std::shared_ptr<TrajectoryPublisherNode> publisher) {
+      const std::string key,
+      std::shared_ptr<TrajectoryWarden> warden,
+      std::shared_ptr<TrajectoryClientNode> client) {
     while(this->ok_) {
       Trajectory trajectory;
-      if(true == warden->Await(key, trajectory)) {
-        publisher->Publish(trajectory);
+      if(Success == warden->Await(key, trajectory)) {
+        // Check the value of the response from the client-server
+        unsigned int status = client->Call(trajectory);
+        // Update the status in the warden
+        warden->SetTrajectoryStatus(status);
       }
     }
   }
+
 
   void TrajectoryDispatcher::Stop() {
     this->ok_ = false;
   }
 }
-
