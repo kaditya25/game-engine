@@ -4,7 +4,6 @@ set(TARGET lib_util)
 
 set(SOURCE_FILES
   timer.cc
-  semaphore.cc
 )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})

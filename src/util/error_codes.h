@@ -20,10 +20,10 @@ namespace game_engine {
     // Trajectory Warden Codes
     KeyAlreadyExists,
     KeyDoesNotExist,
-    OkVariableChanged,
+    ThreadStopped,
 
     // Client Codes
     FailedToCallService,
-    
+
   } StatusCode;
 }
