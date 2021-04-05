@@ -20,7 +20,7 @@ ROS's RVIZ program.
 ### Clone
 ```bash
 cd Workspace
-git clone https://gitlab.com/todd.humphreys/game-engine-student.git
+git clone https://gitlab.com/todd.humphreys/game-engine-student.git  game-engine
 cd game-engine-student
 git submodule update --init --recursive
 ```
