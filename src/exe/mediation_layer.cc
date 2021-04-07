@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -288,7 +286,7 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  // seed for balloon position change
+  // Seed for balloon position change
   bool use_seed;
   if(false == nh.getParam("use_seed", use_seed)) {
     std::cerr << "Required parameter not found on server: use_seed" << std::endl;
@@ -305,7 +303,7 @@ int main(int argc, char** argv) {
     seed = std::random_device{}();
   }
 
-  std::mt19937 gen{ seed };
+  std::mt19937 gen{ static_cast<unsigned>(seed) };
 
   auto red_balloon_status = std::make_shared<BalloonStatus>();
   auto blue_balloon_status = std::make_shared<BalloonStatus>();
