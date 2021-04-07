@@ -33,8 +33,6 @@
 #include "quad_state_watchdog.h"
 #include "goal_watchdog.h"
 
-
-
 using namespace game_engine;
 
 namespace {
@@ -44,7 +42,6 @@ namespace {
     kill_program = 1;
   }
 }
-
 
 int main(int argc, char** argv) {
   // Configure sigint handler
