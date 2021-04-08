@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "trajectory_dispatcher.h"
 
 namespace game_engine {
@@ -43,22 +41,21 @@ namespace game_engine {
     }
   }
 
-  void TrajectoryDispatcher::AwaitTrajectoryChange(
-      const std::string key,
-      std::shared_ptr<TrajectoryWarden> warden,
-      std::shared_ptr<TrajectoryClientNode> client) {
+  void TrajectoryDispatcher::
+  AwaitTrajectoryChange(const std::string key,
+                        std::shared_ptr<TrajectoryWarden> warden,
+                        std::shared_ptr<TrajectoryClientNode> client) {
     while(this->ok_) {
       Trajectory trajectory;
-      if(Success == warden->Await(key, trajectory)) {
+      if(TrajectoryCode::Success == warden->Await(key, trajectory)) {
         // Check the value of the response from the client-server
-        unsigned int status = client->Call(trajectory);
+        TrajectoryCode trajectoryCode = client->Call(trajectory);
         // Update the status in the warden
-        warden->SetTrajectoryStatus(status);
+        warden->SetTrajectoryStatus(trajectoryCode);
       }
     }
   }
-
-
+  
   void TrajectoryDispatcher::Stop() {
     this->ok_ = false;
   }

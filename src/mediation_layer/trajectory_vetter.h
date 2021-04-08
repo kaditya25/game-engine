@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #pragma once
 
 #include <memory>
@@ -8,7 +6,7 @@
 #include "trajectory.h"
 #include "map3d.h"
 #include "quad_state_warden.h"
-#include "error_codes.h"
+#include "trajectory_code.h"
 
 namespace game_engine {
   // The TrajectoryVetter determines if a Trajectory complies with a set of
@@ -51,7 +49,7 @@ namespace game_engine {
 
       // Determines if a trajectory meets the trajectory requirements laid out
       // in the documentation
-      StatusCode Vet(
+      TrajectoryCode Vet(
           const Trajectory& trajectory,
           const Map3D& map,
           const std::shared_ptr<QuadStateWarden> quad_state_warden,
