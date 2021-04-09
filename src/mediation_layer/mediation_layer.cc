@@ -58,7 +58,7 @@ namespace game_engine {
         trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
       trajectory_warden_in->SetTrajectoryStatus(trajectoryCode);
       if (trajectoryCode != TrajectoryCode::Success) {
-        std::cerr << "Trajectory did not pass vetting: rejected with error code "
+        std::cerr << "Trajectory did not pass vetting: rejected with code "
                   << static_cast<unsigned int>(trajectoryCode) <<
           "." << std::endl;
         continue;
@@ -95,7 +95,7 @@ namespace game_engine {
     // Wait for this thread to receive a stop command
     std::thread kill_thread([&, this]() {
                               while(true) {
-                                if(false == this->ok_) {
+                                if(false == ok_) {
                                   break;
                                 } else {
                                   std::this_thread::
@@ -113,6 +113,6 @@ namespace game_engine {
   }
 
   void MediationLayer::Stop() {
-    this->ok_ = false;
+    ok_ = false;
   }
 }

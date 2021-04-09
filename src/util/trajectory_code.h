@@ -24,9 +24,4 @@ namespace game_engine {
     // Client Codes
     FailedToCallService = 14,
   };
-
-  // std::ostream& operator << (std::ostream& os, const TrajectoryCode& tc) {
-  //   os << static_cast<unsigned int>(tc);
-  //   return os;
-  // }  
 }
