@@ -54,7 +54,13 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  const YAML::Node node = YAML::LoadFile(map_file_path);
+  YAML::Node node;
+  try {
+    node = YAML::LoadFile(map_file_path);
+  } catch (...) {
+    std::cerr << "Map file not found.  Check map_file_path in params.yaml" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
   const Map3D map = node["map"].as<Map3D>();
 
   std::map<std::string, std::string> updated_trajectory_topics;

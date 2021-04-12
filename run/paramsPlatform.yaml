@@ -1,17 +1,17 @@
 team_assignments:
-  "phoenix": "blue"
+  "apollo": "blue"
 
 quad_state_topics:
-  "phoenix": "/phoenix/state"
+  "apollo": "/apollo/state"
 
 proposed_trajectory_topics:
-  "phoenix": "/phoenix/proposed_trajectory"
+  "apollo": "/apollo/proposed_trajectory"
 
 updated_trajectory_topics:
-  "phoenix": "/phoenix/updated_trajectory"
+  "apollo": "/apollo/updated_trajectory"
 
   visualization_trajectory_topics:
-  "phoenix": "/phoenix/visualization_trajectory"
+  "apollo": "/apollo/visualization_trajectory"
 
 balloon_status_topics:
   "red": "/game_engine/red_balloon_status"
@@ -42,6 +42,6 @@ seed: 57
 goal_position: [-13.0, 18.0, -4.0]
 
 initial_quad_positions:
-  "phoenix": "-13.0 18.0 -4.0"
+  "apollo": "-13.0 18.0 -4.0"
 
 

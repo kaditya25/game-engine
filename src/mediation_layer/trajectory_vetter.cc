@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "trajectory_vetter.h"
 
 #include <Eigen/Core>
@@ -7,8 +5,8 @@
 
 namespace game_engine {
 
-  StatusCode TrajectoryVetter::Vet(
-      const Trajectory& trajectory,
+  TrajectoryCode TrajectoryVetter::
+  Vet(const Trajectory& trajectory,
       const Map3D& map,
       const std::shared_ptr<QuadStateWarden> quad_state_warden,
       const std::string& quad_name
@@ -17,12 +15,12 @@ namespace game_engine {
     const size_t trajectory_size = trajectory.Size();
     if(trajectory_size < 2) {
       std::cerr << "Specified trajectory for "
-        << quad_name
-        << " has a size of "
-        << trajectory_size
-        << ". Trajectories must have a size of 2 or greater. Rejecting."
-        << std::endl;
-      return NotEnoughTrajectoryPoints;
+                << quad_name
+                << " has a size of "
+                << trajectory_size
+                << ". Trajectories must have a size of 2 or greater. Rejecting."
+                << std::endl;
+      return TrajectoryCode::NotEnoughTrajectoryPoints;
     }
 
     // Initial position constraints
@@ -42,7 +40,7 @@ namespace game_engine {
         << this->options_.max_distance_from_current_position
         << " meters"
         << std::endl;
-      return StartPointFarFromCurrentPosition;
+      return TrajectoryCode::StartPointFarFromCurrentPosition;
     }
 
     // Position constraints
@@ -54,7 +52,7 @@ namespace game_engine {
           << point.transpose()
           << "] exceeded map bounds"
           << std::endl;
-        return PointExceedsMapBounds;
+        return TrajectoryCode::PointExceedsMapBounds;
       }
       if(false == map.IsFreeSpace(point)) {
         std::cerr
@@ -62,7 +60,7 @@ namespace game_engine {
           << point.transpose()
           << "] is contained within an obstacle"
           << std::endl;
-        return PointWithinObstacle;
+        return TrajectoryCode::PointWithinObstacle;
       }
     }
 
@@ -76,7 +74,7 @@ namespace game_engine {
           << this->options_.max_velocity_magnitude
           << " m/s"
           << std::endl;
-        return ExceedsMaxVelocity;
+        return TrajectoryCode::ExceedsMaxVelocity;
       }
     }
 
@@ -95,12 +93,11 @@ namespace game_engine {
           << this->options_.max_velocity_magnitude
           << " m/s"
           << std::endl;
-        return MeanValueExceedsMaxVelocity;
+        return TrajectoryCode::MeanValueExceedsMaxVelocity;
       }
     }
 
-
-    // Acceleration constraints
+// Acceleration constraints
     for(size_t idx = 0; idx < trajectory_size; ++idx) {
       const Eigen::Vector3d acc = trajectory.Acceleration(idx);
       if(this->options_.max_acceleration_magnitude < acc.norm()) {
@@ -112,7 +109,7 @@ namespace game_engine {
           << std::endl;
         std::cout << acc.transpose() << std::endl;
         std::cout << acc.norm() << std::endl;
-        return ExceedsMaxAcceleration;
+        return TrajectoryCode::ExceedsMaxAcceleration;
       }
     }
 
@@ -131,7 +128,7 @@ namespace game_engine {
           << this->options_.max_acceleration_magnitude
           << " m/s"
           << std::endl;
-        return MeanValueExceedsMaxAcceleration;
+        return TrajectoryCode::MeanValueExceedsMaxAcceleration;
       }
     }
 
@@ -145,7 +142,7 @@ namespace game_engine {
         std::cerr
           << "Trajectory timestamps must be monotonically increasing"
           << std::endl;
-        return TimestampsNotIncreasing;
+        return TrajectoryCode::TimestampsNotIncreasing;
       }
 
       if(this->options_.max_delta_t < delta_time) {
@@ -155,10 +152,10 @@ namespace game_engine {
           << this->options_.max_delta_t
           << " seconds."
           << std::endl;
-        return TimeBetweenPointsExceedsMaxTime;
+        return TrajectoryCode::TimeBetweenPointsExceedsMaxTime;
       }
     }
 
-    return Success;
+    return TrajectoryCode::Success;
   }
 }

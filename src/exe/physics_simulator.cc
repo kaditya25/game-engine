@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -106,7 +104,7 @@ int main(int argc, char** argv) {
     initial_quad_positions[quad_name] = Eigen::Vector3d(x,y,z);
   }
 
-  // seed for balloon position change
+  // Obtain seed for balloon position change
   bool use_seed;
   if(false == nh.getParam("use_seed", use_seed)) {
     std::cerr << "Required parameter not found on server: use_seed" << std::endl;

@@ -1,44 +1,40 @@
-// Author: Tucker Haydon
-
 #include <chrono>
-
 #include "example_autonomy_protocol.h"
 
 namespace game_engine {
+  
   std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(50);
+
   std::unordered_map<std::string, Trajectory>
   ExampleAutonomyProtocol::UpdateTrajectories() {
-    //  ========== Error Codes ==========
-    // If any of these are not successful (1), the trajectory will be rejected.
-    // Success = 1,
-    // ------- Error codes for TrajectoryVetter -------
-    // NotEnoughTrajectoryPoints = 2
-    // StartPointFarFromCurrentPosition = 3
-    // PointExceedsMapBounds = 4
-    // PointWithinObstacle = 5
-    // ExceedsMaxVelocity = 6
-    // MeanValueExceedsMaxVelocity = 7
-    // ExceedsMaxAcceleration = 8
-    // MeanValueExceedsMaxAcceleration = 9
-    // TimestampsNotIncreasing = 10
-    // TimeBetweenPointsExceedsMaxTime = 11
-    //------- Error codes for TrajectoryWarden ------- (you should hopefully not see these. if you do contact TA.)
-    // KeyAlreadyExists = 12
-    // KeyDoesNotExist = 13
-    // ThreadStopped = 14
-    //------- Error codes for TrajectoryClient -------
-    // FailedToCallService = 15
 
-    // The first time this->submittedStatus_ is called it will be initialized
-    // to zero. Check the value of this to see which error you may be receiving
-    // upon submitting a trajectory.
-    std::cout << "Submitted status: " << this->submittedStatus_ << std::endl;
-    // For example: We can check the AP initially submits a trajectory with a
-    // time that exceeds the max time between points. We can apply a
-    // conditional statement that checks the error associated with the
-    // submitted trajectory and fix it from there.
-    if (this->submittedStatus_ == TimeBetweenPointsExceedsMaxTime) {
-      std::cout << "Replanning trajectory. Shortening time between trajectory points." << std::endl;
+    // This function creates and returns a proposed trajectory.  The
+    // trajectory gets submitted to the mediation_layer (ML), which responds
+    // by setting the data member trajectoryCode_.  See the header file
+    // game-engine/src/util/trajectory_codes.h for a list of possible codes.
+    //
+    // Any code other than TrajectoryCode::Success indicates that the ML has
+    // rejected the submitted trajectory.
+    // 
+    // trajectoryCode_ is initialized with TrajectoryCode::Success, so this
+    // will be its value the first time this function is called (before any
+    // trajectories have been submitted).  Thereafter, trajectoryCode_ will
+    // indicate the response code for the most recently submitted trajectory.
+    //
+    // If you want to see a numerical value for the code, you can cast and
+    // print the code as shown below.
+    if (trajectoryCode_ != TrajectoryCode::Success) {
+      std::cout << "Response code: " <<
+        static_cast<unsigned int>(trajectoryCode_) << std::endl;
+    }
+
+    // Suppose your AP initially submits a trajectory with a time that exceeds
+    // the maximum allowed time between points. You could apply a conditional
+    // statement that checks the TrajectoryCode associated with the submitted
+    // trajectory and fix the problem, as shown below.
+    if (trajectoryCode_ == TrajectoryCode::TimeBetweenPointsExceedsMaxTime) {
+      std::cout << "Replanning trajectory: "
+        "Shortening time between trajectory points." << std::endl;
       dt_chrono = dt_chrono - std::chrono::milliseconds(15);
     }
 
@@ -80,7 +76,7 @@ namespace game_engine {
 
     // Number of samples
     const size_t N = remaining_chrono_time/dt_chrono;
-    // const size_t N = 1;
+
     // Radius
     const double radius = 0.5;
 
@@ -102,12 +98,11 @@ namespace game_engine {
     const Eigen::Vector3d r = current_pos - circle_center;
     const double theta_start = std::atan2(r.y(), r.x());
 
-    // TrajectoryVector3D is an std::vector object defined in the trajectory.h
-    // file. It's aliased for convenience.
+    // TrajectoryVector3D is an std::vector object defined in trajectory.h
     TrajectoryVector3D trajectory_vector;
     for(size_t idx = 0; idx < N; ++idx) {
       // chrono::duration<double> maintains high-precision floating point time
-      // in seconds use the count function to cast into floating point
+      // in seconds. Use the count function to cast into floating point.
       const std::chrono::duration<double> flight_chrono_time
         = current_chrono_time.time_since_epoch() + idx * dt_chrono;
       const double flight_time = flight_chrono_time.count();
@@ -150,7 +145,6 @@ namespace game_engine {
     // Construct a trajectory from the trajectory vector
     Trajectory trajectory(trajectory_vector);
     trajectory_map[quad_name] = trajectory;
-
 
     return trajectory_map;
   }

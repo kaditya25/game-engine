@@ -1,6 +1,4 @@
-
  #include "trajectory_client.h"
-
 
  namespace game_engine {
    TrajectoryClientNode::TrajectoryClientNode(
@@ -9,7 +7,7 @@
          = node_handle_.serviceClient<mg_msgs::PVAYT>(topic);
    }
 
-   unsigned int TrajectoryClientNode::Call(const Trajectory& trajectory) {
+   TrajectoryCode TrajectoryClientNode::Call(const Trajectory& trajectory) {
      mg_msgs::PVAYT srv;
      for(size_t idx = 0; idx < trajectory.Size(); ++idx) {
        mg_msgs::PVAYStamped instant;
@@ -28,15 +26,14 @@
        instant.header.stamp.sec = std::floor(trajectory.Time(idx));
        instant.header.stamp.nsec
          = (trajectory.Time(idx) - std::floor(trajectory.Time(idx))) * 1e9;
-
        srv.request.trajectory.push_back(instant);
        }
        if (client_.call(srv)) {
-         //ROS_INFO("Client: Successfully called service. Response: %d ", srv.response.status);
-         return srv.response.status;
+         // ROS_INFO("Client: Successfully called service. Response: %d ", srv.response.status);
+         return static_cast<TrajectoryCode>(srv.response.status);
        } else {
          ROS_ERROR("Client: Failed to call service.");
-         return FailedToCallService;
+         return TrajectoryCode::FailedToCallService;
        }
     }
  }

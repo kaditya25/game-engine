@@ -1,5 +1,3 @@
-// Author: Dan LaChapelle
-
 #pragma once
 
 #include <string>

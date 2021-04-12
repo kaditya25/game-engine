@@ -1,6 +1,3 @@
-// Author: Tucker Haydon
-
-
 #include <cstdlib>
 #include <iostream>
 #include <Eigen/StdVector>
@@ -21,24 +18,23 @@ void test_TrajectoryWarden() {
 
     Trajectory dummy_trajectory;
     assert(0 == warden.Keys().size());
-    assert(false == warden.Read("", dummy_trajectory));
-    assert(false == warden.Write("", dummy_trajectory));
-    assert(false == warden.Await("", dummy_trajectory));
+    assert(TrajectoryCode::Success == warden.Read("", dummy_trajectory));
+    assert(TrajectoryCode::Success == warden.Write("", dummy_trajectory));
+    assert(TrajectoryCode::Success == warden.Await("", dummy_trajectory));
   }
 
   { // Test read/write
     TrajectoryWarden warden;
 
     Trajectory trajectory_write({(Eigen::Matrix<double, 11, 1>() << 1,1,1,1,1,1,1,1,1,1,1).finished()});
-    assert(true == warden.Register("test"));
-    assert(true == warden.Write("test", trajectory_write));
+    assert(TrajectoryCode::Success == warden.Register("test"));
+    assert(TrajectoryCode::Success == warden.Write("test", trajectory_write));
 
     Trajectory trajectory_read;
-    assert(true == warden.Read("test", trajectory_read));
+    assert(TrajectoryCode::Success == warden.Read("test", trajectory_read));
     assert(trajectory_read.Size() == trajectory_write.Size());
     assert(trajectory_read.PVAYT(0).isApprox(trajectory_write.PVAYT(0)));
   }
-
 }
 
 void test_Trajectory() {

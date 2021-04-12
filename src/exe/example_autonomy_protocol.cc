@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -36,8 +34,6 @@
 #include "example_autonomy_protocol.h"
 #include "map3d.h"
 
-
-
 using namespace game_engine;
 
 namespace {
@@ -47,7 +43,6 @@ namespace {
     kill_program = 1;
   }
 }
-
 
 int main(int argc, char** argv) {
   // Configure sigint handler
@@ -64,7 +59,13 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  const YAML::Node node = YAML::LoadFile(map_file_path);
+  YAML::Node node;
+  try {
+    node = YAML::LoadFile(map_file_path);
+  } catch (...) {
+    std::cerr << "Map file not found.  Check map_file_path in params.yaml" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
   const Map3D map3d = node["map"].as<Map3D>();
 
   std::map<std::string, std::string> team_assignments;

@@ -1,25 +1,25 @@
-// Author: Tucker Haydon
-
 #include "trajectory_warden.h"
 
 namespace game_engine {
-  StatusCode TrajectoryWarden::Register(const std::string& key) {
+  TrajectoryCode TrajectoryWarden::Register(const std::string& key) {
     // If this key already exists, return false
     if(this->map_.end() != this->map_.find(key)) {
       std::cerr << "TrajectoryWarden::Register -- Key already exists." << std::endl;
-      return KeyAlreadyExists;
+      return TrajectoryCode::KeyAlreadyExists;
     }
 
     this->map_[key] = std::make_shared<TrajectoryContainer>(Trajectory());
     keys_.insert(key);
-    return Success;
+    return TrajectoryCode::Success;
   }
 
-  StatusCode TrajectoryWarden::Write(const std::string& key, const Trajectory& trajectory, bool blocking) {
+  TrajectoryCode TrajectoryWarden::Write(const std::string& key,
+                                         const Trajectory& trajectory,
+                                         bool blocking) {
     // If key does not exist, return false
     if(this->map_.end() == this->map_.find(key)) {
       std::cerr << "TrajectoryWarden::Write -- Key does not exist." << std::endl;
-      return KeyDoesNotExist;
+      return TrajectoryCode::KeyDoesNotExist;
     }
 
     std::shared_ptr<TrajectoryContainer>& container = this->map_[key];
@@ -35,16 +35,17 @@ namespace game_engine {
       container->modified_cv_.notify_all();
     }
 
-    StatusCode status = this->GetLastTrajectoryStatus(blocking);
+    TrajectoryCode status = this->GetLastTrajectoryStatus(blocking);
 
     return status;
   }
 
-  StatusCode TrajectoryWarden::Read(const std::string& key, Trajectory& trajectory) {
+  TrajectoryCode TrajectoryWarden::Read(const std::string& key,
+                                        Trajectory& trajectory) {
     // If key does not exist, return false
     if(this->map_.end() == this->map_.find(key)) {
       std::cerr << "TrajectoryWarden::Read -- Key does not exist." << std::endl;
-      return KeyDoesNotExist;
+      return TrajectoryCode::KeyDoesNotExist;
     }
     std::shared_ptr<TrajectoryContainer>& container = this->map_[key];
 
@@ -52,13 +53,14 @@ namespace game_engine {
       std::lock_guard<std::mutex> lock(container->access_mtx_);
       trajectory = container->trajectory_;
     }
-    return Success;
+    return TrajectoryCode::Success;
   }
 
-  StatusCode TrajectoryWarden::Await(const std::string& key, Trajectory& trajectory) {
+  TrajectoryCode TrajectoryWarden::Await(const std::string& key,
+                                         Trajectory& trajectory) {
     if(this->map_.end() == this->map_.find(key)) {
       std::cerr << "TrajectoryWarden::Await -- Key does not exist." << std::endl;
-      return KeyDoesNotExist;
+      return TrajectoryCode::KeyDoesNotExist;
     }
     std::shared_ptr<TrajectoryContainer>& container = this->map_[key];
 
@@ -69,7 +71,7 @@ namespace game_engine {
       { // Lock mutex for copy
         // Termination
         if(false == this->ok_) {
-          return ThreadStopped;
+          return TrajectoryCode::ThreadStopped;
         }
 
         std::lock_guard<std::mutex> lock(container->access_mtx_);
@@ -78,14 +80,14 @@ namespace game_engine {
       container->modified_ = false;
       lock.unlock();
     }
-    return Success;
+    return TrajectoryCode::Success;
   }
 
   const std::set<std::string>& TrajectoryWarden::Keys() const {
     return this->keys_;
   }
 
-   void TrajectoryWarden::SetTrajectoryStatus(unsigned int status) {
+   void TrajectoryWarden::SetTrajectoryStatus(TrajectoryCode status) {
      this->trajectoryStatus_ = status;
      this->statusUpdated_ = true;
 
@@ -96,14 +98,14 @@ namespace game_engine {
      }
    }
 
-   StatusCode TrajectoryWarden::GetLastTrajectoryStatus(bool blocking) {
+   TrajectoryCode TrajectoryWarden::GetLastTrajectoryStatus(bool blocking) {
      // checks to see if the status hasn't been updated and we want a blocking call
      while (this->statusUpdated_ == false && blocking == true) {
        continue;
      }
 
      this->statusUpdated_ = false;
-     return static_cast<StatusCode>(this->trajectoryStatus_);
+     return static_cast<TrajectoryCode>(trajectoryStatus_);
    }
 
   void TrajectoryWarden::Stop() {

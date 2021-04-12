@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -35,8 +33,6 @@
 #include "quad_state_watchdog.h"
 #include "goal_watchdog.h"
 
-
-
 using namespace game_engine;
 
 namespace {
@@ -46,7 +42,6 @@ namespace {
     kill_program = 1;
   }
 }
-
 
 int main(int argc, char** argv) {
   // Configure sigint handler
@@ -63,7 +58,13 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  const YAML::Node node = YAML::LoadFile(map_file_path);
+  YAML::Node node;
+  try {
+    node = YAML::LoadFile(map_file_path);
+  } catch (...) {
+    std::cerr << "Map file not found.  Check map_file_path in params.yaml" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
   const Map3D map = node["map"].as<Map3D>();
 
   // Initialize subscribers
@@ -288,7 +289,7 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  // seed for balloon position change
+  // Seed for balloon position change
   bool use_seed;
   if(false == nh.getParam("use_seed", use_seed)) {
     std::cerr << "Required parameter not found on server: use_seed" << std::endl;
@@ -305,7 +306,7 @@ int main(int argc, char** argv) {
     seed = std::random_device{}();
   }
 
-  std::mt19937 gen{ seed };
+  std::mt19937 gen{ static_cast<unsigned>(seed) };
 
   auto red_balloon_status = std::make_shared<BalloonStatus>();
   auto blue_balloon_status = std::make_shared<BalloonStatus>();
