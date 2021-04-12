@@ -186,13 +186,6 @@ namespace game_engine {
     {
       for(size_t row = 0; row < this->size_y_; ++row) {
         for(size_t col = 0; col < this->size_x_; ++col) {
-          //Mapping 0,0,0 to minx miny minz
-          // TRIED TO DO MAPPING SO THAT NODE DATA IS DIRECTLY THE rviz coordinates. But doesnt works due to not finding it in the edge graph.
-          // double min_x = (this->origin).x();
-          // double min_y = (this->origin).y();
-          // double min_z = (this->origin).z();
-          // double gridsize = this->gridsize;
-          // node_grid[height][row][col] = std::make_shared<Node3D>(Eigen::Matrix<double, 3, 1>(col*gridsize + min_x ,row*gridsize + min_y,height*gridsize + min_z));
           node_grid[height][row][col] = std::make_shared<Node3D>(Eigen::Matrix<double, 3, 1>(col ,row,height)); 
         }
       }
@@ -203,12 +196,6 @@ namespace game_engine {
       for(int row = 0; row < this->size_y_; ++row) {
         for(int col = 0; col < this->size_x_; ++col) {
           // If current node is unreachable, pass
-
-          //Print if node is startnode
-          //if(height == 5 && row == 18 && col == 66){
-          //   std::cout << "in occupancy_grid3d starting node currently being evaluated in Asgraph" << '\n';
-          //   std::cout << this->IsOccupied(height, row, col) << '\n';
-          //}
 
           if(true == this->IsOccupied(height, row, col)) continue;
 
@@ -282,16 +269,6 @@ namespace game_engine {
           }
           if(row - 1 >= 0 && height - 1 >= 0 && col - 1 >= 0){
             edges.emplace_back(node_grid[height-1][row-1][col-1], node_grid[height][row][col], VERTEX_COST);
-          }
-
-          //Print if node is startnode
-          if(height == 5 && row == 18 && col == 66){
-            for(int i =0; i < 26; i++){
-              //std::cout << "printing start node neighbors " << i << "  location" << '\n';
-              //std::cout << edges[edges.size()-1-i].Source()->Data().x() << '\n';
-              //std::cout << edges[edges.size()-1-i].Source()->Data().y() << '\n';
-              //std::cout << edges[edges.size()-1-i].Source()->Data().z() << '\n';
-            }
           }
 
         }
