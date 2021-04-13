@@ -25,7 +25,7 @@
 #include "quad_state.h"
 #include "quad_state_publisher_node.h"
 
-#include "trajectory_dispatcher.h"
+//#include "trajectory_dispatcher.h"
 #include "mediation_layer.h"
 #include "physics_simulator.h"
 
@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  auto trajectory_warden_in  = std::make_shared<TrajectoryWarden>();
+  auto trajectory_warden_in  = std::make_shared<TrajectoryWardenIn>();
   for(const auto& kv: updated_trajectory_topics) {
     const std::string& quad_name = kv.first;
     trajectory_warden_in->Register(quad_name);

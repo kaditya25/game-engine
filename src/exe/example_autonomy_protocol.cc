@@ -182,17 +182,11 @@ int main(int argc, char** argv) {
   }
 
   // Initialize the TrajectoryWarden
-  auto trajectory_warden_out = std::make_shared<TrajectoryWarden>();
+  auto trajectory_warden_out = std::make_shared<TrajectoryWardenOut>();
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
     trajectory_warden_out->Register(quad_name);
   }
-
-  // Pipe the TrajectoryWarden to the TrajectoryClients
-  auto trajectory_dispatcher = std::make_shared<TrajectoryDispatcher>();
-  std::thread trajectory_dispatcher_thread([&](){
-      trajectory_dispatcher->Run(trajectory_warden_out, proposed_trajectory_clients);
-      });
 
   // Balloon Status
   std::map<std::string, std::string> balloon_status_topics;
@@ -224,7 +218,6 @@ int main(int argc, char** argv) {
 
   BalloonStatus setStartStatusRed = *(red_balloon_status_subscriber_node->balloon_status_);
   setStartStatusRed.set_start = true;
-  //std::cout << setStartStatusRed.position << std::endl;
 
   BalloonStatus setStartStatusBlue = *(blue_balloon_status_subscriber_node->balloon_status_);
   setStartStatusBlue.set_start = true;
@@ -262,7 +255,7 @@ int main(int argc, char** argv) {
   // Start the autonomy protocol
   std::thread ap_thread(
       [&]() {
-        autonomy_protocol->Run();
+        autonomy_protocol->Run(proposed_trajectory_clients);
       });
 
   // Start the kill thread
@@ -279,7 +272,6 @@ int main(int argc, char** argv) {
         ros::shutdown();
 
         autonomy_protocol->Stop();
-        trajectory_dispatcher->Stop();
         quad_state_warden->Stop();
         trajectory_warden_out->Stop();
       });
@@ -290,7 +282,6 @@ int main(int argc, char** argv) {
   // Wait for program termination via ctl-c
   kill_thread.join();
   ap_thread.join();
-  trajectory_dispatcher_thread.join();
 
   return EXIT_SUCCESS;
 }
