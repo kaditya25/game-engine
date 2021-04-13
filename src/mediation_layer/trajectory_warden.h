@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #pragma once
 
 #include <string>
@@ -12,7 +10,7 @@
 #include <atomic>
 
 #include "trajectory.h"
-#include "error_codes.h"
+#include "trajectory_code.h"
 #include "trajectory_client.h"
 
 namespace game_engine {
@@ -36,38 +34,32 @@ namespace game_engine {
       std::unordered_map<std::string, std::shared_ptr<TrajectoryContainer>> map_;
       std::set<std::string> keys_;
       volatile std::atomic<bool> ok_{true};
-
       volatile std::atomic<bool> statusUpdated_{false};
-      unsigned int trajectoryStatus_{1};
+      TrajectoryCode trajectoryStatus_{TrajectoryCode::Success};
 
     public:
       // Constructor
       TrajectoryWarden(){};
 
       // Add a key-value pair to the map
-      StatusCode Register(const std::string& key);
-
+      TrajectoryCode Register(const std::string& key);
       // Copy the latest trajectory associated with a key
-      StatusCode Read(const std::string& key, Trajectory& trajectory);
-
+      TrajectoryCode Read(const std::string& key, Trajectory& trajectory);
       // Await a change to the trajectory associated with the key
-      StatusCode Await(const std::string& key, Trajectory& trajectory, std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client);
-
-      // Getter
+      TrajectoryCode Await(const std::string& key,
+                           Trajectory& trajectory, std::unordered_map<std::string,
+                           std::shared_ptr<TrajectoryClientNode>> client);
       const std::set<std::string>& Keys() const;
-
-      // Setter
-      void SetTrajectoryStatus(unsigned int status);
-
+      void SetTrajectoryStatus(TrajectoryCode status);
       void Stop();
   };
 
   class TrajectoryWardenIn : public TrajectoryWarden {
     private:
-      StatusCode GetLastTrajectoryStatus(bool blocking);
+      TrajectoryCode GetLastTrajectoryStatus(bool blocking);
     public:
       TrajectoryWardenIn() : TrajectoryWarden(){};
-      StatusCode Write(const std::string& key,
+      TrajectoryCode Write(const std::string& key,
                        const Trajectory& trajectory,
                        bool blocking = false);
 
@@ -76,10 +68,10 @@ namespace game_engine {
   class TrajectoryWardenOut : public TrajectoryWarden {
     public:
       TrajectoryWardenOut() : TrajectoryWarden(){};
-      StatusCode Write(const std::string& key,
-                       const Trajectory& trajectory,
-                       std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client,
-                       bool blocking = false);
+      TrajectoryCode Write(const std::string& key,
+                           const Trajectory& trajectory,
+                           std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client,
+                           bool blocking = false);
   };
 
 }

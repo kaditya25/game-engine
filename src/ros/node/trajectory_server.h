@@ -1,5 +1,3 @@
-// Author: Hailey Nichols
-
 #pragma once
 
 #include <ros/ros.h>
@@ -10,7 +8,7 @@
 #include "trajectory.h"
 #include "trajectory_warden.h"
 #include "mg_msgs/PVAYT.h"
-#include "error_codes.h"
+#include "trajectory_code.h"
 
 namespace game_engine {
   class TrajectoryServerNode {

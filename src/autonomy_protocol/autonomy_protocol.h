@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #pragma once
 
 #include <atomic>
@@ -10,14 +8,14 @@
 #include <map>
 #include <string>
 #include <Eigen/Dense>
-#include <stdexcept> // std::out_of_range
+#include <stdexcept> 
 
 #include "trajectory_warden.h"
 #include "trajectory_client.h"
 #include "game_snapshot.h"
 #include "map3d.h"
 #include "balloon_status.h"
-#include "error_codes.h"
+#include "trajectory_code.h"
 
 namespace game_engine {
   // The AutonomyProtocol interfaces with the GameSimulator and enables an
@@ -54,7 +52,7 @@ namespace game_engine {
       std::shared_ptr<BalloonStatus> blue_balloon_status_;
 
       volatile std::atomic<bool> ok_{true};
-      StatusCode submittedStatus_;
+      TrajectoryCode trajectoryCode_{TrajectoryCode::Success};
 
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -98,18 +96,19 @@ namespace game_engine {
   //  * IMPLEMENTATION *
   //  ******************
   inline void AutonomyProtocol::Run(std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients) {
-    while(this->ok_) {
-
+    while(ok_) {
       // Request trajectory updates from the virtual function
       const std::unordered_map<std::string, Trajectory> trajectories =
-        this->UpdateTrajectories();
+        UpdateTrajectories();
 
-      // For every friendly quad, push the intended trajectory to the trajectory warden
-      for(const std::string& quad_name: this->friendly_names_) {
+      // For every friendly quad, push the intended trajectory to the trajectory
+      // warden
+      for(const std::string& quad_name: friendly_names_) {
         try {
           const Trajectory trajectory = trajectories.at(quad_name);
-          StatusCode submittedStatus = this->trajectory_warden_out_->Write(quad_name, trajectory, proposed_trajectory_clients, true);
-          this->submittedStatus_ = submittedStatus;
+          TrajectoryCode trajectoryCode =
+            trajectory_warden_out_->Write(quad_name, trajectory, proposed_trajectory_clients, true);
+          trajectoryCode_ = trajectoryCode;
         } catch(const std::out_of_range& e) {
           continue;
         }
@@ -122,6 +121,6 @@ namespace game_engine {
   }
 
   inline void AutonomyProtocol::Stop() {
-    this->ok_ = false;
+    ok_ = false;
   }
 }

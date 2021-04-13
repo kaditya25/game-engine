@@ -283,7 +283,7 @@ namespace game_engine {
         // Read the most current trajectory
         Trajectory trajectory;
         trajectory_warden_in->Read(quad_name, trajectory);
-        trajectory_warden_in->SetTrajectoryStatus(1);
+        trajectory_warden_in->SetTrajectoryStatus(TrajectoryCode::Success);
 
         // Require a trajectory to be published
         const size_t trajectory_size = trajectory.Size();

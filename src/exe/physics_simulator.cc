@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -25,7 +23,6 @@
 #include "quad_state.h"
 #include "quad_state_publisher_node.h"
 
-//#include "trajectory_dispatcher.h"
 #include "mediation_layer.h"
 #include "physics_simulator.h"
 
@@ -106,7 +103,7 @@ int main(int argc, char** argv) {
     initial_quad_positions[quad_name] = Eigen::Vector3d(x,y,z);
   }
 
-  // seed for balloon position change
+  // Obtain seed for balloon position change
   bool use_seed;
   if(false == nh.getParam("use_seed", use_seed)) {
     std::cerr << "Required parameter not found on server: use_seed" << std::endl;

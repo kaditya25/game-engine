@@ -1,5 +1,3 @@
-// Author: Dan LaChapelle
-
 #include "goal_status_subscriber_node.h"
 
 namespace game_engine {
@@ -22,12 +20,12 @@ namespace game_engine {
     position[2] = msg.pos.z;
 
     GoalStatus goal_status {
-      .active = msg.active.data,
-      .reached = msg.reached.data,
+      .active = static_cast<bool>(msg.active.data),
+      .reached = static_cast<bool>(msg.reached.data),
       .scorer = msg.scorer.data,
       .reach_time = msg.reach_time.data,
       .position = position,
-      .set_start = msg.set_start.data
+      .set_start = static_cast<bool>(msg.set_start.data)
     };
     *(this->goal_status_) = goal_status;
   }

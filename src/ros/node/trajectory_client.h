@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <ros/ros.h>
@@ -8,23 +7,22 @@
 
 #include "trajectory.h"
 #include "mg_msgs/PVAYT.h"
-#include "error_codes.h"
+#include "trajectory_code.h"
 
 namespace game_engine {
   class TrajectoryClientNode {
-    private:
-      // ROS node handle
-      ros::NodeHandle node_handle_;
+  private:
+    // ROS node handle
+    ros::NodeHandle node_handle_;
 
-      // ROS subscriber
-      ros::ServiceClient client_;
+    // ROS subscriber
+    ros::ServiceClient client_;
 
-    public:
-      // Constructor.
-      TrajectoryClientNode(const std::string& topic);
+  public:
+    // Constructor
+    TrajectoryClientNode(const std::string& topic);
 
-      // Publishes the message
-      unsigned int Request(const Trajectory& trajectory);
-
+    // Publishes the message
+    TrajectoryCode Request(const Trajectory& trajectory);
   };
 }
