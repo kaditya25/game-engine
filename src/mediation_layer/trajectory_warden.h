@@ -13,22 +13,21 @@
 
 #include "trajectory.h"
 #include "error_codes.h"
+#include "trajectory_client.h"
 
 namespace game_engine {
   // TrajectoryWarden is a thread-safe abstraction around an unordered map
   // [trajectory_name -> trajectory]. TrajectoryWarden provides thread-safe access,
   // modification, and await-modification of the underlying trajectory.
   class TrajectoryWarden {
-    private:
+    protected:
       // Wraps a Trajectory with local mutexes and condition variables that
       // ensure thread-safe access
       struct TrajectoryContainer {
-        Trajectory trajectory_;
-        std::mutex access_mtx_;
-
         std::mutex modified_mtx_;
         bool modified_{false};
         std::condition_variable modified_cv_;
+        Trajectory trajectory_;
 
         TrajectoryContainer(const Trajectory& trajectory)
           : trajectory_(trajectory) {}
@@ -41,8 +40,6 @@ namespace game_engine {
       volatile std::atomic<bool> statusUpdated_{false};
       unsigned int trajectoryStatus_{1};
 
-      StatusCode GetLastTrajectoryStatus(bool blocking);
-
     public:
       // Constructor
       TrajectoryWarden(){};
@@ -50,14 +47,11 @@ namespace game_engine {
       // Add a key-value pair to the map
       StatusCode Register(const std::string& key);
 
-      // Write a new trajectory
-      StatusCode Write(const std::string& key,  const Trajectory& trajectory, bool blocking = false);
-
       // Copy the latest trajectory associated with a key
       StatusCode Read(const std::string& key, Trajectory& trajectory);
 
       // Await a change to the trajectory associated with the key
-      StatusCode Await(const std::string& key, Trajectory& trajectory);
+      StatusCode Await(const std::string& key, Trajectory& trajectory, std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client);
 
       // Getter
       const std::set<std::string>& Keys() const;
@@ -67,4 +61,25 @@ namespace game_engine {
 
       void Stop();
   };
+
+  class TrajectoryWardenIn : public TrajectoryWarden {
+    private:
+      StatusCode GetLastTrajectoryStatus(bool blocking);
+    public:
+      TrajectoryWardenIn() : TrajectoryWarden(){};
+      StatusCode Write(const std::string& key,
+                       const Trajectory& trajectory,
+                       bool blocking = false);
+
+  };
+
+  class TrajectoryWardenOut : public TrajectoryWarden {
+    public:
+      TrajectoryWardenOut() : TrajectoryWarden(){};
+      StatusCode Write(const std::string& key,
+                       const Trajectory& trajectory,
+                       std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client,
+                       bool blocking = false);
+  };
+
 }
