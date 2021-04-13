@@ -13,6 +13,7 @@
 #include <stdexcept> // std::out_of_range
 
 #include "trajectory_warden.h"
+#include "trajectory_client.h"
 #include "game_snapshot.h"
 #include "map3d.h"
 #include "balloon_status.h"
@@ -45,7 +46,7 @@ namespace game_engine {
       std::vector<std::string> friendly_names_;
       std::vector<std::string> enemy_names_;
       std::shared_ptr<GameSnapshot> snapshot_;
-      std::shared_ptr<TrajectoryWarden> trajectory_warden_out_;
+      std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out_;
       Map3D map3d_;
       Eigen::Vector3d red_balloon_position_;
       Eigen::Vector3d blue_balloon_position_;
@@ -62,7 +63,7 @@ namespace game_engine {
           const std::vector<std::string>& friendly_names,
           const std::vector<std::string>& enemy_names,
           const std::shared_ptr<GameSnapshot> snapshot,
-          const std::shared_ptr<TrajectoryWarden> trajectory_warden_out,
+          const std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out,
           const Map3D& map3d,
           const Eigen::Vector3d& red_balloon_position,
           const Eigen::Vector3d& blue_balloon_position,
@@ -85,7 +86,7 @@ namespace game_engine {
       void Stop();
 
       // Main loop for this thread
-      void Run();
+      void Run(std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients);
 
       // Virtual function to be implemented as by an actor. Input is a snapshot
       // of the system, output is an intended trajectory for each of the
@@ -96,19 +97,18 @@ namespace game_engine {
   //  ******************
   //  * IMPLEMENTATION *
   //  ******************
-  inline void AutonomyProtocol::Run() {
+  inline void AutonomyProtocol::Run(std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients) {
     while(this->ok_) {
 
       // Request trajectory updates from the virtual function
       const std::unordered_map<std::string, Trajectory> trajectories =
         this->UpdateTrajectories();
 
-      // For every friendly quad, push the intended trajectory to the trajectory
-      // warden
+      // For every friendly quad, push the intended trajectory to the trajectory warden
       for(const std::string& quad_name: this->friendly_names_) {
         try {
           const Trajectory trajectory = trajectories.at(quad_name);
-          StatusCode submittedStatus = this->trajectory_warden_out_->Write(quad_name, trajectory, true);
+          StatusCode submittedStatus = this->trajectory_warden_out_->Write(quad_name, trajectory, proposed_trajectory_clients, true);
           this->submittedStatus_ = submittedStatus;
         } catch(const std::out_of_range& e) {
           continue;
