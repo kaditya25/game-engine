@@ -24,7 +24,7 @@ namespace game_engine {
       TrajectoryClientNode(const std::string& topic);
 
       // Publishes the message
-      unsigned int Call(const Trajectory& trajectory);
+      unsigned int Request(const Trajectory& trajectory);
 
   };
 }

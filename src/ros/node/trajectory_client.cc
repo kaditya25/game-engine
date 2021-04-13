@@ -9,7 +9,7 @@
          = node_handle_.serviceClient<mg_msgs::PVAYT>(topic);
    }
 
-   unsigned int TrajectoryClientNode::Call(const Trajectory& trajectory) {
+   unsigned int TrajectoryClientNode::Request(const Trajectory& trajectory) {
      mg_msgs::PVAYT srv;
      for(size_t idx = 0; idx < trajectory.Size(); ++idx) {
        mg_msgs::PVAYStamped instant;
