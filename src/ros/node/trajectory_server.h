@@ -16,7 +16,7 @@ namespace game_engine {
   class TrajectoryServerNode {
     private:
       // Trajectory warden manages multi-threaded access to trajectory data
-      std::shared_ptr<TrajectoryWarden> warden_;
+      std::shared_ptr<TrajectoryWardenIn> warden_;
 
       // ROS node handle
       ros::NodeHandle node_handle_;
@@ -38,6 +38,6 @@ namespace game_engine {
       TrajectoryServerNode(
           const std::string& topic,
           const std::string& key,
-          std::shared_ptr<TrajectoryWarden> warden);
+          std::shared_ptr<TrajectoryWardenIn> warden);
   };
 }
