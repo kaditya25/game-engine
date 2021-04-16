@@ -10,7 +10,7 @@
 #include <Eigen/Dense>
 #include <stdexcept> 
 
-#include "trajectory_warden.h"
+#include "warden.h"
 #include "trajectory_client.h"
 #include "game_snapshot.h"
 #include "map3d.h"

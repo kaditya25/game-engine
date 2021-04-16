@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "quad_state_warden.h"
+#include "warden.h"
 #include "quad_state.h"
 
 namespace game_engine {

@@ -11,12 +11,10 @@
 
 #include "yaml-cpp/yaml.h"
 #include "map3d.h"
-
-#include "trajectory_warden.h"
+#include "warden.h"
 #include "trajectory.h"
 #include "trajectory_client.h"
 
-#include "quad_state_warden.h"
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
 
@@ -27,8 +25,6 @@
 #include "goal_status_publisher_node.h"
 #include "goal_status_subscriber_node.h"
 #include "goal_status.h"
-
-//#include "trajectory_dispatcher.h"
 
 #include "quad_state_guard.h"
 
@@ -148,7 +144,7 @@ int main(int argc, char** argv) {
           0,0,0,
           1,0,0,0,
           0,0,0).finished());
-    quad_state_warden->Write(quad_name,initial_quad_state);
+    quad_state_warden->Write(quad_name, initial_quad_state);
   }
 
   // Pipe ROS data into the QuadStateWarden

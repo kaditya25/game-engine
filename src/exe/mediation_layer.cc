@@ -14,15 +14,13 @@
 
 #include "yaml-cpp/yaml.h"
 #include "map3d.h"
-
-#include "trajectory_warden.h"
+#include "warden.h"
 #include "trajectory.h"
 #include "trajectory_server.h"
 
-#include "quad_state_warden.h"
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
-#include "quad_state_dispatcher.h"
+//#include "quad_state_dispatcher.h"
 #include "quad_state_guard.h"
 
 #include "mediation_layer.h"
