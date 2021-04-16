@@ -38,7 +38,13 @@ namespace game_engine {
     return this->gridsize;
   }
 
-  bool OccupancyGrid3D::IsOccupied(const size_t z, const size_t y, const size_t x) const {
+  bool OccupancyGrid3D::IsOccupied(const size_t z, const size_t y, const size_t x) const 
+  {
+    if (x < 0 || y < 0 || z < 0 || x >= size_x_ || y >= size_y_ || z >= size_z_) 
+    {
+     return true;
+    }
+
     return this->data_[z][y][x];
   }
 
@@ -179,100 +185,113 @@ namespace game_engine {
     return true;
   }
 
-  Graph3D OccupancyGrid3D::AsGraph() const {
-    // Build a 3D array of nodes
-    std::shared_ptr<Node3D> node_grid[this->size_z_][this->size_y_][this->size_x_];
-    for(size_t height = 0; height < this->size_z_; ++height)
-    {
-      for(size_t row = 0; row < this->size_y_; ++row) {
-        for(size_t col = 0; col < this->size_x_; ++col) {
-          node_grid[height][row][col] = std::make_shared<Node3D>(Eigen::Matrix<double, 3, 1>(col ,row,height)); 
+  // Returns the minimum corner coordinates of the grid cell at index [x,y,z]
+  Eigen::Vector3d OccupancyGrid3D::boxCorner(int x, int y, int z) {
+    return Eigen::Vector3d(x*gridsize+origin.x(), y*gridsize+origin.y(), z*gridsize+origin.z());
+  }
+
+  // Returns the center coordinates of the grid cell at index [x,y,z]
+  Eigen::Vector3d OccupancyGrid3D::boxCenter(int x, int y, int z) {
+    return boxCorner(x,y,z) + Eigen::Vector3d(gridsize*0.5, gridsize*0.5, gridsize*0.5);
+  }
+
+
+  Graph3D OccupancyGrid3D::AsGraph() const 
+  {
+      // Build a 3D array of nodes
+      std::shared_ptr<Node3D> node_grid[this->size_z_][this->size_y_][this->size_x_];
+      for(size_t height = 0; height < this->size_z_; ++height)
+      {
+        for(size_t row = 0; row < this->size_y_; ++row) 
+        {
+          for(size_t col = 0; col < this->size_x_; ++col) 
+          {
+            node_grid[height][row][col] = std::make_shared<Node3D>(Eigen::Matrix<double, 3, 1>(col ,row,height)); 
+          }
         }
       }
-    }
-    // Convert node grid to directed edges and add to graph
-    std::vector<DirectedEdge3D> edges;
-    for(int height = 0; height < this->size_z_; ++height){
-      for(int row = 0; row < this->size_y_; ++row) {
-        for(int col = 0; col < this->size_x_; ++col) {
-          // If current node is unreachable, pass
+      // Convert node grid to directed edges and add to graph
+      std::vector<DirectedEdge3D> edges;
+      for(int height = 0; height < this->size_z_; ++height)
+      {
+        for(int row = 0; row < this->size_y_; ++row) 
+        {
+          for(int col = 0; col < this->size_x_; ++col) 
+          {
 
-          if(true == this->IsOccupied(height, row, col)) continue;
+            if(true == this->IsOccupied(height, row, col)) continue;
 
-          constexpr double ADJACENT_COST = 1.0;
-          constexpr double DIAGONAL_COST = std::sqrt(2);
-          constexpr double VERTEX_COST   = std::sqrt(3);
+            constexpr double ADJACENT_COST = 1.0;
+            constexpr double DIAGONAL_COST = std::sqrt(2);
+            constexpr double VERTEX_COST   = std::sqrt(3);
 
-          // Else, create paths from nearby nodes into this one
-          // 26 node surrounding the current node:  6 adjacent nodes. 12 diagonal nodes. 8 vertex nodes.
+            //DirectedEdge3D has 3 attributes: Source, sink, cost.
+            //The 6 adjacent nodes:
+            if(row - 1 >= 0)  edges.emplace_back(node_grid[height][row - 1][col], node_grid[height][row][col], ADJACENT_COST);
+            if(col - 1 >= 0)  edges.emplace_back(node_grid[height][row][col - 1], node_grid[height][row][col], ADJACENT_COST);
+            if(height - 1 >= 0)  edges.emplace_back(node_grid[height-1][row][col], node_grid[height][row][col], ADJACENT_COST);
+            if(row + 1 < this->size_y_)  edges.emplace_back(node_grid[height][row + 1][col], node_grid[height][row][col], ADJACENT_COST);
+            if(col + 1 < this->size_x_)  edges.emplace_back(node_grid[height][row][col + 1], node_grid[height][row][col], ADJACENT_COST);
+            if(height + 1 < this->size_z_)  edges.emplace_back(node_grid[height+1][row][col], node_grid[height][row][col], ADJACENT_COST);
 
-          //DirectedEdge3D has 3 attributes: Source, sink, cost.
-          //The 6 adjacent nodes:
-          if(row - 1 >= 0)  edges.emplace_back(node_grid[height][row - 1][col], node_grid[height][row][col], ADJACENT_COST);
-          if(col - 1 >= 0)  edges.emplace_back(node_grid[height][row][col - 1], node_grid[height][row][col], ADJACENT_COST);
-          if(height - 1 >= 0)  edges.emplace_back(node_grid[height-1][row][col], node_grid[height][row][col], ADJACENT_COST);
-          if(row + 1 < this->size_y_)  edges.emplace_back(node_grid[height][row + 1][col], node_grid[height][row][col], ADJACENT_COST);
-          if(col + 1 < this->size_x_)  edges.emplace_back(node_grid[height][row][col + 1], node_grid[height][row][col], ADJACENT_COST);
-          if(height + 1 < this->size_z_)  edges.emplace_back(node_grid[height+1][row][col], node_grid[height][row][col], ADJACENT_COST);
+            //The 12 diagonal nodes:
+            if(row - 1 >= 0 && col - 1 >= 0) {
+              edges.emplace_back(node_grid[height][row - 1][col - 1], node_grid[height][row][col], DIAGONAL_COST); }
+            if(row - 1 >= 0 && col + 1 < this->size_x_) {
+              edges.emplace_back(node_grid[height][row - 1][col + 1], node_grid[height][row][col], DIAGONAL_COST); }
+            if(row + 1 < this->size_y_ && col - 1 >= 0) {
+              edges.emplace_back(node_grid[height][row + 1][col - 1], node_grid[height][row][col], DIAGONAL_COST); }
+            if(row + 1 < this->size_y_ && col +1 < this->size_x_) {
+              edges.emplace_back(node_grid[height][row + 1][col + 1], node_grid[height][row][col], DIAGONAL_COST); }
+            //topface of the cube
+            if(row + 1 < this->size_y_ && height + 1 < this->size_z_) {
+              edges.emplace_back(node_grid[height+1][row + 1][col], node_grid[height][row][col], DIAGONAL_COST); }
+            if(row - 1 >= 0 && height + 1 < this->size_z_) {
+              edges.emplace_back(node_grid[height+1][row - 1][col], node_grid[height][row][col], DIAGONAL_COST); }
+            if(col + 1 < this->size_x_ && height + 1 < this->size_z_) {
+              edges.emplace_back(node_grid[height+1][row][col + 1], node_grid[height][row][col], DIAGONAL_COST); }
+            if(col - 1 >= 0 && height + 1 < this->size_z_) {
+              edges.emplace_back(node_grid[height+1][row][col - 1], node_grid[height][row][col], DIAGONAL_COST); }
+            //bottom face of the cube
+            if(row + 1 < this->size_y_ && height - 1 >= 0) {
+              edges.emplace_back(node_grid[height-1][row + 1][col], node_grid[height][row][col], DIAGONAL_COST); }
+            if(row - 1 >= 0 && height - 1 >= 0) {
+              edges.emplace_back(node_grid[height-1][row - 1][col], node_grid[height][row][col], DIAGONAL_COST); }
+            if(col + 1 < this->size_x_ && height - 1 >= 0) {
+              edges.emplace_back(node_grid[height-1][row][col + 1], node_grid[height][row][col], DIAGONAL_COST); }
+            if(col - 1 >= 0 && height - 1 >= 0) {
+              edges.emplace_back(node_grid[height-1][row][col - 1], node_grid[height][row][col], DIAGONAL_COST); }
 
-          //The 12 diagonal nodes:
-          if(row - 1 >= 0 && col - 1 >= 0) {
-            edges.emplace_back(node_grid[height][row - 1][col - 1], node_grid[height][row][col], DIAGONAL_COST); }
-          if(row - 1 >= 0 && col + 1 < this->size_x_) {
-            edges.emplace_back(node_grid[height][row - 1][col + 1], node_grid[height][row][col], DIAGONAL_COST); }
-          if(row + 1 < this->size_y_ && col - 1 >= 0) {
-            edges.emplace_back(node_grid[height][row + 1][col - 1], node_grid[height][row][col], DIAGONAL_COST); }
-          if(row + 1 < this->size_y_ && col +1 < this->size_x_) {
-            edges.emplace_back(node_grid[height][row + 1][col + 1], node_grid[height][row][col], DIAGONAL_COST); }
-          //topface of the cube
-          if(row + 1 < this->size_y_ && height + 1 < this->size_z_) {
-            edges.emplace_back(node_grid[height+1][row + 1][col], node_grid[height][row][col], DIAGONAL_COST); }
-          if(row - 1 >= 0 && height + 1 < this->size_z_) {
-            edges.emplace_back(node_grid[height+1][row - 1][col], node_grid[height][row][col], DIAGONAL_COST); }
-          if(col + 1 < this->size_x_ && height + 1 < this->size_z_) {
-            edges.emplace_back(node_grid[height+1][row][col + 1], node_grid[height][row][col], DIAGONAL_COST); }
-          if(col - 1 >= 0 && height + 1 < this->size_z_) {
-            edges.emplace_back(node_grid[height+1][row][col - 1], node_grid[height][row][col], DIAGONAL_COST); }
-          //bottom face of the cube
-          if(row + 1 < this->size_y_ && height - 1 >= 0) {
-            edges.emplace_back(node_grid[height-1][row + 1][col], node_grid[height][row][col], DIAGONAL_COST); }
-          if(row - 1 >= 0 && height - 1 >= 0) {
-            edges.emplace_back(node_grid[height-1][row - 1][col], node_grid[height][row][col], DIAGONAL_COST); }
-          if(col + 1 < this->size_x_ && height - 1 >= 0) {
-            edges.emplace_back(node_grid[height-1][row][col + 1], node_grid[height][row][col], DIAGONAL_COST); }
-          if(col - 1 >= 0 && height - 1 >= 0) {
-            edges.emplace_back(node_grid[height-1][row][col - 1], node_grid[height][row][col], DIAGONAL_COST); }
+            //The 8 vertex nodes:
+            // Top face vertices of the block
+            if(row + 1 < this->size_y_ && height + 1 < this->size_z_ && col + 1 < this->size_x_){
+              edges.emplace_back(node_grid[height+1][row+1][col+1], node_grid[height][row][col], VERTEX_COST);
+            }
+            if(row + 1 < this->size_y_ && height + 1 < this->size_z_ && col - 1 >= 0){
+              edges.emplace_back(node_grid[height+1][row+1][col-1], node_grid[height][row][col], VERTEX_COST);
+            }
+            if(row - 1 >= 0 && height + 1 < this->size_z_ && col + 1 < this->size_x_){
+              edges.emplace_back(node_grid[height+1][row-1][col+1], node_grid[height][row][col], VERTEX_COST);
+            }
+            if(row - 1 >= 0 && height + 1 < this->size_z_ && col - 1 >= 0){
+              edges.emplace_back(node_grid[height+1][row-1][col-1], node_grid[height][row][col], VERTEX_COST);
+            }
+            //Bottom face vertices of the block
+            if(row + 1 < this->size_y_ && height - 1 >= 0  && col + 1 < this->size_x_){
+              edges.emplace_back(node_grid[height-1][row+1][col+1], node_grid[height][row][col], VERTEX_COST);
+            }
+            if(row + 1 < this->size_y_ && height - 1 >= 0  && col - 1 >= 0){
+              edges.emplace_back(node_grid[height-1][row+1][col-1], node_grid[height][row][col], VERTEX_COST);
+            }
+            if(row - 1 >= 0 && height - 1 >= 0 && col + 1 < this->size_x_){
+              edges.emplace_back(node_grid[height-1][row-1][col+1], node_grid[height][row][col], VERTEX_COST);
+            }
+            if(row - 1 >= 0 && height - 1 >= 0 && col - 1 >= 0){
+              edges.emplace_back(node_grid[height-1][row-1][col-1], node_grid[height][row][col], VERTEX_COST);
+            }
 
-          //The 8 vertex nodes:
-          // Top face vertices of the block
-          if(row + 1 < this->size_y_ && height + 1 < this->size_z_ && col + 1 < this->size_x_){
-            edges.emplace_back(node_grid[height+1][row+1][col+1], node_grid[height][row][col], VERTEX_COST);
           }
-          if(row + 1 < this->size_y_ && height + 1 < this->size_z_ && col - 1 >= 0){
-            edges.emplace_back(node_grid[height+1][row+1][col-1], node_grid[height][row][col], VERTEX_COST);
-          }
-          if(row - 1 >= 0 && height + 1 < this->size_z_ && col + 1 < this->size_x_){
-            edges.emplace_back(node_grid[height+1][row-1][col+1], node_grid[height][row][col], VERTEX_COST);
-          }
-          if(row - 1 >= 0 && height + 1 < this->size_z_ && col - 1 >= 0){
-            edges.emplace_back(node_grid[height+1][row-1][col-1], node_grid[height][row][col], VERTEX_COST);
-          }
-          //Bottom face vertices of the block
-          if(row + 1 < this->size_y_ && height - 1 >= 0  && col + 1 < this->size_x_){
-            edges.emplace_back(node_grid[height-1][row+1][col+1], node_grid[height][row][col], VERTEX_COST);
-          }
-          if(row + 1 < this->size_y_ && height - 1 >= 0  && col - 1 >= 0){
-            edges.emplace_back(node_grid[height-1][row+1][col-1], node_grid[height][row][col], VERTEX_COST);
-          }
-          if(row - 1 >= 0 && height - 1 >= 0 && col + 1 < this->size_x_){
-            edges.emplace_back(node_grid[height-1][row-1][col+1], node_grid[height][row][col], VERTEX_COST);
-          }
-          if(row - 1 >= 0 && height - 1 >= 0 && col - 1 >= 0){
-            edges.emplace_back(node_grid[height-1][row-1][col-1], node_grid[height][row][col], VERTEX_COST);
-          }
-
-        }
-      }
+       }
     }
     return Graph3D(edges);
 

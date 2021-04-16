@@ -1,4 +1,5 @@
-// Author: Tucker Haydon
+#ifndef GAMEENGINE_OCCUPANCYGRID3D_H
+#define GAMEENGINE_OCCUPANCYGRID3D_H
 
 #pragma once
 
@@ -20,6 +21,7 @@ namespace game_engine {
       bool*** data_;
       size_t size_x_, size_y_, size_z_;
       bool heap_allocated_{false};
+      
       //Added: the origin of occupancy grid in rviz coordinate
       Eigen::Vector3d origin;
       double gridsize;
@@ -50,9 +52,14 @@ namespace game_engine {
       size_t SizeZ() const;
 
       Eigen::Vector3d Origin() const;
-
+      Eigen::Vector3d boxCorner(int x, int y, int z);
+      Eigen::Vector3d boxCenter(int x, int y, int z);
       bool IsOccupied(const size_t z, const size_t y, const size_t x) const;
 
       const bool*** Data() const;
   };
 }
+
+
+
+#endif //GAMEENGINE_OCCUPANCYGRID3D_H
