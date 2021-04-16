@@ -8,8 +8,8 @@ set(SOURCE_FILES
   example_autonomy_protocol.cc
   game_snapshot.cc
   student_autonomy_protocol.cc
-  occupancy_grid3d.cpp
-  student_game_engine_visualizer.cpp 
+  occupancy_grid3d.cc
+  student_game_engine_visualizer.cc
   )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})

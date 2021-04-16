@@ -8,7 +8,7 @@
 #include "../dependencies/P4/examples/gnuplot-iostream.h"
 
 #include "example_autonomy_protocol.h"
-#include "occupancy_grid.h"
+#include "occupancy_grid3d.h"
 #include "graph.h"
 #include "student_game_engine_visualizer.h"
 
