@@ -6,7 +6,7 @@
 #include <functional>
 
 #include "trajectory.h"
-#include "trajectory_warden.h"
+#include "warden.h"
 #include "mg_msgs/PVAYT.h"
 #include "trajectory_code.h"
 

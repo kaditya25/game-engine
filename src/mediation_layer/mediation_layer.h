@@ -6,8 +6,7 @@
 #include <string>
 #include <random>
 
-#include "trajectory_warden.h"
-#include "quad_state_warden.h"
+#include "warden.h"
 #include "quad_state_watchdog_status.h"
 #include "trajectory_client.h"
 #include "map3d.h"

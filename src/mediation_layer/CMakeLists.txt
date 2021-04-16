@@ -10,9 +10,8 @@ set(SOURCE_FILES
   quad_state.cc
   quad_state_dispatcher.cc
   quad_state_guard.cc
-  quad_state_warden.cc
   trajectory.cc
-  trajectory_warden.cc
+  warden.cc
   trajectory_vetter.cc
   balloon_watchdog.cc
   goal_watchdog.cc

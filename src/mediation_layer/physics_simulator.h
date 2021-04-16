@@ -14,7 +14,7 @@
 #include <utility>
 #include <map>
 
-#include "trajectory_warden.h"
+#include "warden.h"
 #include "quad_state_publisher_node.h"
 
 namespace game_engine {
