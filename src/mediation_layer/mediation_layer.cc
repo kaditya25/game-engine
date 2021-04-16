@@ -51,7 +51,7 @@ namespace game_engine {
 
         // Determine if trajectory has violated constraints
         Trajectory trajectory;
-        trajectory_warden_in->Await(key, trajectory, trajectory_clients);
+        trajectory_warden_in->Await(key, trajectory);
         TrajectoryCode trajectoryCode =
           trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
         trajectory_warden_in->SetTrajectoryStatus(trajectoryCode);
