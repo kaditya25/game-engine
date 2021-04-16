@@ -57,9 +57,9 @@ target_compile_options(integration_tests PRIVATE
 
 
 add_executable(mediation_layer_tests mediation_layer_tests.cc)
-target_include_directories(mediation_layer_tests PUBLIC 
+target_include_directories(mediation_layer_tests PUBLIC
 )
-target_link_libraries(mediation_layer_tests PUBLIC 
+target_link_libraries(mediation_layer_tests PUBLIC
   lib_geometry
   lib_mediation_layer
   Eigen3::Eigen)
@@ -68,6 +68,6 @@ set_target_properties(mediation_layer_tests PROPERTIES
   CXX_STANDARD_REQUIRED YES
   CXX_EXTENSIONS NO
 )
-target_compile_options(mediation_layer_tests PRIVATE 
+target_compile_options(mediation_layer_tests PRIVATE
   -Wfatal-errors
 )
