@@ -19,26 +19,19 @@ namespace game_engine {
   std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(40);
   std::unordered_map<std::string, Trajectory>
   ExampleAutonomyProtocol::UpdateTrajectories() {
-    //  ========== Error Codes ==========
-    // If any of these are not successful (1), the trajectory will be rejected.
-    // Success = 1,
-    // ------- Error codes for TrajectoryVetter -------
-    // NotEnoughTrajectoryPoints = 2
-    // StartPointFarFromCurrentPosition = 3
-    // PointExceedsMapBounds = 4
-    // PointWithinObstacle = 5
-    // ExceedsMaxVelocity = 6
-    // MeanValueExceedsMaxVelocity = 7
-    // ExceedsMaxAcceleration = 8
-    // MeanValueExceedsMaxAcceleration = 9
-    // TimestampsNotIncreasing = 10
-    // TimeBetweenPointsExceedsMaxTime = 11
-    //------- Error codes for TrajectoryWarden ------- (you should hopefully not see these. if you do contact TA.)
-    // KeyAlreadyExists = 12
-    // KeyDoesNotExist = 13
-    // ThreadStopped = 14
-    //------- Error codes for TrajectoryClient -------
-    // FailedToCallService = 15
+
+    // This function creates and returns a proposed trajectory.  The
+    // trajectory gets submitted to the mediation_layer (ML), which responds
+    // by setting the data member trajectoryCode_.  See the header file
+    // game-engine/src/util/trajectory_codes.h for a list of possible codes.
+    //
+    // Any code other than TrajectoryCode::Success indicates that the ML has
+    // rejected the submitted trajectory.
+    //
+    // trajectoryCode_ is initialized with TrajectoryCode::Success, so this
+    // will be its value the first time this function is called (before any
+    // trajectories have been submitted).  Thereafter, trajectoryCode_ will
+    // indicate the response code for the most recently submitted trajectory.
 
     static OccupancyGrid3D occupancy_grid;
     static Graph3D graphOfArena;   // Used by Astar, need to convert Astar 2d to 3D
@@ -51,17 +44,15 @@ namespace game_engine {
     if(firstTime)
     {
       firstTime = false;
-      occupancy_grid.LoadFromMap(this->map3d_, DISCRETE_LENGTH, SAFETY_BOUNDS);
+      occupancy_grid.LoadFromMap(map3d_, DISCRETE_LENGTH, SAFETY_BOUNDS);
       graphOfArena = occupancy_grid.AsGraph();  // You can run Astar on this graph
       visualizer.startVisualizing("/game_engine/environment");
-      red_balloon_pos = this->red_balloon_status_->position;
-      blue_balloon_pos = this->blue_balloon_status_->position;
+      red_balloon_pos = red_balloon_status_->position;
+      blue_balloon_pos = blue_balloon_status_->position;
       // Note the balloon popped status of the balloon can be read via the following commented out line of code:
-      // this->red_balloon_status_->popped
+      // red_balloon_status_->popped
     }
 
-    // Check the value of this to see which error you may be receiving
-    // upon submitting a trajectory.
     // If you want to see a numerical value for the code, you can cast and
     // print the code as shown below.
     if (trajectoryCode_ != TrajectoryCode::Success) {
