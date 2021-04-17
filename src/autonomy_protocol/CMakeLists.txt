@@ -8,11 +8,14 @@ set(SOURCE_FILES
   example_autonomy_protocol.cc
   game_snapshot.cc
   student_autonomy_protocol.cc
-)
+  occupancy_grid3d.cc
+  student_game_engine_visualizer.cc
+  )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})
 
 target_include_directories(${TARGET} PUBLIC
+  ${PROJECT_SOURCE_DIR}/src/P4/src
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -20,6 +23,8 @@ target_link_libraries(${TARGET} PUBLIC
   lib_mediation_layer
   lib_environment
   lib_util
+  lib_p4
+  ${Boost_LIBRARIES}
   Eigen3::Eigen)
 
 set_target_properties(${TARGET} PROPERTIES
@@ -28,6 +33,6 @@ set_target_properties(${TARGET} PROPERTIES
   CXX_EXTENSIONS NO
 )
 
-target_compile_options(${TARGET} PRIVATE 
+target_compile_options(${TARGET} PRIVATE
   -Wfatal-errors
 )
