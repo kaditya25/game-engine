@@ -60,19 +60,25 @@ namespace game_engine {
       // this->red_balloon_status_->popped
     }
 
-    // The first time this->submittedStatus_ is called it will be initialized
-    // to zero. Check the value of this to see which error you may be receiving
+    // Check the value of this to see which error you may be receiving
     // upon submitting a trajectory.
-    std::cout << "Submitted status: " << this->submittedStatus_ << std::endl;
-
-    // For example: We can check the AP initially submits a trajectory with a
-    // time that exceeds the max time between points. We can apply a
-    // conditional statement that checks the error associated with the
-    // submitted trajectory and fix it from there.
-    if (this->submittedStatus_ == TimeBetweenPointsExceedsMaxTime) {
-      std::cout << "Replanning trajectory. Shortening time between trajectory points." << std::endl;
-      dt_chrono = dt_chrono - std::chrono::milliseconds(2);
+    // If you want to see a numerical value for the code, you can cast and
+    // print the code as shown below.
+    if (trajectoryCode_ != TrajectoryCode::Success) {
+      std::cout << "Response code: " <<
+        static_cast<unsigned int>(trajectoryCode_) << std::endl;
     }
+
+    // Suppose your AP initially submits a trajectory with a time that exceeds
+    // the maximum allowed time between points. You could apply a conditional
+    // statement that checks the TrajectoryCode associated with the submitted
+    // trajectory and fix the problem, as shown below.
+    if (trajectoryCode_ == TrajectoryCode::TimeBetweenPointsExceedsMaxTime) {
+      std::cout << "Replanning trajectory: "
+        "Shortening time between trajectory points." << std::endl;
+      dt_chrono = dt_chrono - std::chrono::milliseconds(15);
+    }
+
 
     // Always use the chrono::system_clock for time. Trajectories require time
     // points measured in floating point seconds from the unix epoch.
