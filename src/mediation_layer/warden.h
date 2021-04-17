@@ -52,7 +52,7 @@ namespace game_engine {
             }
 
             this->map_[key] = std::make_shared<Warden::Container>(T());
-            std::cout << "Key: " << key << std::endl;
+            std::cout << "Quad: " << key << " successfully registered on the map." << std::endl;
             keys_.insert(key);
             return TrajectoryCode::Success;
         };
