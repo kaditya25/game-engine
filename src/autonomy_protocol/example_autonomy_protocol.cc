@@ -37,7 +37,7 @@ namespace game_engine {
     static Graph3D graphOfArena;   // Used by Astar, need to convert Astar 2d to 3D
     static Student_game_engine_visualizer visualizer;
     static bool firstTime = true;
-    static std::string& quad_name = this->friendly_names_[0];;
+    static std::string& quad_name = friendly_names_[0];
     static Eigen::Vector3d red_balloon_pos;
     static Eigen::Vector3d blue_balloon_pos;
 
