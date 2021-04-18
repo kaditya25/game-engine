@@ -11,12 +11,10 @@
 
 #include "yaml-cpp/yaml.h"
 #include "map3d.h"
-
-#include "trajectory_warden.h"
+#include "warden.h"
 #include "trajectory.h"
 #include "trajectory_client.h"
 
-#include "quad_state_warden.h"
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
 
@@ -27,8 +25,6 @@
 #include "goal_status_publisher_node.h"
 #include "goal_status_subscriber_node.h"
 #include "goal_status.h"
-
-#include "trajectory_dispatcher.h"
 
 #include "quad_state_guard.h"
 
@@ -148,7 +144,7 @@ int main(int argc, char** argv) {
           0,0,0,
           1,0,0,0,
           0,0,0).finished());
-    quad_state_warden->Write(quad_name,initial_quad_state);
+    quad_state_warden->Write(quad_name, initial_quad_state);
   }
 
   // Pipe ROS data into the QuadStateWarden
@@ -180,17 +176,11 @@ int main(int argc, char** argv) {
       std::make_shared<TrajectoryClientNode>(topic);
   }
   // Initialize the TrajectoryWarden
-  auto trajectory_warden_out = std::make_shared<TrajectoryWarden>();
+  auto trajectory_warden_out = std::make_shared<TrajectoryWardenOut>();
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
     trajectory_warden_out->Register(quad_name);
   }
-
-  // Pipe the TrajectoryWarden to the TrajectoryPublishers
-  auto trajectory_dispatcher = std::make_shared<TrajectoryDispatcher>();
-  std::thread trajectory_dispatcher_thread([&](){
-      trajectory_dispatcher->Run(trajectory_warden_out, proposed_trajectory_clients);
-      });
 
   // Balloon Status
   std::map<std::string, std::string> balloon_status_topics;
@@ -258,7 +248,7 @@ int main(int argc, char** argv) {
   // Start the autonomy protocol
   std::thread ap_thread(
       [&]() {
-        autonomy_protocol->Run();
+        autonomy_protocol->Run(proposed_trajectory_clients);
       });
 
   // Start the kill thread
@@ -275,7 +265,6 @@ int main(int argc, char** argv) {
         ros::shutdown();
 
         autonomy_protocol->Stop();
-        trajectory_dispatcher->Stop();
         quad_state_warden->Stop();
         trajectory_warden_out->Stop();
       });
@@ -286,7 +275,6 @@ int main(int argc, char** argv) {
   // Wait for program termination via ctl-c
   kill_thread.join();
   ap_thread.join();
-  trajectory_dispatcher_thread.join();
 
   return EXIT_SUCCESS;
 }

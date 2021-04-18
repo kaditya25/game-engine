@@ -9,13 +9,14 @@
 #include <string>
 #include <unordered_map>
 
-#include "quad_state_warden.h"
+#include "warden.h"
 #include "quad_state_guard.h"
 #include "quad_state.h"
+#include "trajectory_code.h"
 
 namespace game_engine {
   // Class that manages data transfer between a state warden and state guards.
-  // See the doc/software-patterns.md file for futher information about how the
+  // See the doc/software-patterns.md file for further information about how the
   // guard, warden, and dispatcher patterns interact.
   class QuadStateDispatcher {
     private:

@@ -106,6 +106,20 @@ int main(int argc, char** argv) {
     initial_quad_positions[quad_name] = Eigen::Vector3d(x,y,z);
   }
 
+  // Create quad state guards that will be accessed by the mediation layer
+  std::unordered_map<std::string, std::shared_ptr<QuadStateGuard>> quad_state_guards;
+  for(const auto& kv: quad_state_topics) {
+      const std::string& quad_name = kv.first;
+      const Eigen::Vector3d& initial_quad_position = initial_quad_positions[quad_name];
+      quad_state_guards[quad_name] = std::make_shared<QuadStateGuard>(QuadState(
+              (Eigen::Matrix<double, 13, 1>() <<
+              initial_quad_position(0), initial_quad_position(1), initial_quad_position(2),
+              0,0,0,
+              1,0,0,0,
+              0,0,0
+              ).finished()));
+    }
+
   // Initialize the QuadStateWarden. The QuadStateWarden enables safe, multi-threaded
   // access to quadcopter state data. Internal components that require access to
   // state data should request access through QuadStateWarden.
@@ -134,22 +148,6 @@ int main(int argc, char** argv) {
             topic, 
             quad_name, 
             quad_state_warden));
-  }
-
-
-  // Create quad state guards that will be accessed by the mediation layer
-  std::unordered_map<std::string, std::shared_ptr<QuadStateGuard>> quad_state_guards;
-  for(const auto& kv: quad_state_topics) {
-    const std::string& quad_name = kv.first;
-    const Eigen::Vector3d& initial_quad_position = initial_quad_positions[quad_name];
-    quad_state_guards[quad_name] 
-      = std::make_shared<QuadStateGuard>(QuadState(
-            (Eigen::Matrix<double, 13, 1>() <<
-          initial_quad_position(0), initial_quad_position(1), initial_quad_position(2),
-          0,0,0,
-          1,0,0,0,
-          0,0,0
-          ).finished()));
   }
 
   // The quad state dispatcher pipes data from the state warden to any state

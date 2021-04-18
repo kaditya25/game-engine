@@ -8,7 +8,7 @@
 #include <vector>
 #include <random>
 
-#include "quad_state_warden.h"
+#include "warden.h"
 #include "goal_status_publisher_node.h"
 #include "goal_status_subscriber_node.h"
 

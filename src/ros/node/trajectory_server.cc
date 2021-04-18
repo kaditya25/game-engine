@@ -4,7 +4,7 @@ namespace game_engine {
   TrajectoryServerNode::
   TrajectoryServerNode(const std::string& topic,
                        const std::string& key,
-                       std::shared_ptr<TrajectoryWarden> warden) {
+                       std::shared_ptr<TrajectoryWardenIn> warden) {
     this->key_ = key;
     this->warden_ = warden;
     this->node_handle_ = ros::NodeHandle("/game_engine/");

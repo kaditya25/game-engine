@@ -6,15 +6,14 @@
 #include <cassert>
 
 #include "trajectory.h"
-#include "trajectory_warden.h"
 #include "quad_state.h"
-#include "quad_state_warden.h"
+#include "warden.h"
 
 using namespace game_engine;
 
 void test_TrajectoryWarden() {
   { // Trivial
-    TrajectoryWarden warden;
+    TrajectoryWardenIn warden;
 
     Trajectory dummy_trajectory;
     assert(0 == warden.Keys().size());
@@ -24,7 +23,7 @@ void test_TrajectoryWarden() {
   }
 
   { // Test read/write
-    TrajectoryWarden warden;
+    TrajectoryWardenIn warden;
 
     Trajectory trajectory_write({(Eigen::Matrix<double, 11, 1>() << 1,1,1,1,1,1,1,1,1,1,1).finished()});
     assert(TrajectoryCode::Success == warden.Register("test"));
@@ -74,20 +73,20 @@ void test_QuadStateWarden() {
 
     QuadState dummy_state;
     assert(0 == warden.Keys().size());
-    assert(false == warden.Read("", dummy_state));
-    assert(false == warden.Write("", dummy_state));
-    assert(false == warden.Await("", dummy_state));
+    assert(TrajectoryCode::Success == warden.Read("", dummy_state));
+    assert(TrajectoryCode::Success == warden.Write("", dummy_state));
+    assert(TrajectoryCode::Success == warden.Await("", dummy_state));
   }
 
   { // Test read/write
     QuadStateWarden warden;
 
     QuadState state_write({(Eigen::Matrix<double, 13, 1>() << 0,0,0,0,0,0,1,0,0,0,0,0,0).finished()});
-    assert(true == warden.Register("test"));
-    assert(true == warden.Write("test", state_write));
+    assert(TrajectoryCode::Success == warden.Register("test"));
+    assert(TrajectoryCode::Success == warden.Write("test", state_write));
 
     QuadState state_read;
-    assert(true == warden.Read("test", state_read));
+    assert(TrajectoryCode::Success == warden.Read("test", state_read));
     assert(state_read.Position().isApprox(state_write.Position()));
     assert(state_read.Velocity().isApprox(state_write.Velocity()));
     assert(state_read.Orientation().isApprox(state_write.Orientation()));

@@ -6,7 +6,7 @@
 #include <string>
 #include <memory>
 
-#include "quad_state_warden.h"
+#include "warden.h"
 #include "map3d.h"
 #include "quad_state_watchdog_status.h"
 

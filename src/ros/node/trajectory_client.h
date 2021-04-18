@@ -23,6 +23,6 @@ namespace game_engine {
     TrajectoryClientNode(const std::string& topic);
 
     // Publishes the message
-    TrajectoryCode Call(const Trajectory& trajectory);
+    TrajectoryCode Request(const Trajectory& trajectory);
   };
 }
