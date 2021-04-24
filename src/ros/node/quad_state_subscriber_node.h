@@ -7,7 +7,7 @@
 #include <string>
 #include <functional>
 
-#include "quad_state_warden.h"
+#include "warden.h"
 #include "quad_state.h"
 
 #include "nav_msgs/Odometry.h"

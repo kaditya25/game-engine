@@ -1,10 +1,22 @@
+// Author: Tucker Haydon
+
 #include <chrono>
+
+#include "../dependencies/P4/dependencies/osqp/include/osqp.h"
+#include "../dependencies/P4/src/polynomial_sampler.h"
+#include "../dependencies/P4/src/polynomial_solver.h"
+#include "../dependencies/P4/examples/gnuplot-iostream.h"
+
 #include "example_autonomy_protocol.h"
+#include "occupancy_grid3d.h"
+#include "graph.h"
+#include "student_game_engine_visualizer.h"
+
+#define DISCRETE_LENGTH .2 // The length of one side of a cube in meters in the occupancy grid
+#define SAFETY_BOUNDS .34  // How big the bubble around obstacles will be
 
 namespace game_engine {
-  
-  std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(50);
-
+  std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(40);
   std::unordered_map<std::string, Trajectory>
   ExampleAutonomyProtocol::UpdateTrajectories() {
 
@@ -15,12 +27,32 @@ namespace game_engine {
     //
     // Any code other than TrajectoryCode::Success indicates that the ML has
     // rejected the submitted trajectory.
-    // 
+    //
     // trajectoryCode_ is initialized with TrajectoryCode::Success, so this
     // will be its value the first time this function is called (before any
     // trajectories have been submitted).  Thereafter, trajectoryCode_ will
     // indicate the response code for the most recently submitted trajectory.
-    //
+
+    static OccupancyGrid3D occupancy_grid;
+    static Graph3D graphOfArena;   // Used by Astar, need to convert Astar 2d to 3D
+    static Student_game_engine_visualizer visualizer;
+    static bool firstTime = true;
+    static std::string& quad_name = friendly_names_[0];
+    static Eigen::Vector3d red_balloon_pos;
+    static Eigen::Vector3d blue_balloon_pos;
+
+    if(firstTime)
+    {
+      firstTime = false;
+      occupancy_grid.LoadFromMap(map3d_, DISCRETE_LENGTH, SAFETY_BOUNDS);
+      graphOfArena = occupancy_grid.AsGraph();  // You can run Astar on this graph
+      visualizer.startVisualizing("/game_engine/environment");
+      red_balloon_pos = red_balloon_status_->position;
+      blue_balloon_pos = blue_balloon_status_->position;
+      // Note the balloon popped status of the balloon can be read via the following commented out line of code:
+      // red_balloon_status_->popped
+    }
+
     // If you want to see a numerical value for the code, you can cast and
     // print the code as shown below.
     if (trajectoryCode_ != TrajectoryCode::Success) {
@@ -37,6 +69,7 @@ namespace game_engine {
         "Shortening time between trajectory points." << std::endl;
       dt_chrono = dt_chrono - std::chrono::milliseconds(15);
     }
+
 
     // Always use the chrono::system_clock for time. Trajectories require time
     // points measured in floating point seconds from the unix epoch.
@@ -57,9 +90,7 @@ namespace game_engine {
 
     // If beyond the end time, return an empty map
     std::unordered_map<std::string, Trajectory> trajectory_map;
-    if(current_chrono_time > end_chrono_time) {
-      return trajectory_map;
-    }
+    if(current_chrono_time > end_chrono_time) {return trajectory_map;}
 
     // The following code generates and returns a new trajectory each time it
     // runs.  The new trajectory starts at the location on the original circle
@@ -76,14 +107,12 @@ namespace game_engine {
 
     // Number of samples
     const size_t N = remaining_chrono_time/dt_chrono;
-
+    // const size_t N = 1;
     // Radius
     const double radius = 0.5;
 
     // Angular speed in radians/s
     constexpr double omega = 2*M_PI/30;
-
-    const std::string& quad_name = this->friendly_names_[0];
 
     // Load the current position
     Eigen::Vector3d current_pos;
@@ -98,11 +127,13 @@ namespace game_engine {
     const Eigen::Vector3d r = current_pos - circle_center;
     const double theta_start = std::atan2(r.y(), r.x());
 
-    // TrajectoryVector3D is an std::vector object defined in trajectory.h
+    // TrajectoryVector3D is an std::vector object defined in the trajectory.h
+    // file. It's aliased for convenience.
     TrajectoryVector3D trajectory_vector;
-    for(size_t idx = 0; idx < N; ++idx) {
+    for(size_t idx = 0; idx < N; ++idx) 
+    {
       // chrono::duration<double> maintains high-precision floating point time
-      // in seconds. Use the count function to cast into floating point.
+      // in seconds use the count function to cast into floating point
       const std::chrono::duration<double> flight_chrono_time
         = current_chrono_time.time_since_epoch() + idx * dt_chrono;
       const double flight_time = flight_chrono_time.count();
@@ -141,11 +172,12 @@ namespace game_engine {
             time
             ).finished());
     }
-
     // Construct a trajectory from the trajectory vector
     Trajectory trajectory(trajectory_vector);
+    visualizer.drawTrajectory(trajectory);
     trajectory_map[quad_name] = trajectory;
 
     return trajectory_map;
   }
+
 }

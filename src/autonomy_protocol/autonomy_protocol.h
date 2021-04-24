@@ -10,7 +10,8 @@
 #include <Eigen/Dense>
 #include <stdexcept> 
 
-#include "trajectory_warden.h"
+#include "warden.h"
+#include "trajectory_client.h"
 #include "game_snapshot.h"
 #include "map3d.h"
 #include "balloon_status.h"
@@ -39,62 +40,63 @@ namespace game_engine {
   //
   // The AutonomyProtocol should be run as its own thread.
   class AutonomyProtocol {
-  protected:
-    std::vector<std::string> friendly_names_;
-    std::vector<std::string> enemy_names_;
-    std::shared_ptr<GameSnapshot> snapshot_;
-    std::shared_ptr<TrajectoryWarden> trajectory_warden_out_;
-    Map3D map3d_;
-    Eigen::Vector3d red_balloon_position_;
-    Eigen::Vector3d blue_balloon_position_;
-    std::shared_ptr<BalloonStatus> red_balloon_status_;
-    std::shared_ptr<BalloonStatus> blue_balloon_status_;
+    protected:
+      std::vector<std::string> friendly_names_;
+      std::vector<std::string> enemy_names_;
+      std::shared_ptr<GameSnapshot> snapshot_;
+      std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out_;
+      Map3D map3d_;
+      Eigen::Vector3d red_balloon_position_;
+      Eigen::Vector3d blue_balloon_position_;
+      std::shared_ptr<BalloonStatus> red_balloon_status_;
+      std::shared_ptr<BalloonStatus> blue_balloon_status_;
 
-    volatile std::atomic<bool> ok_{true};
-    TrajectoryCode trajectoryCode_{TrajectoryCode::Success};
+      volatile std::atomic<bool> ok_{true};
+      TrajectoryCode trajectoryCode_{TrajectoryCode::Success};
 
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-    AutonomyProtocol(const std::vector<std::string>& friendly_names,
-                     const std::vector<std::string>& enemy_names,
-                     const std::shared_ptr<GameSnapshot> snapshot,
-                     const std::shared_ptr<TrajectoryWarden> trajectory_warden_out,
-                     const Map3D& map3d,
-                     const Eigen::Vector3d& red_balloon_position,
-                     const Eigen::Vector3d& blue_balloon_position,
-                     const std::shared_ptr<BalloonStatus> red_balloon_status,
-                     const std::shared_ptr<BalloonStatus> blue_balloon_status)
-    : friendly_names_(friendly_names),
-      enemy_names_(enemy_names),
-      snapshot_(snapshot),
-      trajectory_warden_out_(trajectory_warden_out),
-      map3d_(map3d),
-      red_balloon_position_(red_balloon_position),
-      blue_balloon_position_(blue_balloon_position),
-      red_balloon_status_(red_balloon_status),
-      blue_balloon_status_(blue_balloon_status) {}
+      AutonomyProtocol(
+          const std::vector<std::string>& friendly_names,
+          const std::vector<std::string>& enemy_names,
+          const std::shared_ptr<GameSnapshot> snapshot,
+          const std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out,
+          const Map3D& map3d,
+          const Eigen::Vector3d& red_balloon_position,
+          const Eigen::Vector3d& blue_balloon_position,
+          const std::shared_ptr<BalloonStatus> red_balloon_status,
+          const std::shared_ptr<BalloonStatus> blue_balloon_status)
+        : friendly_names_(friendly_names),
+          enemy_names_(enemy_names),
+          snapshot_(snapshot),
+          trajectory_warden_out_(trajectory_warden_out),
+          map3d_(map3d),
+          red_balloon_position_(red_balloon_position),
+          blue_balloon_position_(blue_balloon_position),
+          red_balloon_status_(red_balloon_status),
+          blue_balloon_status_(blue_balloon_status) {}
 
-    virtual ~AutonomyProtocol(){}
 
-    // Stop this thread from running
-    void Stop();
+      virtual ~AutonomyProtocol(){}
 
-    // Main loop for this thread
-    void Run();
+      // Stop this thread from running
+      void Stop();
 
-    // Virtual function to be implemented as by an actor. Input is a snapshot
-    // of the system, output is an intended trajectory for each of the
-    // friendly quads.
-    virtual std::unordered_map<std::string, Trajectory> UpdateTrajectories() = 0;
+      // Main loop for this thread
+      void Run(std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients);
+
+      // Virtual function to be implemented as by an actor. Input is a snapshot
+      // of the system, output is an intended trajectory for each of the
+      // friendly quads.
+      virtual std::unordered_map<std::string, Trajectory> UpdateTrajectories() = 0;
   };
 
   //  ******************
   //  * IMPLEMENTATION *
   //  ******************
-  inline void AutonomyProtocol::Run() {
+  inline void AutonomyProtocol::Run(std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients) {
     while(ok_) {
-
       // Request trajectory updates from the virtual function
       const std::unordered_map<std::string, Trajectory> trajectories =
         UpdateTrajectories();
@@ -105,7 +107,7 @@ namespace game_engine {
         try {
           const Trajectory trajectory = trajectories.at(quad_name);
           TrajectoryCode trajectoryCode =
-            trajectory_warden_out_->Write(quad_name, trajectory, true);
+            trajectory_warden_out_->Write(quad_name, trajectory, proposed_trajectory_clients, true);
           trajectoryCode_ = trajectoryCode;
         } catch(const std::out_of_range& e) {
           continue;

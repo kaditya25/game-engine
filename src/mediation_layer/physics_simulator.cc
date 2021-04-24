@@ -186,7 +186,7 @@ namespace game_engine {
   }
 
   void PhysicsSimulator::Run(
-      std::shared_ptr<TrajectoryWarden> trajectory_warden_in,
+      std::shared_ptr<TrajectoryWardenIn> trajectory_warden_in,
       std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers,
       unsigned int seed) {
 
@@ -266,7 +266,7 @@ namespace game_engine {
             ).finished();
     }
 
-    while(true == this->ok_) {
+    while(this->ok_) {
       // Current time
       const auto current_time = std::chrono::system_clock::now();
 

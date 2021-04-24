@@ -5,7 +5,7 @@
 
 #include "trajectory.h"
 #include "map3d.h"
-#include "quad_state_warden.h"
+#include "warden.h"
 #include "trajectory_code.h"
 
 namespace game_engine {

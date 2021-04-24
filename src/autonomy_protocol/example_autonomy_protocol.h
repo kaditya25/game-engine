@@ -19,7 +19,7 @@ namespace game_engine {
           const std::vector<std::string>& friendly_names,
           const std::vector<std::string>& enemy_names,
           const std::shared_ptr<GameSnapshot> snapshot,
-          const std::shared_ptr<TrajectoryWarden> trajectory_warden_out,
+          const std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out,
           const Map3D& map3d,
           const Eigen::Vector3d& red_balloon_position,
           const Eigen::Vector3d& blue_balloon_position,
