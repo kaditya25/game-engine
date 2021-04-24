@@ -1,15 +1,11 @@
 # Software Patterns
 This file serves as informal documentation of the various software patterns used
-in the GameEngine. 
+within GameEngine. 
 
 ## ROS
-ROS has a tendency to spread its tendrils throughout a code base. Before long,
-one might find themselves importing ROS packages and subscribing/publishing data
-without a defined structure. This is quick and easy, but there are no shortcuts
-in life and one will tend to acquire technical debt.
-
-To manage ROS and keep software components weakly linked, almost all ROS code is
-limited to the (ros)[../src/ros] directory.
+ROS has a tendency to spread its tendrils throughout a code base.  To manage
+ROS and keep software components weakly linked, almost all ROS code is limited
+to the (ros)[../src/ros] directory.
 
 ### Publishers and Subscribers
 Any new publishers and subscribers should be wrapped in a new class instance.

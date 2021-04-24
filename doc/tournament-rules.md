@@ -12,7 +12,7 @@ For example, a team that pops both balloons within the time limit will be
 scored higher than a team that only pops one balloon even if the second team's
 round-trip time was shorter.
 
-Thus, the scoring reflects a law of software design: 
+The scoring reflects a law of software design: 
 1) get it working
 2) get it working right
 3) get it working right and fast
@@ -23,10 +23,10 @@ tournament day. If the instructors determine that a team's attempt failed due a
 failure of course materials (e.g., balloon gets sucked into quadcopter's motor),
 the attempt is refunded and the team is permitted to try again.
 
-## Path Constraints for Obstacle Course
+## Path Constraints for the Obstacle Course
 The following subsections introduce path constraints that teams must respect.
 
-### No-Fly Zone
+### No-Fly Zones
 Quadcopters must not fly into obstacles or exceed the bounds of the map. This
 constraint manifests in two ways:
 

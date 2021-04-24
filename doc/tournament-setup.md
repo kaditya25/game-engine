@@ -28,18 +28,31 @@ In the `~/Workspace` directory, either clone a fresh copy of the
 `game-engine-student` repository (if you want to start with a clean slate), or
 update your existing local `game-engine` repository (if one already exists at
 that location and you want to keep it).  Name your local repository
-`game-engine`.  To clone a fresh copy:
+`game-engine`.
+
+### To clone a fresh copy:
 ```bash
 cd ~/Workspace/
 git clone https://gitlab.com/todd.humphreys/game-engine-student.git game-engine
 cd game-engine
 git submodule update --init --recursive
 ```
-To update an existing copy (assuming `origin` refers to
-`https://gitlab.com/todd.humphreys/game-engine-student.git`)
+
+### To update an existing copy
+The code below assumes `origin` refers to
+`https://gitlab.com/todd.humphreys/game-engine-student.git`.
+
+If your local repository is named `game-engine-student`, rename it as
+`game-engine`:
+```bash
+cd ~/Workspace
+mv game-engine-student game-engine
+```
+
+Pull the latest changes into your code:
 ```bash
 cd ~/Workspace/game-engine
-git pull origin master
+git pull origin master  # de-conflict as necessary
 git submodule update --init --recursive
 ```
 
@@ -149,5 +162,6 @@ As before,
 - Add your team members as Maintainer and the TAs as Reporter to the remote repository.
 - Rename `origin` as `source` and add your new remote repository as `origin`.
 - Push your local repository to `origin`.
+- Configure `balloon-locator` with your name and email.
 - Add the executable (in this case balloon-locator/exe/locateBalloon) to your
   repository so the TAs can pull and evaluate it.

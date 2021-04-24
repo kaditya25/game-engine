@@ -1,7 +1,7 @@
 # Tournament Instructions
 
 ## Goals
-Vision Test: Determine the red and blue balloon center locations to within 10
+Vision Test: Estimate the red and blue balloon center locations to within 10
 cm based on a set of images and their corresponding metadata.
 
 Obstacle Course: Command a quadcopter to pop two balloons and return to the
@@ -10,10 +10,11 @@ start position as quickly as possible.
 ## Obstacle Course Notes
 
 ### Interface
-Students must complete the function `StudentAutonomyProtocol::UpdateTrajectories`
-located in the file `src/autonomy_protocol/student_autonomy_protocol.h`. This
-function provides access to map data, balloon data, and the current state of the
-quadcopter and requires students to specify trajectories for the quadcopters. 
+Students must complete the function
+`StudentAutonomyProtocol::UpdateTrajectories` located in the file
+`game-engine/src/autonomy_protocol/student_autonomy_protocol.h`. This function
+provides access to map data, balloon data, and the current state of the
+quadcopter, and expects students to specify quadcopter trajectories.
 
 Note that the interface only specifies the input and output (quad state ->
 quad trajectory), but not how to accomplish it. It is up to students to
@@ -42,8 +43,7 @@ without written permission of one of the TAs.
 ### Running the Game Engine
 To run the final project, follow the build/run instructions in `README.md` in
 the top-level `game-engine` directory. Student autonomy protocols are compiled
-into an executable called `student_autonomy_protocol`. Instead of running
-`example_autonomy_protocol`, run `student_autonomy_protocol`.
+into an executable called `student_autonomy_protocol`. 
 
 ### Tagging releases
 During the pre-tournament and tournament, your team will want the TA to
