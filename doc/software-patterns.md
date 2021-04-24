@@ -1,9 +1,6 @@
 # Software Patterns
 This file serves as informal documentation of the various software patterns used
-in the GameEngine. The original author, Tucker Haydon, developed the majority of
-the GameEngine from scratch and did not know the proper names of specific
-patterns. Understand that there may be a naming conflict between the described
-patterns and industry-standard patterns.
+in the GameEngine. 
 
 ## ROS
 ROS has a tendency to spread its tendrils throughout a code base. Before long,
