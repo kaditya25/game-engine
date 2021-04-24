@@ -140,19 +140,6 @@ To pull from `origin`:
 git pull origin master
 ```
 
-## Add `student_autonomy_protocol` binary
-To facilitate the TAs' evaluation of your team's autonomy protocol, add the
-`student_autonomy_protocol` binary to your git repository:
-```bash
-cd ~/Workspace/game-engine/bin/
-git add student_autonomy_protocol
-```
-This way, each time you push to `origin`, the latest
-`student_autonomy_protocol` gets automatically pushed, permitting the TAs to
-pull it for evaluation.  Note that it's normally bad form to add binaries to a
-repository because they take up unnecessary space: it's the source code that
-matters!  But in this case convenience is the main consideration.
-
 ## Create a remote GitLab repository for the Vision Test
 Follow steps similar to the above to create your team's remote repository for
 the tournament's Vision Test.  Name the remote repository `balloon-locator`.
@@ -163,5 +150,4 @@ As before,
 - Rename `origin` as `source` and add your new remote repository as `origin`.
 - Push your local repository to `origin`.
 - Configure `balloon-locator` with your name and email.
-- Add the executable (in this case balloon-locator/exe/locateBalloon) to your
-  repository so the TAs can pull and evaluate it.
+

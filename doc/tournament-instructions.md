@@ -7,6 +7,17 @@ cm based on a set of images and their corresponding metadata.
 Obstacle Course: Command a quadcopter to pop two balloons and return to the
 start position as quickly as possible.
 
+## Important Dates
+- April 29: Pre-tournament starts. First day that students may submit
+  binaries
+- April 30: First pre-tournament evaluation date. Binaries and tournament standing
+  are evaluated at 9 am. Binaries will be updated and evaluated every week day
+  at 9 am thereafter until the end of the pre-tournament.
+- May 12: Final day of pre-tournament. Final evaluation at 9 am. Final map of
+  arena released (this one will be used on the day of the tournament).
+- May 13: Tournament binaries (both obstacle course and vision test) must be submitted by 9 am.    
+- May 14, Tournament day. 9 am
+
 ## Obstacle Course Notes
 
 ### Interface
@@ -45,7 +56,7 @@ To run the final project, follow the build/run instructions in `README.md` in
 the top-level `game-engine` directory. Student autonomy protocols are compiled
 into an executable called `student_autonomy_protocol`. 
 
-### Tagging releases
+<!--- ### Tagging releases
 During the pre-tournament and tournament, your team will want the TA to
 evaluate only your *approved* `student_autonomy_protocol` binary, which may
 not be the one in the master branch of your team's GitLab repository.  You'll
@@ -76,5 +87,39 @@ the example below, the annotated tag is labeled with example message
 ```bash
 git tag -a release -m "pre-tournament day 3"
 git push origin release
+```-->
+
+## Tournament Binaries
+To allow teams to evaluate their standing with respect to the other teams, but
+prevent code-sharing, the pre-tournament will employ binaries. Each
+game-engine repository is set up to build a binary called
+"student_autonomy_protocol" and place it into a game-engine/bin folder. Teams
+will be required to submit this binary for pre-tournament evaluation.  A TA
+will pull these binaries every weekday at 9 am and evaluate tournament
+standings.
+
+Clone the `tournament-binaries` repository as follows:
+```bash
+cd ~/Workspace
+git clone https://gitlab.com/todd.humphreys/tournament-binaries.git
 ```
+
+### Binary Submission
+To submit a binary, copy your `student_autonomy_protocol` binary into your
+team's directory in `tournament-binaries` and then push to the remote
+repository:
+
+```bash
+cd ~/Workspace/tournament-binaries/YOUR_TEAM_NAME
+cp ../../game-engine/bin/student_autonomy_protocol .
+git add student_autonomy_protocol
+git push origin master
+```
+
+### Public Binaries
+All submitted binaries become public. Thus, all teams may view their
+competition's binaries.  To evaluate an opponent's strategy, launch all
+tournament executables as normal, but substitute an opponent's
+`student_autonomy_protocol`.
+
 
