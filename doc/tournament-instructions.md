@@ -47,14 +47,14 @@ current functionality without the written permission of one of the TAs.
 
 ### Code Restrictions
 1) Don't alter any code in the src/exe folder
-2) Don't  alter any of the AutonomyProtocol interfaces
+2) Don't  alter any of the `AutonomyProtocol` interfaces
 3) Don't change or remove any core functionalities of `game-engine`
 without written permission of one of the TAs.
 
 ### Running the Game Engine
-To run `game-engine`, follow the build/run instructions in `README.md` in
-the top-level `game-engine` directory. Your autonomy protocol is compiled
-into an executable called `student_autonomy_protocol`. 
+To run `game-engine`, follow the build/run instructions in `README.md` in the
+top-level `game-engine` directory. Your autonomy protocol will be compiled
+into an executable called `student_autonomy_protocol`.
 
 <!--- ### Tagging releases
 During the pre-tournament and tournament, your team will want the TA to
