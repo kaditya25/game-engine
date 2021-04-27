@@ -152,7 +152,7 @@ namespace game_engine {
     {
       for(size_t row = 0; row < this->size_y_; ++row) {
         for(size_t col = 0; col < this->size_x_; ++col) {
-          const Point3D p(min_x + col*sample_delta, min_y+row*sample_delta, min_z+height*sample_delta);
+          Point3D p(min_x + col*sample_delta + sample_delta*.5, min_y+row*sample_delta + sample_delta*.5, min_z+height*sample_delta + sample_delta*.5);
           // True indicates occupied, false indicates free
           this->data_[height][row][col] = !inflated_map.Contains(p) || !inflated_map.IsFreeSpace(p);
         }
