@@ -34,15 +34,14 @@ namespace game_engine {
     // indicate the response code for the most recently submitted trajectory.
 
     static OccupancyGrid3D occupancy_grid;
-    static Graph3D graphOfArena;   // Used by Astar, need to convert Astar 2d to 3D
+    static Graph3D graphOfArena;   // Used by A*, need to convert A* 2d to 3D
     static Student_game_engine_visualizer visualizer;
     static bool firstTime = true;
     static std::string& quad_name = friendly_names_[0];
     static Eigen::Vector3d red_balloon_pos;
     static Eigen::Vector3d blue_balloon_pos;
 
-    if(firstTime)
-    {
+    if(firstTime) {
       firstTime = false;
       occupancy_grid.LoadFromMap(map3d_, DISCRETE_LENGTH, SAFETY_BOUNDS);
       graphOfArena = occupancy_grid.AsGraph();  // You can run Astar on this graph
@@ -130,8 +129,7 @@ namespace game_engine {
     // TrajectoryVector3D is an std::vector object defined in the trajectory.h
     // file. It's aliased for convenience.
     TrajectoryVector3D trajectory_vector;
-    for(size_t idx = 0; idx < N; ++idx) 
-    {
+    for(size_t idx = 0; idx < N; ++idx) {
       // chrono::duration<double> maintains high-precision floating point time
       // in seconds use the count function to cast into floating point
       const std::chrono::duration<double> flight_chrono_time
