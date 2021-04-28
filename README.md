@@ -126,7 +126,7 @@ After the first time you build `game-engine`, you'll need to add a command
 to your your `.zshrc` configuration file so that whenever you open a terminal,
 the shell will run the necessary ROS setup scripts.
 
-First open `.zshrc` in your favorite editor (e.g., for sublime):
+First open `.zshrc` in your favorite editor; e.g., for sublime:
 ```bash
 subl ~/.zshrc
 ```
@@ -139,7 +139,7 @@ source ~/Workspace/game-engine/build/devel/setup.zsh
 The Game Engine is composed of several interacting executables. After
 building, you must ensure that the following programs are running. You are
 encouraged to use a terminal multiplexer like tmux and start each program in a
-separate pane.
+separate pane. See [here](tmux/README.md) for further information on tmux.
 
 ### ROS Core
 ```bash
