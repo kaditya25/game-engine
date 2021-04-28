@@ -54,6 +54,7 @@ namespace game_engine {
       Eigen::Vector3d Origin() const;
       Eigen::Vector3d boxCorner(int x, int y, int z);
       Eigen::Vector3d boxCenter(int x, int y, int z);
+      std::tuple<int,int,int> mapToGridCoordinates(Eigen::Vector3d pt);
       bool IsOccupied(const size_t z, const size_t y, const size_t x) const;
 
       const bool*** Data() const;

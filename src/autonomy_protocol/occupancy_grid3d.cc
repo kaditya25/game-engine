@@ -195,6 +195,14 @@ namespace game_engine {
     return boxCorner(x,y,z) + Eigen::Vector3d(gridsize*0.5, gridsize*0.5, gridsize*0.5);
   }
 
+  std::tuple<int,int,int> OccupancyGrid3D::mapToGridCoordinates(Eigen::Vector3d pt) 
+  {
+    return std::tuple<int,int,int>(
+      floor((pt[0] - origin.x()) / gridsize),
+      floor((pt[1] - origin.y()) / gridsize),
+      floor((pt[2] - origin.z()) / gridsize)
+    );
+  }
 
   Graph3D OccupancyGrid3D::AsGraph() const 
   {
