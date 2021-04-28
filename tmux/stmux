@@ -1,0 +1,33 @@
+#! /bin/bash
+tmux new-session -d -s main
+tmux rename-window 'code'
+tmux send-keys "cd ~/Workspace/game-engine/src" C-l C-m C-l
+tmux new-window
+tmux rename-window 'build'
+tmux send-keys 'cd ~/Workspace/game-engine/build' C-l C-m C-l
+tmux new-window
+tmux rename-window 'cmd'
+tmux split-window -h -b
+tmux send-keys 'cd ~/Workspace/game-engine/bin' C-l C-m C-l
+tmux split-window -v -b
+tmux send-keys 'cd ~/Workspace/game-engine/bin' C-l C-m C-l
+tmux split-window -v -b
+tmux send-keys 'cd ~/Workspace/game-engine/bin' C-l C-m C-l
+tmux split-window -v -b
+tmux send-keys 'cd ~/Workspace/game-engine/bin' C-l C-m C-l
+tmux select-pane -D
+tmux send-keys 'cd ~/Workspace/game-engine/bin' C-l C-m C-l
+tmux select-pane -D
+tmux send-keys 'cd ~/Workspace/game-engine/bin' C-l C-m C-l
+tmux split-window -v
+tmux send-keys 'cd ~/Workspace/game-engine/bin' C-l C-m C-l
+tmux select-pane -R
+tmux split-window -v 
+tmux send-keys 'cd ~/Workspace/game-engine/run' C-l C-m C-l
+tmux select-pane -U
+tmux send-keys 'cd ~/Workspace/game-engine/run' C-l C-m C-l
+tmux split-window -v
+tmux send-keys 'cd ~/Workspace/game-engine/run' C-l C-m C-l
+tmux select-pane -U
+tmux select-window -t 3
+tmux -2 attach-session -t main
