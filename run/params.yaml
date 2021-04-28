@@ -20,28 +20,27 @@ balloon_status_topics:
 goal_status_topics:
   "home": "/game_engine/home_status"
 
-map_file_path: "/home/aerial-robotics/Workspace/game-engine/resources/maps/forest.map"
+map_file_path: "/home/aerial-robotics/Workspace/game-engine/resources/maps/tournament.map"
 quad_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/quad.stl"
 balloon_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/balloon.stl"
 goal_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/torus.stl"
 
 blue_balloon_position: [-16.0, 19.0, -4.0]
-red_balloon_position:  [-26.0, 15.0, 0.0]
+red_balloon_position:  [-23.0, 17.0, -2.0]
 
-move_blue: true
+move_blue: false
 blue_balloon_position_new: [-21.0, 19.0, -4.0]
 blue_balloon_max_move_time: 60.0
 
-move_red: true
+move_red: false
 red_balloon_position_new:  [-24.0, 20.0, -3.5]
 red_balloon_max_move_time: 60.0
 
 use_seed: true
 seed: 0
 
-goal_position: [-12.0, 14.0, -4.0]
+goal_position: [-13.0, 16.0, -4.0]
 
 initial_quad_positions:
-  "apollo": "-12.0 14.0 -4.0"
-
+  "apollo": "-13.0 16.0 -4.0"
 

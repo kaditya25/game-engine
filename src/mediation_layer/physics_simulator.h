@@ -60,7 +60,7 @@ namespace game_engine {
         double max_frequency = 1.0;
 
         // Standard deviation of VonKarman model
-#define WIND_INTENSITY 2
+#define WIND_INTENSITY 1
 #if WIND_INTENSITY<=1
         // Slight breeze
         double sigma_u_x = 0.1;
