@@ -12,26 +12,30 @@ quadcopter's state at a subsequent time point. VZ pushes visualization data to
 ROS's RVIZ program.
 
 ## Installation
-### Prerequisites 
+### Dependencies
 1. [Eigen](https://eigen.tuxfamily.org)
 2. [ROS](http://www.ros.org)
 3. [P4](https://gitlab.com/radionavlab/public/p4)
 
 ### Clone
 ```bash
-cd Workspace
+cd ~/Workspace
 git clone https://gitlab.com/todd.humphreys/game-engine-student.git game-engine
 cd game-engine
 git submodule update --init --recursive
 ```
 
-### Building Dependencies
+<!--- [Todd doesn't think any of this is necessary] ### Building Dependencies
 
-If you are cloning or using the repository for the first time, you will need to build the dependencies (the submodules). They all use the same build process, included below. 
+If you are cloning or using the repository for the first time, you will need
+to build the dependencies (the submodules). They all use the same build
+process, included below.
 
 <p>
 <details>
-Note: If you want to make the dependencies available system-wide, follow the `make` command with `sudo make install`.
+
+Note: If you want to make the dependencies available system-wide, follow the
+`make` command with `sudo make install`.
 
 #### Eigen
 
@@ -98,17 +102,20 @@ To do this, open the cmake curses interface:
 ```bash
 mkdir build # (if the build directory hasn't already been created)
 cd build
-ccmake ..
+cmake ..
 ```
 Navigate to the `osqp_DIR` setting and change it to the location of the osqp binaries. It may be different depending where you cloned the repositories to, but for my virtual machine, it looks something like this:
 ```
 /home/aerial-robotics/Workspace/game-engine-student/src/dependencies/P4/dependencies/osqp/build
 ```
 </details>
-</p>
+</p> -->
+
+### Build
 
 ```bash
-mkdir build # (if the build directory hasn't already been created)
+cd ~/Workspace/game-engine
+mkdir build # (do this only if the `build` directory hasn't already been created)
 cd build
 cmake ..
 make -j4
@@ -127,7 +134,7 @@ roscore
 
 ### Load ROS params
 The ROS parameters found in `game-engine/run/params.yaml` must be loaded after
-roscore has been started or re-loaded if any of the parameters have changed
+`roscore` has been started or re-loaded if any of the parameters have changed
 since loading.
 
 First, modify the file paths in `/game-engine/run/params.yaml` (e.g.,
@@ -172,7 +179,7 @@ cd game-engine/bin
 ./visualizer
 ```
 Note that it may take some time (a few 10s of seconds) for all the elements of
-the arena to get populated in RVIZ.
+the arena to get populated into the RVIZ display.
 
 ### Autonomy Protocol
 The autonomy protocol takes the current quadcopter state and publishes a
