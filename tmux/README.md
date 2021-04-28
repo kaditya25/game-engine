@@ -40,6 +40,7 @@ tutorial on tmux. Note that the tmux configuration you installed from
 - To split the current pane vertically: prefix Left or Right
 - To split the current pane horizontally: prefix Down or Up
 - To navigate between panes: C-Down or Up or Right or Left
+- To close a pane: C-d
 
 You can have a look at all tmux settings by inspecting the file
 `~/.tmux.conf`.
