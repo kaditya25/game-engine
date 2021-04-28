@@ -22,7 +22,7 @@ cd dotfiles
 Next, move the `stmux` bash script into `/usr/local/bin` so that it can be run
 by typing `stmux` on the command line:
 ```bash
-cd Workspace/game-engine/tmux
+cd ~/Workspace/game-engine/tmux
 sudo cp stmux /usr/local/bin
 ```
 
