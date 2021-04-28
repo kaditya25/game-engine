@@ -115,10 +115,25 @@ Navigate to the `osqp_DIR` setting and change it to the location of the osqp bin
 
 ```bash
 cd ~/Workspace/game-engine
-mkdir build # (do this only if the `build` directory hasn't already been created)
+mkdir build # (do this only if the build directory hasn't already been created)
 cd build
 cmake ..
 make -j4
+```
+
+### Configure for ROS
+After the first time you build `game-engine`, you'll need to add some commands
+to your your `.zshrc` configuration file so that whenever you open a terminal,
+the shell will run the necessary ROS setup scripts.
+
+First open `.zshrc` in your favorite editor (e.g., for sublime):
+```bash
+subl ~/.zshrc
+```
+Then add these lines to the bottom of the file:
+```bash
+source /opt/ros/noetic/setup.zsh
+source ~/Workspace/game-engine/build/devel/setup.zsh
 ```
 
 ## Running the Game Engine
