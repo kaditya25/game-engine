@@ -122,7 +122,7 @@ make -j4
 ```
 
 ### Configure for ROS
-After the first time you build `game-engine`, you'll need to add some commands
+After the first time you build `game-engine`, you'll need to add a command
 to your your `.zshrc` configuration file so that whenever you open a terminal,
 the shell will run the necessary ROS setup scripts.
 
@@ -130,9 +130,8 @@ First open `.zshrc` in your favorite editor (e.g., for sublime):
 ```bash
 subl ~/.zshrc
 ```
-Then add these lines to the bottom of the file:
+Then add this line to the bottom of the file:
 ```bash
-source /opt/ros/noetic/setup.zsh
 source ~/Workspace/game-engine/build/devel/setup.zsh
 ```
 
