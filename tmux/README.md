@@ -22,7 +22,7 @@ cd dotfiles
 Next, move the `stmux` bash script into `/usr/local/bin` so that it can be run
 by typing `stmux` on the command line:
 ```bash
-cd Workspace/game-engine/tmux
+cd ~/Workspace/game-engine/tmux
 sudo cp stmux /usr/local/bin
 ```
 
@@ -34,12 +34,13 @@ tutorial on tmux. Note that the tmux configuration you installed from
 `dotfiles` alters the default tmux behavior somewhat:
 
 - By default, tmux's prefix key is `C-b` (Ctrl-b).  But this requires pressing
-  two buttons!  The RNL's prefix key is the backtick "`", which is right
+  two buttons!  The RNL's prefix key is the backtick `, which is right
   next to the numeric 1 key.
 - To switch to window 2: prefix 2
-- To split the current pane vertically: prefix right arrow or left arrow
-- To split the current pane horizontally: prefix up arrow or down arrow
-- To navigate between panes: prefix arrow (whichever you want)
+- To split the current pane vertically: prefix Left or Right
+- To split the current pane horizontally: prefix Down or Up
+- To navigate between panes: C-Down or Up or Right or Left
+- To close a pane: C-d
 
 You can have a look at all tmux settings by inspecting the file
 `~/.tmux.conf`.
