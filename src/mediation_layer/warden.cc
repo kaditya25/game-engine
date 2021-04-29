@@ -84,6 +84,57 @@ namespace game_engine {
         this->statusUpdated_ = true;
     };
 
+    //====================================
+    //     TrajectoryWardenIn_PubSub
+    //====================================
+    TrajectoryCode TrajectoryWardenIn_PubSub::Write(const std::string& key,
+                                                    const Trajectory& trajectory) {
+        // If key does not exist, return false
+        if (this->map_.end() == this->map_.find(key)) {
+            std::cerr << "TrajectoryWardenIn::Write -- Key does not exist." << std::endl;
+            return TrajectoryCode::KeyDoesNotExist;
+        }
+
+        std::shared_ptr <Warden<Trajectory>::Container> &container = this->map_[key];
+
+        { // Lock mutex for modification
+            std::lock_guard <std::mutex> lock(container->modified_mtx_);
+            container->type_ = trajectory;
+            container->modified_ = true;
+            container->modified_cv_.notify_all();
+        }
+
+        return TrajectoryCode::Success;
+    };
+
+    //=====================================
+    //     TrajectoryWardenOut_PubSub
+    //=====================================
+
+    TrajectoryCode TrajectoryWardenOut_PubSub::Write(const std::string& key,
+                                                     const Trajectory& trajectory,
+                                                     std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> publisher) {
+        // If key does not exist, return false
+        if (this->map_.end() == this->map_.find(key)) {
+            std::cerr << "TrajectoryWardenOut_PubSub::Write -- Key does not exist." << std::endl;
+            return TrajectoryCode::KeyDoesNotExist;
+        }
+
+        std::shared_ptr <Warden<Trajectory>::Container> &container = this->map_[key];
+
+        { // Lock mutex for modification
+            std::lock_guard <std::mutex> lock(container->modified_mtx_);
+            container->type_ = trajectory;
+            container->modified_ = true;
+            container->modified_cv_.notify_all();
+        }
+
+        // The TrajectoryWardenOut publishes
+        publisher[key]->Publish(trajectory);
+
+        return TrajectoryCode::Success;
+    };
+
     //============================
     //     QuadStateWarden
     //============================

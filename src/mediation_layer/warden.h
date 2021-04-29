@@ -13,6 +13,7 @@
 #include "trajectory_code.h"
 #include "trajectory.h"
 #include "trajectory_client.h"
+#include "trajectory_publisher_node.h"
 
 #include "quad_state.h"
 #include "quad_state_guard.h"
@@ -148,6 +149,21 @@ namespace game_engine {
                              bool blocking = false);
 
         void SetTrajectoryStatus(TrajectoryCode status);
+    };
+
+    class TrajectoryWardenIn_PubSub : public Warden<Trajectory> {
+    public:
+        TrajectoryWardenIn_PubSub(){};
+        TrajectoryCode Write(const std::string& key,
+                             const Trajectory& trajectory);
+    };
+
+    class TrajectoryWardenOut_PubSub : public Warden<Trajectory> {
+    public:
+        TrajectoryWardenOut_PubSub(){};
+        TrajectoryCode Write(const std::string& key,
+                             const Trajectory& trajectory,
+                             std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> publisher);
     };
 
     class QuadStateWarden : public Warden<QuadState> {
