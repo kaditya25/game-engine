@@ -1,5 +1,3 @@
-// Author: Dan LaChapelle
-
 #include <chrono>
 #include <thread>
 

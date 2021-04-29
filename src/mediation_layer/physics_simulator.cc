@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "physics_simulator.h"
 #include "runge_kutta_4.h"
 

@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "quad_state_dispatcher.h"
 
 namespace game_engine {

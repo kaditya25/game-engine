@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #pragma once 
 
 #include <atomic>
@@ -24,16 +22,15 @@ namespace game_engine {
   // perturbed state of the quadcopter some time in the future and publishes
   // that as the 'current state' of the quad.
   //
-  // The model used for the physics simulator is described in the following
-  // section. x_m denotes the mediated (intended) trajectory and x_p denotes the
-  // perturbed trajectory. x_p is solved by forward-integrating the intended
-  // trajectory with the following model:
-  //   x_ddot_p = x_ddot_m + kd * (x_dot_p - x_dot_m) + kp * (x_p - x_m) + F
-  // F is a catch-all force introduced to model controllability constraints,
-  // wind, and other stochastic forces that prevent the quadcopters from
-  // perfectly following the intended trajectory.
+  // The following model used for the physics simulator: x_m denotes the
+  // mediated (intended) trajectory and x_p denotes the perturbed
+  // trajectory. x_p is solved by forward-integrating the intended trajectory
+  // with the following model: x_ddot_p = x_ddot_m + kd * (x_dot_p - x_dot_m)
+  // + kp * (x_p - x_m) + F F is a catch-all force introduced to model
+  // controllability constraints, wind, and other stochastic forces that
+  // prevent the quadcopters from perfectly following the intended trajectory.
   //
-  // In the presence of no forcing function, the perturbed trajectory will be
+  // In the absence of a forcing function, the perturbed trajectory will be
   // exactly the mediated trajectory (provided the mediation trajectory is
   // smooth).
   //
@@ -60,28 +57,9 @@ namespace game_engine {
         double max_frequency = 1.0;
 
         // Standard deviation of VonKarman model
-#define WIND_INTENSITY 1
-#if WIND_INTENSITY<=1
-        // Slight breeze
         double sigma_u_x = 0.1;
         double sigma_u_y = 0.1;
         double sigma_u_z = 0.05;
-#elif WIND_INTENSITY == 2
-        // Stiff wind
-        double sigma_u_x = 0.2;
-        double sigma_u_y = 0.2;
-        double sigma_u_z = 0.1;
-#elif WIND_INTENSITY == 3
-        // Intense wind
-        double sigma_u_x = 0.4;
-        double sigma_u_y = 0.4;
-        double sigma_u_z = 0.2;
-#else
-        // Ludicrous wind
-        double sigma_u_x = 0.8;
-        double sigma_u_y = 0.8;
-        double sigma_u_z = 0.4;
-#endif
 
         // Scale length of VonKarman model
         double L_u_x = 1.5;
