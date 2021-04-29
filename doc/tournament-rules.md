@@ -42,7 +42,7 @@ the quadcopters. Teams should take care not to fly too close to obstacles in
 case the wind or another disturbance forces the quadcopter into the
 obstacle. A quadcopter is considered to be touching a boundary or obstacle if
 the center-of-mass position of the quadcopter has an L-infinity distance of
-**20 cm** or less from any point on any boundary of an obstacle.
+**40 cm** or less to any point on any boundary of an obstacle.
 
 ### Maximum Velocity
 Proposed trajectories must not specify flight in any direction with a velocity

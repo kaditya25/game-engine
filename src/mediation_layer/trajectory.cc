@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "trajectory.h"
 
 namespace game_engine {

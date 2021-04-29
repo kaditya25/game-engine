@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "quad_state_watchdog_status.h"
 
 namespace game_engine {

@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #pragma once
 
 #include <vector>
@@ -18,7 +16,7 @@ namespace game_engine {
     public:
       struct Options {
         // Minimum l-infinity distance from all obstacles that a quad may fly
-        double min_distance = 0.20;
+        double min_distance = 0.40;
 
         Options() {}
       };

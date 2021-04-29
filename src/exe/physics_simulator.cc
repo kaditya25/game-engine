@@ -120,7 +120,44 @@ int main(int argc, char** argv) {
     seed = std::random_device{}();
   }
 
+  // Configure wind intensity
+  int wind_intensity = 1;
+  if(false == nh.getParam("wind_intensity", wind_intensity)) {
+    std::cerr << "Required parameter not found on server: wind_intensity" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
   PhysicsSimulator::Options physics_simulator_options;
+  
+  switch(wind_intensity) {
+  case 1:
+    // Mild wind
+    physics_simulator_options.sigma_u_x = 0.1;
+    physics_simulator_options.sigma_u_y = 0.1;
+    physics_simulator_options.sigma_u_z = 0.05;
+    break;
+  case 2:
+    // Stiff wind
+    physics_simulator_options.sigma_u_x = 0.2;
+    physics_simulator_options.sigma_u_y = 0.2;
+    physics_simulator_options.sigma_u_z = 0.1;
+    break;
+  case 3:
+    // Intense wind
+    physics_simulator_options.sigma_u_x = 0.4;
+    physics_simulator_options.sigma_u_y = 0.4;
+    physics_simulator_options.sigma_u_z = 0.2;
+    break;
+  case 4:
+    // Ludicrous wind
+    physics_simulator_options.sigma_u_x = 0.8;
+    physics_simulator_options.sigma_u_y = 0.8;
+    physics_simulator_options.sigma_u_z = 0.4;
+    break;
+  default:
+    std::cerr << "wind_intensity must be an integer on [1,4]" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+  
   physics_simulator_options.initial_quad_positions = initial_quad_positions;
   auto physics_simulator = std::make_shared<PhysicsSimulator>(physics_simulator_options);
   std::thread physics_simulator_thread(

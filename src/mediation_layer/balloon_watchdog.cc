@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <chrono>
 #include <thread>
 
