@@ -6,7 +6,7 @@ namespace game_engine {
     TrajectorySubscriberNode::TrajectorySubscriberNode(
             const std::string& topic,
             const std::string& key,
-            std::shared_ptr<TrajectoryWardenIn_PubSub> warden) {
+            std::shared_ptr<TrajectoryWardenSubscriber> warden) {
         this->key_ = key;
         this->warden_ = warden;
         this->node_handle_ = ros::NodeHandle("/game_engine/");

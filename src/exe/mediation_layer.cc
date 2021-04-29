@@ -86,12 +86,12 @@ int main(int argc, char** argv) {
   // multi-threaded access to trajectory data. Internal components that require
   // access to proposed and updated trajectories should request access through
   // TrajectoryWarden.
-  auto trajectory_warden_in  = std::make_shared<TrajectoryWardenIn>();
-  auto trajectory_warden_out = std::make_shared<TrajectoryWardenOut_PubSub>();
+  auto trajectory_warden_srv  = std::make_shared<TrajectoryWardenServer>();
+  auto trajectory_warden_pub = std::make_shared<TrajectoryWardenPublisher>();
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
-    trajectory_warden_in->Register(quad_name);
-    trajectory_warden_out->Register(quad_name);
+    trajectory_warden_srv->Register(quad_name);
+    trajectory_warden_pub->Register(quad_name);
   }
 
   // Initialize servers
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
       const std::string& topic = kv.second;
       trajectory_servers[quad_name] = std::make_shared<TrajectoryServerNode>(topic,
                                                                              quad_name,
-                                                                             trajectory_warden_in);
+                                                                             trajectory_warden_srv);
   }
 
     // For every quad, publish to its corresponding updated_trajectory topic
@@ -388,8 +388,8 @@ int main(int argc, char** argv) {
       [&]() {
         mediation_layer->Run(
             map,
-            trajectory_warden_in,
-            trajectory_warden_out,
+            trajectory_warden_srv,
+            trajectory_warden_pub,
             quad_state_warden,
             quad_state_watchdog_status,
             trajectory_publishers);
@@ -411,8 +411,8 @@ int main(int argc, char** argv) {
 
         mediation_layer->Stop();
 
-        trajectory_warden_in->Stop();
-        trajectory_warden_out->Stop();
+        trajectory_warden_srv->Stop();
+        trajectory_warden_pub->Stop();
         quad_state_warden->Stop();
         red_balloon_watchdog->Stop();
         blue_balloon_watchdog->Stop();

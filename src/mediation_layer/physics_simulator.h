@@ -86,7 +86,7 @@ namespace game_engine {
 
       PhysicsSimulator(const Options& options) : options_(options) {}
 
-      void Run(std::shared_ptr<TrajectoryWardenIn_PubSub> trajectory_warden_in,
+      void Run(std::shared_ptr<TrajectoryWardenSubscriber> trajectory_warden_sub,
                std::unordered_map<std::string,
                std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers,
                unsigned int seed);

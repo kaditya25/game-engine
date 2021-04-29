@@ -16,7 +16,6 @@
 #include "map3d.h"
 #include "warden.h"
 #include "trajectory.h"
-//#include "trajectory_server.h"
 #include "trajectory_subscriber_node.h"
 
 #include "quad_state.h"
@@ -57,10 +56,10 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  auto trajectory_warden_in  = std::make_shared<TrajectoryWardenIn_PubSub>();
+  auto trajectory_warden_sub  = std::make_shared<TrajectoryWardenSubscriber>();
   for(const auto& kv: updated_trajectory_topics) {
     const std::string& quad_name = kv.first;
-    trajectory_warden_in->Register(quad_name);
+    trajectory_warden_sub->Register(quad_name);
   }
 
     std::unordered_map<std::string, std::shared_ptr<TrajectorySubscriberNode>> trajectory_subscribers;
@@ -71,7 +70,7 @@ int main(int argc, char** argv) {
                 std::make_shared<TrajectorySubscriberNode>(
                         topic,
                         quad_name,
-                        trajectory_warden_in);
+                        trajectory_warden_sub);
     }
 
 
@@ -162,7 +161,7 @@ int main(int argc, char** argv) {
   auto physics_simulator = std::make_shared<PhysicsSimulator>(physics_simulator_options);
   std::thread physics_simulator_thread(
       [&]() {
-        physics_simulator->Run(trajectory_warden_in, quad_state_publishers, seed);
+        physics_simulator->Run(trajectory_warden_sub, quad_state_publishers, seed);
       });
 
   // Kill program thread. This thread sleeps for a second and then checks if the
@@ -179,7 +178,7 @@ int main(int argc, char** argv) {
         }
         ros::shutdown();
 
-        trajectory_warden_in->Stop();
+        trajectory_warden_sub->Stop();
         physics_simulator->Stop();
       });
 

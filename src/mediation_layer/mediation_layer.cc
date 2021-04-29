@@ -8,8 +8,8 @@ namespace game_engine {
     void MediationLayer::TransferData(
        const std::string& key,
        const Map3D& map,
-       std::shared_ptr<TrajectoryWardenIn> trajectory_warden_in,
-       std::shared_ptr<TrajectoryWardenOut_PubSub> trajectory_warden_out,
+       std::shared_ptr<TrajectoryWardenServer> trajectory_warden_srv,
+       std::shared_ptr<TrajectoryWardenPublisher> trajectory_warden_pub,
        std::shared_ptr<QuadStateWarden> quad_state_warden,
        std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
        std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers) {
@@ -45,16 +45,16 @@ namespace game_engine {
           }
           const Trajectory freeze_trajectory(freeze_trajectory_vector);
 
-          trajectory_warden_out->Write(key, freeze_trajectory_vector, trajectory_publishers);
+          trajectory_warden_pub->Write(key, freeze_trajectory_vector, trajectory_publishers);
           continue;
         }
 
         // Determine if trajectory has violated constraints
         Trajectory trajectory;
-        trajectory_warden_in->Await(key, trajectory);
+          trajectory_warden_srv->Await(key, trajectory);
         TrajectoryCode trajectoryCode =
           trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
-        trajectory_warden_in->SetTrajectoryStatus(trajectoryCode);
+          trajectory_warden_srv->SetTrajectoryStatus(trajectoryCode);
         if (trajectoryCode != TrajectoryCode::Success) {
           std::cerr << "Trajectory did not pass vetting: rejected with code "
                     << static_cast<unsigned int>(trajectoryCode) <<
@@ -62,15 +62,15 @@ namespace game_engine {
           continue;
         }
 
-        //trajectory_warden_out->SetTrajectoryStatus(trajectoryCode);
-        trajectory_warden_out->Write(key, trajectory, trajectory_publishers);
+        //trajectory_warden_pub->SetTrajectoryStatus(trajectoryCode);
+        trajectory_warden_pub->Write(key, trajectory, trajectory_publishers);
     }
   }
 
   void MediationLayer::
   Run(const Map3D& map,
-      std::shared_ptr<TrajectoryWardenIn> trajectory_warden_in,
-      std::shared_ptr<TrajectoryWardenOut_PubSub> trajectory_warden_out,
+      std::shared_ptr<TrajectoryWardenServer> trajectory_warden_srv,
+      std::shared_ptr<TrajectoryWardenPublisher> trajectory_warden_pub,
       std::shared_ptr<QuadStateWarden> quad_state_warden,
       std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
       std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers) {
@@ -84,9 +84,10 @@ namespace game_engine {
     // Assign a thread to await changes in each trajectory
     for(const std::string& key: state_keys) {
       thread_pool.push_back(std::move(std::thread([&](){
-          TransferData(key, map,
-                       trajectory_warden_in,
-                       trajectory_warden_out,
+          TransferData(key,
+                       map,
+                       trajectory_warden_srv,
+                       trajectory_warden_pub,
                        quad_state_warden,
                        quad_state_watchdog_status,
                        trajectory_publishers);})));

@@ -123,13 +123,13 @@ namespace game_engine {
     //============================
     //     INHERITED CLASSES
     //============================
-    class TrajectoryWardenIn : public Warden<Trajectory> {
+    class TrajectoryWardenServer : public Warden<Trajectory> {
     private:
         volatile std::atomic<bool> statusUpdated_{false};
         TrajectoryCode trajectoryStatus_{TrajectoryCode::Success};
         TrajectoryCode GetLastTrajectoryStatus(bool blocking);
     public:
-        TrajectoryWardenIn(){};
+        TrajectoryWardenServer(){};
         TrajectoryCode Write(const std::string& key,
                              const Trajectory& trajectory,
                              bool blocking = false);
@@ -137,12 +137,12 @@ namespace game_engine {
         void SetTrajectoryStatus(TrajectoryCode status);
     };
 
-    class TrajectoryWardenOut : public Warden<Trajectory> {
+    class TrajectoryWardenClient : public Warden<Trajectory> {
     private:
         volatile std::atomic<bool> statusUpdated_{false};
         TrajectoryCode trajectoryStatus_{TrajectoryCode::Success};
     public:
-        TrajectoryWardenOut(){};
+        TrajectoryWardenClient(){};
         TrajectoryCode Write(const std::string& key,
                              const Trajectory& trajectory,
                              std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client,
@@ -151,16 +151,16 @@ namespace game_engine {
         void SetTrajectoryStatus(TrajectoryCode status);
     };
 
-    class TrajectoryWardenIn_PubSub : public Warden<Trajectory> {
+    class TrajectoryWardenSubscriber : public Warden<Trajectory> {
     public:
-        TrajectoryWardenIn_PubSub(){};
+        TrajectoryWardenSubscriber(){};
         TrajectoryCode Write(const std::string& key,
                              const Trajectory& trajectory);
     };
 
-    class TrajectoryWardenOut_PubSub : public Warden<Trajectory> {
+    class TrajectoryWardenPublisher : public Warden<Trajectory> {
     public:
-        TrajectoryWardenOut_PubSub(){};
+        TrajectoryWardenPublisher(){};
         TrajectoryCode Write(const std::string& key,
                              const Trajectory& trajectory,
                              std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> publisher);
