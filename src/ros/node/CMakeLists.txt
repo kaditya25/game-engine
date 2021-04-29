@@ -19,6 +19,8 @@ set(SOURCE_FILES
   balloon_status_subscriber_node.cc
   goal_status_publisher_node.cc
   goal_status_subscriber_node.cc
+  trajectory_publisher_node.cc
+  trajectory_subscriber_node.cc
   trajectory_client.cc
   trajectory_server.cc
 )
