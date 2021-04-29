@@ -16,7 +16,8 @@
 #include "map3d.h"
 #include "warden.h"
 #include "trajectory.h"
-#include "trajectory_server.h"
+//#include "trajectory_server.h"
+#include "trajectory_subscriber_node.h"
 
 #include "quad_state.h"
 #include "quad_state_publisher_node.h"
@@ -56,24 +57,25 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  auto trajectory_warden_in  = std::make_shared<TrajectoryWardenIn>();
+  auto trajectory_warden_in  = std::make_shared<TrajectoryWardenIn_PubSub>();
   for(const auto& kv: updated_trajectory_topics) {
     const std::string& quad_name = kv.first;
     trajectory_warden_in->Register(quad_name);
   }
 
-  std::unordered_map<std::string, std::shared_ptr<TrajectoryServerNode>> trajectory_servers;
-  for(const auto& kv: updated_trajectory_topics) {
-    const std::string& quad_name = kv.first;
-    const std::string& topic = kv.second;
-    trajectory_servers[quad_name] =
-        std::make_shared<TrajectoryServerNode>(
-            topic,
-            quad_name,
-            trajectory_warden_in);
-  }
+    std::unordered_map<std::string, std::shared_ptr<TrajectorySubscriberNode>> trajectory_subscribers;
+    for(const auto& kv: updated_trajectory_topics) {
+        const std::string& quad_name = kv.first;
+        const std::string& topic = kv.second;
+        trajectory_subscribers[quad_name] =
+                std::make_shared<TrajectorySubscriberNode>(
+                        topic,
+                        quad_name,
+                        trajectory_warden_in);
+    }
 
-  std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers;
+
+    std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers;
   for(const auto& kv: quad_state_topics) {
     const std::string& quad_name = kv.first;
     const std::string& topic = kv.second;
