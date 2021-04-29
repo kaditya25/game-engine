@@ -9,10 +9,10 @@ namespace game_engine {
        const std::string& key,
        const Map3D& map,
        std::shared_ptr<TrajectoryWardenIn> trajectory_warden_in,
-       std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out,
+       std::shared_ptr<TrajectoryWardenOut_PubSub> trajectory_warden_out,
        std::shared_ptr<QuadStateWarden> quad_state_warden,
        std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-       std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> trajectory_clients) {
+       std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers) {
 
       TrajectoryVetter trajectory_vetter;
       while(true == this->ok_) {
@@ -45,7 +45,7 @@ namespace game_engine {
           }
           const Trajectory freeze_trajectory(freeze_trajectory_vector);
 
-          trajectory_warden_out->Write(key, freeze_trajectory_vector, trajectory_clients);
+          trajectory_warden_out->Write(key, freeze_trajectory_vector, trajectory_publishers);
           continue;
         }
 
@@ -63,17 +63,17 @@ namespace game_engine {
         }
 
         //trajectory_warden_out->SetTrajectoryStatus(trajectoryCode);
-        trajectory_warden_out->Write(key, trajectory, trajectory_clients);
+        trajectory_warden_out->Write(key, trajectory, trajectory_publishers);
     }
   }
 
   void MediationLayer::
   Run(const Map3D& map,
       std::shared_ptr<TrajectoryWardenIn> trajectory_warden_in,
-      std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out,
+      std::shared_ptr<TrajectoryWardenOut_PubSub> trajectory_warden_out,
       std::shared_ptr<QuadStateWarden> quad_state_warden,
       std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-      std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> trajectory_clients) {
+      std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers) {
 
     // Local thread pool
     std::vector<std::thread> thread_pool;
@@ -89,7 +89,7 @@ namespace game_engine {
                        trajectory_warden_out,
                        quad_state_warden,
                        quad_state_watchdog_status,
-                       trajectory_clients);})));
+                       trajectory_publishers);})));
     }
 
     // Wait for this thread to receive a stop command
