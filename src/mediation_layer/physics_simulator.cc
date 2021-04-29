@@ -186,7 +186,7 @@ namespace game_engine {
   }
 
   void PhysicsSimulator::Run(
-      std::shared_ptr<TrajectoryWardenIn> trajectory_warden_in,
+      std::shared_ptr<TrajectoryWardenIn_PubSub> trajectory_warden_in,
       std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers,
       unsigned int seed) {
 
@@ -283,7 +283,6 @@ namespace game_engine {
         // Read the most current trajectory
         Trajectory trajectory;
         trajectory_warden_in->Read(quad_name, trajectory);
-        trajectory_warden_in->SetTrajectoryStatus(TrajectoryCode::Success);
 
         // Require a trajectory to be published
         const size_t trajectory_size = trajectory.Size();
