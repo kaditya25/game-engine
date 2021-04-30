@@ -16,7 +16,7 @@
 #include "map3d.h"
 #include "warden.h"
 #include "trajectory.h"
-#include "trajectory_server.h"
+#include "trajectory_subscriber_node.h"
 
 #include "quad_state.h"
 #include "quad_state_publisher_node.h"
@@ -56,24 +56,25 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  auto trajectory_warden_in  = std::make_shared<TrajectoryWardenIn>();
+  auto trajectory_warden_sub  = std::make_shared<TrajectoryWardenSubscriber>();
   for(const auto& kv: updated_trajectory_topics) {
     const std::string& quad_name = kv.first;
-    trajectory_warden_in->Register(quad_name);
+    trajectory_warden_sub->Register(quad_name);
   }
 
-  std::unordered_map<std::string, std::shared_ptr<TrajectoryServerNode>> trajectory_servers;
-  for(const auto& kv: updated_trajectory_topics) {
-    const std::string& quad_name = kv.first;
-    const std::string& topic = kv.second;
-    trajectory_servers[quad_name] =
-        std::make_shared<TrajectoryServerNode>(
-            topic,
-            quad_name,
-            trajectory_warden_in);
-  }
+    std::unordered_map<std::string, std::shared_ptr<TrajectorySubscriberNode>> trajectory_subscribers;
+    for(const auto& kv: updated_trajectory_topics) {
+        const std::string& quad_name = kv.first;
+        const std::string& topic = kv.second;
+        trajectory_subscribers[quad_name] =
+                std::make_shared<TrajectorySubscriberNode>(
+                        topic,
+                        quad_name,
+                        trajectory_warden_sub);
+    }
 
-  std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers;
+
+    std::unordered_map<std::string, std::shared_ptr<QuadStatePublisherNode>> quad_state_publishers;
   for(const auto& kv: quad_state_topics) {
     const std::string& quad_name = kv.first;
     const std::string& topic = kv.second;
@@ -160,7 +161,7 @@ int main(int argc, char** argv) {
   auto physics_simulator = std::make_shared<PhysicsSimulator>(physics_simulator_options);
   std::thread physics_simulator_thread(
       [&]() {
-        physics_simulator->Run(trajectory_warden_in, quad_state_publishers, seed);
+        physics_simulator->Run(trajectory_warden_sub, quad_state_publishers, seed);
       });
 
   // Kill program thread. This thread sleeps for a second and then checks if the
@@ -177,7 +178,7 @@ int main(int argc, char** argv) {
         }
         ros::shutdown();
 
-        trajectory_warden_in->Stop();
+        trajectory_warden_sub->Stop();
         physics_simulator->Stop();
       });
 

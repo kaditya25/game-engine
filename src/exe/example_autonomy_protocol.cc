@@ -180,10 +180,10 @@ int main(int argc, char** argv) {
   }
 
   // Initialize the TrajectoryWarden
-  auto trajectory_warden_out = std::make_shared<TrajectoryWardenOut>();
+  auto trajectory_warden_client = std::make_shared<TrajectoryWardenClient>();
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
-    trajectory_warden_out->Register(quad_name);
+    trajectory_warden_client->Register(quad_name);
   }
 
   // Balloon Status
@@ -243,7 +243,7 @@ int main(int argc, char** argv) {
       blue_quad_names,
       red_quad_names,
       game_snapshot,
-      trajectory_warden_out,
+      trajectory_warden_client,
       map3d,
       red_balloon_position,
       blue_balloon_position,
@@ -271,7 +271,7 @@ int main(int argc, char** argv) {
 
         autonomy_protocol->Stop();
         quad_state_warden->Stop();
-        trajectory_warden_out->Stop();
+        trajectory_warden_client->Stop();
       });
 
   // Spin for ros subscribers

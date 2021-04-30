@@ -13,6 +13,7 @@
 #include "trajectory_code.h"
 #include "trajectory.h"
 #include "trajectory_client.h"
+#include "trajectory_publisher_node.h"
 
 #include "quad_state.h"
 #include "quad_state_guard.h"
@@ -122,13 +123,13 @@ namespace game_engine {
     //============================
     //     INHERITED CLASSES
     //============================
-    class TrajectoryWardenIn : public Warden<Trajectory> {
+    class TrajectoryWardenServer : public Warden<Trajectory> {
     private:
         volatile std::atomic<bool> statusUpdated_{false};
         TrajectoryCode trajectoryStatus_{TrajectoryCode::Success};
         TrajectoryCode GetLastTrajectoryStatus(bool blocking);
     public:
-        TrajectoryWardenIn(){};
+        TrajectoryWardenServer(){};
         TrajectoryCode Write(const std::string& key,
                              const Trajectory& trajectory,
                              bool blocking = false);
@@ -136,18 +137,33 @@ namespace game_engine {
         void SetTrajectoryStatus(TrajectoryCode status);
     };
 
-    class TrajectoryWardenOut : public Warden<Trajectory> {
+    class TrajectoryWardenClient : public Warden<Trajectory> {
     private:
         volatile std::atomic<bool> statusUpdated_{false};
         TrajectoryCode trajectoryStatus_{TrajectoryCode::Success};
     public:
-        TrajectoryWardenOut(){};
+        TrajectoryWardenClient(){};
         TrajectoryCode Write(const std::string& key,
                              const Trajectory& trajectory,
                              std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client,
                              bool blocking = false);
 
         void SetTrajectoryStatus(TrajectoryCode status);
+    };
+
+    class TrajectoryWardenSubscriber : public Warden<Trajectory> {
+    public:
+        TrajectoryWardenSubscriber(){};
+        TrajectoryCode Write(const std::string& key,
+                             const Trajectory& trajectory);
+    };
+
+    class TrajectoryWardenPublisher : public Warden<Trajectory> {
+    public:
+        TrajectoryWardenPublisher(){};
+        TrajectoryCode Write(const std::string& key,
+                             const Trajectory& trajectory,
+                             std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> publisher);
     };
 
     class QuadStateWarden : public Warden<QuadState> {

@@ -13,7 +13,7 @@ using namespace game_engine;
 
 void test_TrajectoryWarden() {
   { // Trivial
-    TrajectoryWardenIn warden;
+    TrajectoryWardenSubscriber warden;
 
     Trajectory dummy_trajectory;
     assert(0 == warden.Keys().size());
@@ -23,7 +23,7 @@ void test_TrajectoryWarden() {
   }
 
   { // Test read/write
-    TrajectoryWardenIn warden;
+    TrajectoryWardenSubscriber warden;
 
     Trajectory trajectory_write({(Eigen::Matrix<double, 11, 1>() << 1,1,1,1,1,1,1,1,1,1,1).finished()});
     assert(TrajectoryCode::Success == warden.Register("test"));

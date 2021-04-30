@@ -7,6 +7,8 @@
 #include "warden.h"
 #include "quad_state_watchdog_status.h"
 #include "trajectory_client.h"
+#include "trajectory_publisher_node.h"
+
 #include "map3d.h"
 
 namespace game_engine {
@@ -28,11 +30,11 @@ namespace game_engine {
       void TransferData(
           const std::string& key,
           const Map3D& map,
-          std::shared_ptr<TrajectoryWardenIn> trajectory_warden_in,
-          std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out,
+          std::shared_ptr<TrajectoryWardenServer> trajectory_warden_srv,
+          std::shared_ptr<TrajectoryWardenPublisher> trajectory_warden_pub,
           std::shared_ptr<QuadStateWarden> quad_state_warden,
           std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-          std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> trajectory_clients);
+          std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers);
 
     public:
       MediationLayer() {}
@@ -42,11 +44,11 @@ namespace game_engine {
       // Note: These values are intentionally copied
       void Run(
           const Map3D& map,
-          std::shared_ptr<TrajectoryWardenIn> trajectory_warden_in,
-          std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out,
+          std::shared_ptr<TrajectoryWardenServer> trajectory_warden_srv,
+          std::shared_ptr<TrajectoryWardenPublisher> trajectory_warden_pub,
           std::shared_ptr<QuadStateWarden> state_warden,
           std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-          std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> trajectory_clients);
+          std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers);
 
       // Stop this thread and all sub-threads
       void Stop();

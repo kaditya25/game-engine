@@ -17,6 +17,7 @@
 #include "warden.h"
 #include "trajectory.h"
 #include "trajectory_server.h"
+#include "trajectory_publisher_node.h"
 
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
@@ -81,24 +82,16 @@ int main(int argc, char** argv) {
       std::exit(EXIT_FAILURE);
   }
 
-  // For every quad, service to its corresponding updated_trajectory topic
-  std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> trajectory_clients;
-  for(const auto& kv: updated_trajectory_topics) {
-      const std::string& quad_name = kv.first;
-      const std::string& topic = kv.second;
-      trajectory_clients[quad_name] = std::make_shared<TrajectoryClientNode>(topic);
-  }
-
   // Initialize the TrajectoryWardens. The TrajectoryWarden enables safe,
   // multi-threaded access to trajectory data. Internal components that require
   // access to proposed and updated trajectories should request access through
   // TrajectoryWarden.
-  auto trajectory_warden_in  = std::make_shared<TrajectoryWardenIn>();
-  auto trajectory_warden_out = std::make_shared<TrajectoryWardenOut>();
+  auto trajectory_warden_srv  = std::make_shared<TrajectoryWardenServer>();
+  auto trajectory_warden_pub = std::make_shared<TrajectoryWardenPublisher>();
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
-    trajectory_warden_in->Register(quad_name);
-    trajectory_warden_out->Register(quad_name);
+    trajectory_warden_srv->Register(quad_name);
+    trajectory_warden_pub->Register(quad_name);
   }
 
   // Initialize servers
@@ -108,15 +101,21 @@ int main(int argc, char** argv) {
   for(const auto& kv: proposed_trajectory_topics) {
       const std::string& quad_name = kv.first;
       const std::string& topic = kv.second;
-      trajectory_servers[quad_name] =
-              std::make_shared<TrajectoryServerNode>(
-                      topic,
-                      quad_name,
-                      trajectory_warden_in);
+      trajectory_servers[quad_name] = std::make_shared<TrajectoryServerNode>(topic,
+                                                                             quad_name,
+                                                                             trajectory_warden_srv);
   }
 
+    // For every quad, publish to its corresponding updated_trajectory topic
+    std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers;
+    for(const auto& kv: updated_trajectory_topics) {
+        const std::string& quad_name = kv.first;
+        const std::string& topic = kv.second;
+        trajectory_publishers[quad_name] = std::make_shared<TrajectoryPublisherNode>(topic);
+    }
 
-  std::map<std::string, std::string> quad_state_topics;
+
+    std::map<std::string, std::string> quad_state_topics;
   if(false == nh.getParam("quad_state_topics", quad_state_topics)) {
     std::cerr << "Required parameter not found on server: quad_state_topics" << std::endl;
     std::exit(EXIT_FAILURE);
@@ -389,11 +388,11 @@ int main(int argc, char** argv) {
       [&]() {
         mediation_layer->Run(
             map,
-            trajectory_warden_in,
-            trajectory_warden_out,
+            trajectory_warden_srv,
+            trajectory_warden_pub,
             quad_state_warden,
             quad_state_watchdog_status,
-            trajectory_clients);
+            trajectory_publishers);
       });
 
   // Kill program thread. This thread sleeps for a second and then checks if the
@@ -412,8 +411,8 @@ int main(int argc, char** argv) {
 
         mediation_layer->Stop();
 
-        trajectory_warden_in->Stop();
-        trajectory_warden_out->Stop();
+        trajectory_warden_srv->Stop();
+        trajectory_warden_pub->Stop();
         quad_state_warden->Stop();
         red_balloon_watchdog->Stop();
         blue_balloon_watchdog->Stop();

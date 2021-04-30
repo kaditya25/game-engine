@@ -44,7 +44,7 @@ namespace game_engine {
       std::vector<std::string> friendly_names_;
       std::vector<std::string> enemy_names_;
       std::shared_ptr<GameSnapshot> snapshot_;
-      std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out_;
+      std::shared_ptr<TrajectoryWardenClient> trajectory_warden_client_;
       Map3D map3d_;
       Eigen::Vector3d red_balloon_position_;
       Eigen::Vector3d blue_balloon_position_;
@@ -61,7 +61,7 @@ namespace game_engine {
           const std::vector<std::string>& friendly_names,
           const std::vector<std::string>& enemy_names,
           const std::shared_ptr<GameSnapshot> snapshot,
-          const std::shared_ptr<TrajectoryWardenOut> trajectory_warden_out,
+          const std::shared_ptr<TrajectoryWardenClient> trajectory_warden_client,
           const Map3D& map3d,
           const Eigen::Vector3d& red_balloon_position,
           const Eigen::Vector3d& blue_balloon_position,
@@ -70,7 +70,7 @@ namespace game_engine {
         : friendly_names_(friendly_names),
           enemy_names_(enemy_names),
           snapshot_(snapshot),
-          trajectory_warden_out_(trajectory_warden_out),
+          trajectory_warden_client_(trajectory_warden_client),
           map3d_(map3d),
           red_balloon_position_(red_balloon_position),
           blue_balloon_position_(blue_balloon_position),
@@ -95,7 +95,8 @@ namespace game_engine {
   //  ******************
   //  * IMPLEMENTATION *
   //  ******************
-  inline void AutonomyProtocol::Run(std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients) {
+  inline void AutonomyProtocol::Run(
+          std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients) {
     while(ok_) {
       // Request trajectory updates from the virtual function
       const std::unordered_map<std::string, Trajectory> trajectories =
@@ -107,7 +108,7 @@ namespace game_engine {
         try {
           const Trajectory trajectory = trajectories.at(quad_name);
           TrajectoryCode trajectoryCode =
-            trajectory_warden_out_->Write(quad_name, trajectory, proposed_trajectory_clients, true);
+              trajectory_warden_client_->Write(quad_name, trajectory, proposed_trajectory_clients, true);
           trajectoryCode_ = trajectoryCode;
         } catch(const std::out_of_range& e) {
           continue;

@@ -4,7 +4,7 @@ namespace game_engine {
     //============================
     //     TrajectoryWardenIn
     //============================
-    TrajectoryCode TrajectoryWardenIn::GetLastTrajectoryStatus(bool blocking) {
+    TrajectoryCode TrajectoryWardenServer::GetLastTrajectoryStatus(bool blocking) {
         // Checks to see if the status hasn't been updated yet and a blocking call is wanted.
         // If a blocking call is wanted, then wait until the statusUpdated_ marker returns true.
         // If a blocking call is not wanted, just return the most recently updated status.
@@ -15,9 +15,9 @@ namespace game_engine {
         return static_cast<TrajectoryCode>(trajectoryStatus_);
     };
 
-    TrajectoryCode TrajectoryWardenIn::Write(const std::string& key,
-                                             const Trajectory& trajectory,
-                                             bool blocking) {
+    TrajectoryCode TrajectoryWardenServer::Write(const std::string& key,
+                                                 const Trajectory& trajectory,
+                                                 bool blocking) {
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
             std::cerr << "TrajectoryWardenIn::Write -- Key does not exist." << std::endl;
@@ -39,20 +39,22 @@ namespace game_engine {
         return status;
     };
 
-    void TrajectoryWardenIn::SetTrajectoryStatus(TrajectoryCode status) {
+    void TrajectoryWardenServer::SetTrajectoryStatus(TrajectoryCode status) {
         // Set the two variables to true if the status was updated and the value of the status
         this->trajectoryStatus_ = status;
         this->statusUpdated_ = true;
     };
 
-    //============================
-    //     TrajectoryWardenOut
-    //============================
+    //==============================
+    //     TrajectoryWardenClient
+    //==============================
 
-    TrajectoryCode TrajectoryWardenOut::Write(const std::string& key,
-                                              const Trajectory& trajectory,
-                                              std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client,
-                                              bool blocking) {
+    TrajectoryCode TrajectoryWardenClient::Write(
+            const std::string& key,
+            const Trajectory& trajectory,
+            std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client,
+            bool blocking) {
+
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
             std::cerr << "TrajectoryWardenOut::Write -- Key does not exist." << std::endl;
@@ -79,9 +81,62 @@ namespace game_engine {
         return status;
     };
 
-    void TrajectoryWardenOut::SetTrajectoryStatus(TrajectoryCode status) {
+    void TrajectoryWardenClient::SetTrajectoryStatus(TrajectoryCode status) {
         this->trajectoryStatus_ = status;
         this->statusUpdated_ = true;
+    };
+
+    //====================================
+    //     TrajectoryWardenSubscriber
+    //====================================
+    TrajectoryCode TrajectoryWardenSubscriber::Write(const std::string& key,
+                                                     const Trajectory& trajectory) {
+        // If key does not exist, return false
+        if (this->map_.end() == this->map_.find(key)) {
+            std::cerr << "TrajectoryWardenIn::Write -- Key does not exist." << std::endl;
+            return TrajectoryCode::KeyDoesNotExist;
+        }
+
+        std::shared_ptr <Warden<Trajectory>::Container> &container = this->map_[key];
+
+        { // Lock mutex for modification
+            std::lock_guard <std::mutex> lock(container->modified_mtx_);
+            container->type_ = trajectory;
+            container->modified_ = true;
+            container->modified_cv_.notify_all();
+        }
+
+        return TrajectoryCode::Success;
+    };
+
+    //=====================================
+    //     TrajectoryWardenPublisher
+    //=====================================
+
+    TrajectoryCode TrajectoryWardenPublisher::Write(
+            const std::string& key,
+            const Trajectory& trajectory,
+            std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> publisher) {
+
+        // If key does not exist, return false
+        if (this->map_.end() == this->map_.find(key)) {
+            std::cerr << "TrajectoryWardenOut_PubSub::Write -- Key does not exist." << std::endl;
+            return TrajectoryCode::KeyDoesNotExist;
+        }
+
+        std::shared_ptr <Warden<Trajectory>::Container> &container = this->map_[key];
+
+        { // Lock mutex for modification
+            std::lock_guard <std::mutex> lock(container->modified_mtx_);
+            container->type_ = trajectory;
+            container->modified_ = true;
+            container->modified_cv_.notify_all();
+        }
+
+        // publish trajectory
+        publisher[key]->Publish(trajectory);
+
+        return TrajectoryCode::Success;
     };
 
     //============================
