@@ -3,6 +3,5 @@ debug
 *~
 *.swp
 tags
-bin
 core
 todd_params.yaml
