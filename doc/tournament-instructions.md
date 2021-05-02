@@ -10,12 +10,12 @@ start position as quickly as possible.
 ## Important Dates
 - April 29: Pre-tournament starts. First day that your team may submit
   `student_autonomy_protocol` binaries
-- April 30: First pre-tournament evaluation date. Binaries and tournament standing
-  are evaluated at 9 am. Binaries will be updated and evaluated every week day
+- April 30: First pre-tournament evaluation date. Code tagged 'release' is
+  evaluated at 9 am. 'release' code will be pulled and evaluated every week day
   at 9 am thereafter until the end of the pre-tournament.
 - May 12: Final pre-tournament evaluation at 9 am. Final map of
   arena released: this is the map that will be used on the day of the tournament.
-- May 13: Tournament binaries (both obstacle course and vision test) must be submitted by 9 am.    
+- May 13: Tournament code for both obstacle course and vision test must be tagged 'release' by 9 am.    
 - May 14, Tournament day. 9 am to 12 pm.
 
 ## Obstacle Course Notes
