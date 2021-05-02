@@ -149,26 +149,9 @@ As before,
 - Push your local repository to `origin`.
 - Configure `balloon-locator` with your name and email.
 
-## Submitting your Binary Executables
+## Accessing Other Teams' Binary Executables
 Clone the `tournament-binaries` repository as follows:
 ```bash
 cd ~/Workspace
 git clone https://gitlab.com/todd.humphreys/tournament-binaries.git
 ```
-
-To submit a binary for pre-tournament evaluation, copy your
-`student_autonomy_protocol` binary into your team's directory in
-`tournament-binaries` and then push to the remote repository:
-
-```bash
-cd ~/Workspace/tournament-binaries/YOUR_TEAM_NAME
-cp ../../game-engine/bin/student_autonomy_protocol .
-git add student_autonomy_protocol
-git push origin master
-```
-
-There is no need to submit your `locateBalloons` binary during the
-pre-tournament.  You will submit `locateBalloons` only on the day before the
-tournament (by 9 am).  Follow the same procedure outlined above to submit
-`locateBalloons`.
-

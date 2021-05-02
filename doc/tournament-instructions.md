@@ -56,7 +56,7 @@ To run `game-engine`, follow the build/run instructions in `README.md` in the
 top-level `game-engine` directory. Your autonomy protocol will be compiled
 into an executable called `student_autonomy_protocol`.
 
-<!--- ### Tagging releases
+### Tagging releases for Evaluation
 During the pre-tournament and tournament, your team will want the TA to
 evaluate only your *approved* `student_autonomy_protocol` binary, which may
 not be the one in the master branch of your team's GitLab repository.  You'll
@@ -87,19 +87,20 @@ the example below, the annotated tag is labeled with example message
 ```bash
 git tag -a release -m "pre-tournament day 3"
 git push origin release
-```-->
+```
 
-## Submission of Binaries
+A TA will pull your `release` tag every evaluation day at 9 am and evaluate
+your pre-tournament standing.
+
+
+## Availability of Binaries
 
 To allow teams to evaluate their standing with respect to the other teams, but
-prevent code-sharing, teams will submit binaries for the obstacle course.
-Your team will submit `game-engine/bin/student_autonomy_protocol` for
-pre-tournament evaluation.  A TA will pull these binaries every weekday at 9
-am and evaluate pre-tournament standings.
-
-All submitted binaries become public. Therefore, all teams may view their
-competition's binaries.  To evaluate an opponent's strategy, launch all
-tournament executables as normal, but substitute an opponent's
-`student_autonomy_protocol` for yours.
+prevent code-sharing, the TAs will post all teams' `student_autonomy_protocol`
+binaries.  To evaluate an opponent's strategy, launch all tournament
+executables as normal, but substitute an opponent's
+`student_autonomy_protocol` for yours.  Note that if your file paths are
+different from the ones other students are using, dynamic linking of libraries
+may fail.
 
 
