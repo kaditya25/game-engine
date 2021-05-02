@@ -9,8 +9,8 @@ start position as quickly as possible.
 
 ## Important Dates
 - April 29: Pre-tournament starts.
-- April 30: First pre-tournament evaluation date. game-engine code tagged 'release' is
-  evaluated at 9 am. 'release' code will be pulled and evaluated every week day
+- April 30: First pre-tournament evaluation date. `game-engine` code tagged `release` is
+  evaluated at 9 am. `release` code will be pulled and evaluated every week day
   at 9 am thereafter until the end of the pre-tournament.
 - May 12: Final pre-tournament evaluation at 9 am. Final map of
   arena released: this is the map that will be used on the day of the tournament.
@@ -57,14 +57,14 @@ into an executable called `student_autonomy_protocol`.
 
 ### Tagging releases for Evaluation
 During the pre-tournament and tournament, your team will want the TA to
-evaluate only your *approved* `student_autonomy_protocol` binary, which may
-not be the one in the master branch of your team's GitLab repository.  You'll
-want to *tag* an approved release so that the TA knows which one to test.  The
-TA will test whichever revision is tagged `release`.
+evaluate only your *approved* `student_autonomy_protocol` code, which may not
+be the code in the master branch of your team's GitLab repository.  You'll
+want to *tag* an approved code release so that the TA knows which one to test.
+The TA will test whichever master-branch revision is tagged `release`.
 
 Suppose you're happy with the way your autonomy protocol is running on your
-local machine and you'd like to tag the current version as `release`.  Perform
-the following steps.
+local machine and you'd like to tag the current master-branch version as
+`release`.  Perform the following steps.
 
 First, commit your current version and push to `origin` on branch `master`:
 ```bash
