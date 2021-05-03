@@ -23,6 +23,7 @@
 
 #include "mediation_layer.h"
 #include "physics_simulator.h"
+#include "wind_intensity.h"
 
 #include "quad_state_guard.h"
 
@@ -120,40 +121,40 @@ int main(int argc, char** argv) {
   }
 
   // Configure wind intensity
-  int wind_intensity = 1;
-  if(false == nh.getParam("wind_intensity", wind_intensity)) {
+  int wind_intensity_int = 0;
+  if(false == nh.getParam("wind_intensity", wind_intensity_int)) {
     std::cerr << "Required parameter not found on server: wind_intensity" << std::endl;
     std::exit(EXIT_FAILURE);
   }
+  const WindIntensity wind_intensity =
+    static_cast<WindIntensity>(wind_intensity_int);
   PhysicsSimulator::Options physics_simulator_options;
   
   switch(wind_intensity) {
-  case 1:
-    // Mild wind
+  case WindIntensity::Mild:
     physics_simulator_options.sigma_u_x = 0.1;
     physics_simulator_options.sigma_u_y = 0.1;
     physics_simulator_options.sigma_u_z = 0.05;
     break;
-  case 2:
-    // Stiff wind
+  case WindIntensity::Stiff:
     physics_simulator_options.sigma_u_x = 0.2;
     physics_simulator_options.sigma_u_y = 0.2;
     physics_simulator_options.sigma_u_z = 0.1;
     break;
-  case 3:
-    // Intense wind
+  case WindIntensity::Intense:
     physics_simulator_options.sigma_u_x = 0.4;
     physics_simulator_options.sigma_u_y = 0.4;
     physics_simulator_options.sigma_u_z = 0.2;
     break;
-  case 4:
-    // Ludicrous wind
+  case WindIntensity::Ludicrous:
     physics_simulator_options.sigma_u_x = 0.8;
     physics_simulator_options.sigma_u_y = 0.8;
     physics_simulator_options.sigma_u_z = 0.4;
     break;
   default:
-    std::cerr << "wind_intensity must be an integer on [1,4]" << std::endl;
+    std::cerr << "wind_intensity must be an integer on [" <<
+      static_cast<int>(WindIntensity::Minimum) << "," <<
+      static_cast<int>(WindIntensity::Maximum) << "]"  << std::endl;
     std::exit(EXIT_FAILURE);
   }
   

@@ -83,25 +83,23 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  std::vector<double> blue_balloon_position_vector;
-  if(false == nh.getParam("blue_balloon_position", blue_balloon_position_vector)) {
-    std::cerr << "Required parameter not found on server: blue_balloon_position" << std::endl;
+  std::vector<double> goal_position_vector;
+  if(false == nh.getParam("goal_position", goal_position_vector)) {
+    std::cerr << "Required parameter not found on server: goal_position" << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  const Eigen::Vector3d blue_balloon_position(
-      blue_balloon_position_vector[0],
-      blue_balloon_position_vector[1],
-      blue_balloon_position_vector[2]);
+  const Eigen::Vector3d goal_position(
+      goal_position_vector[0],
+      goal_position_vector[1],
+      goal_position_vector[2]);
 
-  std::vector<double> red_balloon_position_vector;
-  if(false == nh.getParam("red_balloon_position", red_balloon_position_vector)) {
-    std::cerr << "Required parameter not found on server: red_balloon_position" << std::endl;
+  int wind_intensity_int = 0;
+  if(false == nh.getParam("wind_intensity", wind_intensity_int)) {
+    std::cerr << "Required parameter not found on server: wind_intensity" << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  const Eigen::Vector3d red_balloon_position(
-      red_balloon_position_vector[0],
-      red_balloon_position_vector[1],
-      red_balloon_position_vector[2]);
+  const WindIntensity wind_intensity =
+    static_cast<WindIntensity>(wind_intensity_int);
 
   // Team Assignments
   std::vector<std::string> red_quad_names;
@@ -236,7 +234,6 @@ int main(int argc, char** argv) {
   blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
-  //std::cout << red_balloon_status_subscriber_node->balloon_status_->position << std::endl;
   // The AutonomyProtocol
   std::shared_ptr<AutonomyProtocol> autonomy_protocol
     = std::make_shared<ExampleAutonomyProtocol>(
@@ -245,10 +242,10 @@ int main(int argc, char** argv) {
       game_snapshot,
       trajectory_warden_client,
       map3d,
-      red_balloon_position,
-      blue_balloon_position,
       red_balloon_status,
-      blue_balloon_status);
+      blue_balloon_status,
+      goal_position,
+      wind_intensity);
 
   // Start the autonomy protocol
   std::thread ap_thread(

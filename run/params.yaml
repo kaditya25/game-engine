@@ -4,8 +4,8 @@ team_assignments:
 quad_state_topics:
   "apollo": "/apollo/state"
 
-proposed_trajectory_topics:
-  "apollo": "/apollo/proposed_trajectory"
+#proposed_trajectory_topics:
+#"apollo": "/apollo/proposed_trajectory"
 
 updated_trajectory_topics:
   "apollo": "/apollo/updated_trajectory"

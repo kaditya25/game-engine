@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -11,6 +9,7 @@
 
 #include "yaml-cpp/yaml.h"
 #include "map3d.h"
+
 #include "warden.h"
 #include "trajectory.h"
 #include "trajectory_client.h"
@@ -18,8 +17,8 @@
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
 
-#include "balloon_status_publisher_node.h"
 #include "balloon_status_subscriber_node.h"
+#include "balloon_status_publisher_node.h"
 #include "balloon_status.h"
 
 #include "goal_status_publisher_node.h"
@@ -42,7 +41,6 @@ namespace {
   }
 }
 
-
 int main(int argc, char** argv) {
   // Configure sigint handler
   std::signal(SIGINT, SigIntHandler);
@@ -58,7 +56,13 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  const YAML::Node node = YAML::LoadFile(map_file_path);
+  YAML::Node node;
+  try {
+    node = YAML::LoadFile(map_file_path);
+  } catch (...) {
+    std::cerr << "Map file not found.  Check map_file_path in params.yaml" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
   const Map3D map3d = node["map"].as<Map3D>();
 
   std::map<std::string, std::string> team_assignments;
@@ -79,25 +83,23 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
-  std::vector<double> blue_balloon_position_vector;
-  if(false == nh.getParam("blue_balloon_position", blue_balloon_position_vector)) {
-    std::cerr << "Required parameter not found on server: blue_balloon_position" << std::endl;
+  std::vector<double> goal_position_vector;
+  if(false == nh.getParam("goal_position", goal_position_vector)) {
+    std::cerr << "Required parameter not found on server: goal_position" << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  const Eigen::Vector3d blue_balloon_position(
-      blue_balloon_position_vector[0],
-      blue_balloon_position_vector[1],
-      blue_balloon_position_vector[2]);
+  const Eigen::Vector3d goal_position(
+      goal_position_vector[0],
+      goal_position_vector[1],
+      goal_position_vector[2]);
 
-  std::vector<double> red_balloon_position_vector;
-  if(false == nh.getParam("red_balloon_position", red_balloon_position_vector)) {
-    std::cerr << "Required parameter not found on server: red_balloon_position" << std::endl;
+  int wind_intensity_int = 0;
+  if(false == nh.getParam("wind_intensity", wind_intensity_int)) {
+    std::cerr << "Required parameter not found on server: wind_intensity" << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  const Eigen::Vector3d red_balloon_position(
-      red_balloon_position_vector[0],
-      red_balloon_position_vector[1],
-      red_balloon_position_vector[2]);
+  const WindIntensity wind_intensity =
+    static_cast<WindIntensity>(wind_intensity_int);
 
   // Team Assignments
   std::vector<std::string> red_quad_names;
@@ -166,8 +168,7 @@ int main(int argc, char** argv) {
       quad_state_warden,
       GameSnapshot::Options());
 
-  // Initialize the TrajectoryPublishers
-  // Initialize the TrajectoryPublishers
+  // Initialize the Trajectory Client
   std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients;
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
@@ -175,6 +176,7 @@ int main(int argc, char** argv) {
     proposed_trajectory_clients[quad_name] =
       std::make_shared<TrajectoryClientNode>(topic);
   }
+
   // Initialize the TrajectoryWarden
   auto trajectory_warden_client = std::make_shared<TrajectoryWardenClient>();
   for(const auto& kv: proposed_trajectory_topics) {
@@ -225,8 +227,8 @@ int main(int argc, char** argv) {
   GoalStatus setStartStatusGoal = *(goal_status_subscriber_node->goal_status_);
   setStartStatusGoal.set_start = true;
 
-  // wait for 1 sec
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  // wait for .5 sec
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   red_balloon_status_publisher_node->Publish(setStartStatusRed);
   blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
@@ -240,10 +242,10 @@ int main(int argc, char** argv) {
       game_snapshot,
       trajectory_warden_client,
       map3d,
-      red_balloon_position,
-      blue_balloon_position,
       red_balloon_status,
-      blue_balloon_status);
+      blue_balloon_status,
+      goal_position,
+      wind_intensity);
 
   // Start the autonomy protocol
   std::thread ap_thread(

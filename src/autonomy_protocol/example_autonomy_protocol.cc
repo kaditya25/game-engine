@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <chrono>
 
 #include "../dependencies/P4/dependencies/osqp/include/osqp.h"
@@ -34,23 +32,23 @@ namespace game_engine {
     // indicate the response code for the most recently submitted trajectory.
 
     static OccupancyGrid3D occupancy_grid;
-    static Graph3D graphOfArena;   // Used by A*, need to convert A* 2d to 3D
+    static Graph3D graphOfArena; // Used by A*, you'll need to convert A* 2D to 3D
     static Student_game_engine_visualizer visualizer;
     static bool firstTime = true;
     static std::string& quad_name = friendly_names_[0];
-    static Eigen::Vector3d red_balloon_pos;
-    static Eigen::Vector3d blue_balloon_pos;
-
+    
     if(firstTime) {
       firstTime = false;
       occupancy_grid.LoadFromMap(map3d_, DISCRETE_LENGTH, SAFETY_BOUNDS);
-      graphOfArena = occupancy_grid.AsGraph();  // You can run Astar on this graph
+      graphOfArena = occupancy_grid.AsGraph();  // You can run A* on this graph
       visualizer.startVisualizing("/game_engine/environment");
-      red_balloon_pos = red_balloon_status_->position;
-      blue_balloon_pos = blue_balloon_status_->position;
-      // Note the balloon popped status of the balloon can be read via the following commented out line of code:
-      // red_balloon_status_->popped
     }
+
+    // Obtain current balloon positions and popped state
+    const Eigen::Vector3d red_balloon_pos = red_balloon_status_->position;
+    const Eigen::Vector3d blue_balloon_pos = blue_balloon_status_->position;
+    const bool red_balloon_popped = red_balloon_status_->popped;
+    const bool blue_balloon_popped = blue_balloon_status_->popped;
 
     // If you want to see a numerical value for the code, you can cast and
     // print the code as shown below.
@@ -69,7 +67,6 @@ namespace game_engine {
       dt_chrono = dt_chrono - std::chrono::milliseconds(15);
     }
 
-
     // Always use the chrono::system_clock for time. Trajectories require time
     // points measured in floating point seconds from the unix epoch.
     const std::chrono::milliseconds T_chrono = std::chrono::seconds(30);
@@ -87,10 +84,6 @@ namespace game_engine {
     const std::chrono::time_point<std::chrono::system_clock> current_chrono_time
       = std::chrono::system_clock::now();
 
-    // If beyond the end time, return an empty map
-    std::unordered_map<std::string, Trajectory> trajectory_map;
-    if(current_chrono_time > end_chrono_time) {return trajectory_map;}
-
     // The following code generates and returns a new trajectory each time it
     // runs.  The new trajectory starts at the location on the original circle
     // that is closest to the current location of the quad and it creates a
@@ -106,7 +99,16 @@ namespace game_engine {
 
     // Number of samples
     const size_t N = remaining_chrono_time/dt_chrono;
-    // const size_t N = 1;
+
+    // If end time has been exceeded, or if there are too few samples for a
+    // trajectory, return an empty map
+    constexpr size_t min_required_samples_in_trajectory = 2;
+    std::unordered_map<std::string, Trajectory> trajectory_map;
+    if(current_chrono_time >= end_chrono_time ||
+       N < min_required_samples_in_trajectory) {
+      return trajectory_map;
+    }
+
     // Radius
     const double radius = 0.5;
 
@@ -177,5 +179,4 @@ namespace game_engine {
 
     return trajectory_map;
   }
-
 }
