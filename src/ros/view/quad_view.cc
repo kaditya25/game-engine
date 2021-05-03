@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "quad_view.h"
 
 namespace game_engine {
@@ -15,13 +13,13 @@ namespace game_engine {
     marker.ns = "Quad";
     marker.type = visualization_msgs::Marker::MESH_RESOURCE;
     marker.action = visualization_msgs::Marker::ADD;
-    marker.scale.x = 0.6f;
-    marker.scale.y = 0.6f;
-    marker.scale.z = 0.6f;
+    marker.scale.x = 1.0f;
+    marker.scale.y = 1.0f;
+    marker.scale.z = 1.0f;
     // Empirical shifts since quad stl does not have origin at center of quad
-    marker.pose.position.x = quad_position.x() - 0.13;
-    marker.pose.position.y = quad_position.y() - 0.10;
-    marker.pose.position.z = quad_position.z() - 0.04;
+    marker.pose.position.x = quad_position.x() - 0.15;
+    marker.pose.position.y = quad_position.y() - 0.15;
+    marker.pose.position.z = quad_position.z() - 0.07;
     marker.pose.orientation.w = 0.5f;
     marker.pose.orientation.x = 0.5f;
     marker.pose.orientation.y = 0.5f;

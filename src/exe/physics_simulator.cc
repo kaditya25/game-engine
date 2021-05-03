@@ -131,6 +131,11 @@ int main(int argc, char** argv) {
   PhysicsSimulator::Options physics_simulator_options;
   
   switch(wind_intensity) {
+  case WindIntensity::Zero:
+    physics_simulator_options.sigma_u_x = 0.0001;
+    physics_simulator_options.sigma_u_y = 0.0001;
+    physics_simulator_options.sigma_u_z = 0.00005;
+    break;
   case WindIntensity::Mild:
     physics_simulator_options.sigma_u_x = 0.1;
     physics_simulator_options.sigma_u_y = 0.1;

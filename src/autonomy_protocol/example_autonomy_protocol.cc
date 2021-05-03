@@ -1,8 +1,8 @@
 #include <chrono>
 
-#include "../dependencies/P4/dependencies/osqp/include/osqp.h"
-#include "../dependencies/P4/src/polynomial_sampler.h"
-#include "../dependencies/P4/src/polynomial_solver.h"
+#include "osqp.h"
+#include "polynomial_sampler.h"
+#include "polynomial_solver.h"
 #include "../dependencies/P4/examples/gnuplot-iostream.h"
 
 #include "example_autonomy_protocol.h"
@@ -10,12 +10,13 @@
 #include "graph.h"
 #include "student_game_engine_visualizer.h"
 
-#define DISCRETE_LENGTH .2 // The length of one side of a cube in meters in the occupancy grid
-#define SAFETY_BOUNDS .34  // How big the bubble around obstacles will be
+// The length of one side of a cube in meters in the occupancy grid
+#define DISCRETE_LENGTH .2
+// How big the "inflation" bubble around obstacles will be, in meters
+#define SAFETY_BOUNDS .34  
 
 namespace game_engine {
   std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(40);
-
 
   // UpdateTrajectories creates and returns a proposed trajectory.  The
   // proposed trajectory gets submitted to the mediation_layer (ML), which
@@ -49,15 +50,14 @@ namespace game_engine {
       = std::chrono::system_clock::now();
     static const std::chrono::time_point<std::chrono::system_clock> end_chrono_time
       = start_chrono_time + T_chrono;
-    static bool arrived_at_goal = false;
 
     // Load the current quad position
     const std::string& quad_name = friendly_names_[0];
     Eigen::Vector3d current_pos;
     snapshot_->Position(quad_name, current_pos);
 
-    // Configure some variables the first time this function is called
-    if(firstTime) {
+    // Set some static variables the first time this function is called
+    if (firstTime) {
       firstTime = false;
       occupancy_grid.LoadFromMap(map3d_, DISCRETE_LENGTH, SAFETY_BOUNDS);
       // You can run A* on graphOfArena once you created a 3D version of A*
@@ -74,6 +74,9 @@ namespace game_engine {
 
     // Condition some decisions on wind intensity
     switch (wind_intensity_) {
+    case WindIntensity::Zero:
+      // Do something zero-ish
+      break;
     case WindIntensity::Mild:
       // Do something mild
       break;
@@ -87,7 +90,7 @@ namespace game_engine {
       // Do something ludicrous
       break;
     default:
-      std::cerr << "Unrecognized WindIntenstiy" << std::endl;
+      std::cerr << "Unrecognized WindIntenstiy value." << std::endl;
       std::exit(EXIT_FAILURE);
     }
     
@@ -141,43 +144,54 @@ namespace game_engine {
     if (current_chrono_time >= end_chrono_time ||
        N < min_required_samples_in_trajectory) {
       return trajectory_map;
-    }    
-    
-    // If quad has arrived at goal position, halt there by returning an empty
-    // map
-    constexpr double goal_arrival_threshold = 0.1;
-    const Eigen::Vector3d dv = current_pos - goal_position_;
-    if (remaining_chrono_time < std::chrono::seconds(duration_sec - 10) &&
-       dv.norm() < goal_arrival_threshold) {
-      arrived_at_goal = true;
     }
-    if (arrived_at_goal) {
+
+    // Halt at goal position when close
+    constexpr double goal_arrival_threshold_meters = 0.1;
+    const Eigen::Vector3d dv = current_pos - goal_position_;
+    // TrajectoryVector3D is an std::vector object defined in trajectory.h
+    TrajectoryVector3D trajectory_vector;
+    if (remaining_chrono_time < std::chrono::seconds(duration_sec - 10) &&
+       dv.norm() < goal_arrival_threshold_meters) {
+      for (size_t idx = 0; idx < 100; ++idx) {
+        const std::chrono::duration<double> flight_chrono_time
+          = current_chrono_time.time_since_epoch() + idx * dt_chrono;
+        const double flight_time = flight_chrono_time.count();
+            trajectory_vector.push_back((Eigen::Matrix<double, 11, 1>() <<
+                                         goal_position_.x(),
+                                         goal_position_.y(),
+                                         goal_position_.z(),
+                                         0,0,0,
+                                         0,0,0,
+                                         0,
+                                         flight_time).finished());
+      }
+      Trajectory trajectory(trajectory_vector);
+      visualizer.drawTrajectory(trajectory);
+      trajectory_map[quad_name] = trajectory;
       return trajectory_map;
     }
 
-    // Radius
+    // Radius of circular example trajectory in meters
     const double radius = 0.5;
 
-    // Angular speed in radians/s
+    // Angular speed of circular example trajectory in radians/s 
     constexpr double omega = 2*M_PI/duration_sec;
 
     // Place the center of the circle 1 radius in the y-direction from the
-    // starting position
-    Eigen::Vector3d circle_center = start_pos + Eigen::Vector3d(0, radius, 0);
+    // goal position
+    const Eigen::Vector3d circle_center = goal_position_ + Eigen::Vector3d(0, radius, 0);
 
     // Transform the current position into an angle
     const Eigen::Vector3d r = current_pos - circle_center;
     const double theta_start = std::atan2(r.y(), r.x());
 
-    // TrajectoryVector3D is an std::vector object defined in the trajectory.h
-    // file. It's aliased for convenience.
-    TrajectoryVector3D trajectory_vector;
-    for(size_t idx = 0; idx < N; ++idx) {
+    // Generate remaining circular trajectory
+    for (size_t idx = 0; idx < N; ++idx) {
       // chrono::duration<double> maintains high-precision floating point time
       // in seconds use the count function to cast into floating point
       const std::chrono::duration<double> flight_chrono_time
         = current_chrono_time.time_since_epoch() + idx * dt_chrono;
-      const double flight_time = flight_chrono_time.count();
 
       // Angle in radians
       const double theta = theta_start + omega * idx * dt;
@@ -201,7 +215,7 @@ namespace game_engine {
 
       // The trajectory requires the time to be specified as a floating point
       // number that measures the number of seconds since the unix epoch.
-      const double time = flight_chrono_time.count();
+      const double flight_time = flight_chrono_time.count();
 
       // Push an Eigen instance onto the trajectory vector
       trajectory_vector.push_back(
@@ -210,8 +224,7 @@ namespace game_engine {
             vx,  vy,  vz,
             ax,  ay,  az,
             yaw,
-            time
-            ).finished());
+            flight_time).finished());
     }
     // Construct a trajectory from the trajectory vector
     Trajectory trajectory(trajectory_vector);
