@@ -50,20 +50,25 @@ namespace game_engine {
         }
 
         // Determine if trajectory has violated constraints
-        Trajectory trajectory;
+        // Grab lock
+        // Check if modified
+        // if true, grab trajectory, vet, and then publish
+        // else continue
+
+        if(trajectory_warden_srv->modifiedStatus(key)){
+          Trajectory trajectory;
           trajectory_warden_srv->Await(key, trajectory);
-        TrajectoryCode trajectoryCode =
+          TrajectoryCode trajectoryCode =
           trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
           trajectory_warden_srv->SetTrajectoryStatus(trajectoryCode);
-        if (trajectoryCode != TrajectoryCode::Success) {
-          std::cerr << "Trajectory did not pass vetting: rejected with code "
-                    << static_cast<unsigned int>(trajectoryCode) <<
-                    "." << std::endl;
-          continue;
+          if (trajectoryCode != TrajectoryCode::Success) {
+            std::cerr << "Trajectory did not pass vetting: rejected with code "
+                      << static_cast<unsigned int>(trajectoryCode) <<
+                      "." << std::endl;
+            continue;
+          }
+          trajectory_warden_pub->Write(key, trajectory, trajectory_publishers);
         }
-
-        //trajectory_warden_pub->SetTrajectoryStatus(trajectoryCode);
-        trajectory_warden_pub->Write(key, trajectory, trajectory_publishers);
     }
   }
 

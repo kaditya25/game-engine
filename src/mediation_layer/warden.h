@@ -108,6 +108,11 @@ namespace game_engine {
             return this->keys_;
         };
 
+        bool modifiedStatus(const std::string &key){
+            std::shared_ptr <Container> &container = this->map_[key];
+            return container->modified_;
+        };
+
         // Break all condition variable wait statements
         void Stop() {
             this->ok_ = false;
