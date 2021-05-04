@@ -4,7 +4,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
 
-add_executable(mediation_layer mediation_layer.cc)
+add_executable(mediation_layer mediation_layer_main.cc)
 target_include_directories(mediation_layer PUBLIC ${catkin_INCLUDE_DIRS})
 target_link_libraries(mediation_layer
   lib_geometry
@@ -25,7 +25,7 @@ set_target_properties(mediation_layer
   RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
-add_executable(visualizer visualizer.cc)
+add_executable(visualizer visualizer_main.cc)
 target_include_directories(visualizer PUBLIC ${catkin_INCLUDE_DIRS})
 target_link_libraries(visualizer
   lib_geometry
@@ -46,7 +46,7 @@ set_target_properties(visualizer
   RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
-add_executable(physics_simulator physics_simulator.cc)
+add_executable(physics_simulator physics_simulator_main.cc)
 target_include_directories(physics_simulator PUBLIC ${catkin_INCLUDE_DIRS})
 target_link_libraries(physics_simulator
   lib_geometry
@@ -66,7 +66,7 @@ set_target_properties(physics_simulator
   RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
-add_executable(example_autonomy_protocol example_autonomy_protocol.cc)
+add_executable(example_autonomy_protocol example_autonomy_protocol_main.cc)
 target_include_directories(example_autonomy_protocol PUBLIC ${catkin_INCLUDE_DIRS})
 target_link_libraries(example_autonomy_protocol
   lib_geometry
@@ -86,7 +86,7 @@ set_target_properties(example_autonomy_protocol
   RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
-add_executable(student_autonomy_protocol student_autonomy_protocol.cc)
+add_executable(student_autonomy_protocol student_autonomy_protocol_main.cc)
 target_include_directories(student_autonomy_protocol PUBLIC ${catkin_INCLUDE_DIRS})
 target_link_libraries(student_autonomy_protocol
   lib_geometry
