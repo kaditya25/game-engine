@@ -40,7 +40,7 @@ use_seed: true
 seed: 0
 
 # 0: zero, 1: mild, 2: stiff, 3: intense, 4: ludicrous
-wind_intensity: 1
+wind_intensity: 2
 
 goal_position: [-13.0, 16.0, -4.0]
 
