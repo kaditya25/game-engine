@@ -28,11 +28,11 @@ goal_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resourc
 blue_balloon_position: [-19.0, 17.0, -4.0]
 red_balloon_position:  [-26.0, 17.0, 0.0]
 
-move_blue: true
+move_blue: false
 blue_balloon_position_new: [-26.0, 17.0, 0.0]
 blue_balloon_max_move_time: 60.0
 
-move_red: true
+move_red: false
 red_balloon_position_new:  [-19.0, 17.0, -4.0]
 red_balloon_max_move_time: 60.0
 
