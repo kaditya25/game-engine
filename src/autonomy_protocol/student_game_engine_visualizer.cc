@@ -1,11 +1,8 @@
-//
-// Created by james on 4/29/20.
-//
+#include <thread>
+#include <cmath>
 
 #include "student_game_engine_visualizer.h"
 
-#include <thread>
-#include <cmath>
 void Student_game_engine_visualizer::startVisualizing(std::string msg_name) {
   auto nodeHandle = ros::NodeHandle("/occupancy_visualizer/");
   publisher_ = nodeHandle.advertise<visualization_msgs::Marker>(msg_name, 100);
@@ -28,43 +25,6 @@ void Student_game_engine_visualizer::spin() {
   publisher_.publish(msg);
 
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-}
-
-void Student_game_engine_visualizer::drawOccupancyGrid(game_engine::OccupancyGrid3D *grid) {
-  visualization_msgs::Marker msg;
-  msg.header.frame_id = "world";
-  msg.id = 12346;
-  msg.ns = "occupancy_grid";
-  msg.type = visualization_msgs::Marker::CUBE_LIST;
-  msg.action = visualization_msgs::Marker::ADD;
-
-  msg.scale.x = grid->GridSize();
-  msg.scale.y = grid->GridSize();
-  msg.scale.z = grid->GridSize();
-  msg.color.r = 1;
-  msg.color.a = 0.5;
-  msg.pose.orientation.w = 1;
-
-  // Iterate through occupancy grid points, adding a cube at that spot if it's occupied
-  for(int x = 0; x < grid->SizeX(); x++) {
-    for(int y = 0; y < grid->SizeY(); y++) {
-      for(int z = 0; z < grid->SizeZ(); z++)
-      {
-        if(grid->IsOccupied(z,y,x)) 
-        {
-          Eigen::Vector3d pt = grid->boxCenter(x,y,z);
-          geometry_msgs::Point point;
-          point.x = pt[0];
-          point.y = pt[1];
-          point.z = pt[2];
-          msg.points.push_back(point);
-        }
-      }
-    }
-  }
-
-  publisher_.publish(msg);
-
 }
 
 void Student_game_engine_visualizer::drawPath(std::vector<Eigen::Vector3d> path, int id) {

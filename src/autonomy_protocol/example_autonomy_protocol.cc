@@ -33,18 +33,24 @@ namespace game_engine {
   std::unordered_map<std::string, Trajectory>
   ExampleAutonomyProtocol::UpdateTrajectories() {
 
-    // Set duration of example trajectory
+    // Set the duration of the example trajectory
     constexpr int duration_sec = 30;
     const std::chrono::milliseconds T_chrono =
       std::chrono::seconds(duration_sec);
 
     // 'static' variables act like Matlab persistent variables, maintaining
     // their value between function calls. The initializer is only called
-    // once.
+    // once.  If you prefer, you could instead include these variables as data
+    // members in your StudentAutonomyProtocol class, which is a more standard
+    // C++ code design pattern.
     static OccupancyGrid3D occupancy_grid;
-    static Graph3D graphOfArena; 
+    static Graph3D graphOfArena;
+    // Student_game_engine_visualizer is a class that supports visualizing
+    // paths, curves, points, and whole trajectories in the RVIZ display of
+    // the arena to aid in your algorithm development.
     static Student_game_engine_visualizer visualizer;
     static bool firstTime = true;
+    static bool halt = false;
     static Eigen::Vector3d start_pos;
     static const std::chrono::time_point<std::chrono::system_clock> start_chrono_time
       = std::chrono::system_clock::now();
@@ -90,31 +96,34 @@ namespace game_engine {
       // Do something ludicrous
       break;
     default:
-      std::cerr << "Unrecognized WindIntenstiy value." << std::endl;
+      std::cerr << "Unrecognized WindIntensity value." << std::endl;
       std::exit(EXIT_FAILURE);
     }
-    
-    // Respond to anomalous TrajectoryCode
-    if (trajectoryCode_ != TrajectoryCode::Success) {
-      
-      // If you want to see a numerical value for the code, you can cast and
-      // print the code as shown below.
-      std::cout << "TrajectoryCode: " <<
-        static_cast<int>(trajectoryCode_) << std::endl;
-    }   
 
-    // Suppose your AP initially submits a trajectory with a time that exceeds
-    // the maximum allowed time between points. You could apply a conditional
-    // statement that checks the TrajectoryCode associated with the submitted
-    // trajectory and fix the problem, as shown below.
-    if (trajectoryCode_ == TrajectoryCode::TimeBetweenPointsExceedsMaxTime) {
+    // You can fill out this switch statement with case statements tailored to
+    // each TrajectoryCode.
+    switch (trajectoryCode_) {
+    case TrajectoryCode::Success:
+      // You probably won't need to do anything in response to Success.
+      break;
+    case TrajectoryCode::TimeBetweenPointsExceedsMaxTime: {
+      // Suppose your AP initially submits a trajectory with a time that
+      // exceeds the maximum allowed time between points. You could fix the
+      // problem as shown below.
       std::cout << "Replanning trajectory: "
         "Shortening time between trajectory points." << std::endl;
       dt_chrono = dt_chrono - std::chrono::milliseconds(15);
+      break;
     }
-
+    default:
+      // If you want to see a numerical TrajectoryCode value, you can cast and
+      // print the code as shown below.
+      std::cout << "TrajectoryCode: " <<
+        static_cast<int>(trajectoryCode_) << std::endl;
+    }
+    
     // Always use the chrono::system_clock for time. Trajectories require time
-    // points measured in floating point seconds from the unix epoch.
+    // points measured in floating point seconds from the Unix epoch.
     const double dt =
       std::chrono::duration_cast<std::chrono::duration<double>>(dt_chrono).count();
     const std::chrono::time_point<std::chrono::system_clock> current_chrono_time
@@ -127,7 +136,7 @@ namespace game_engine {
     // that is closest to the current location of the quad and it creates a
     // trajectory of N position, velocity, and acceleration (PVA) points
     // spaced by dt seconds.  Thus, the code below responds to the actual
-    // position of the quad and adjusts the newly generated trajectory
+    // position of the quad and adjusts the newly-generated trajectory
     // accordingly.  But note that its strategy is not optimal for covering
     // the greatest distance in the allotted time in the presence of
     // disturbance accelerations.
@@ -147,12 +156,14 @@ namespace game_engine {
     }
 
     // Halt at goal position when close
-    constexpr double goal_arrival_threshold_meters = 0.1;
+    constexpr double goal_arrival_threshold_meters = 0.3;
     const Eigen::Vector3d dv = current_pos - goal_position_;
     // TrajectoryVector3D is an std::vector object defined in trajectory.h
     TrajectoryVector3D trajectory_vector;
-    if (remaining_chrono_time < std::chrono::seconds(duration_sec - 10) &&
-       dv.norm() < goal_arrival_threshold_meters) {
+    if (halt ||
+        (remaining_chrono_time < std::chrono::seconds(duration_sec - 10) &&
+         dv.norm() < goal_arrival_threshold_meters)) {
+      halt = true;
       for (size_t idx = 0; idx < 100; ++idx) {
         const std::chrono::duration<double> flight_chrono_time
           = current_chrono_time.time_since_epoch() + idx * dt_chrono;
@@ -173,7 +184,7 @@ namespace game_engine {
     }
 
     // Radius of circular example trajectory in meters
-    const double radius = 0.5;
+    const double radius = 1.0;
 
     // Angular speed of circular example trajectory in radians/s 
     constexpr double omega = 2*M_PI/duration_sec;
@@ -228,6 +239,14 @@ namespace game_engine {
     }
     // Construct a trajectory from the trajectory vector
     Trajectory trajectory(trajectory_vector);
+    // Invoke the visualizer to see the proposed trajectory, which will be
+    // displayed in violet. See student_game_engine_visualizer.h for other
+    // visualization options: you can visualize a short path, a single point,
+    // etc.  It will be helpful to get such visual feedback on candidate
+    // trajectories.  Note that there is a built-in visualizer called
+    // "ViewManager" implemented elsewhere in the game-engine code, but you
+    // don't have full control over what it displays like you do with the
+    // Student_game_engine_visualizer invoked below.
     visualizer.drawTrajectory(trajectory);
     trajectory_map[quad_name] = trajectory;
 
