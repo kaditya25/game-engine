@@ -1,7 +1,3 @@
-//
-// Created by james on 4/29/20.
-//
-
 #ifndef GAMEENGINE_SUPER_DUPER_VISUALIZIFIER_H
 #define GAMEENGINE_SUPER_DUPER_VISUALIZIFIER_H
 
@@ -20,7 +16,6 @@ public:
   Student_game_engine_visualizer() {}
   void startVisualizing(std::string msg_name);
   void spin();
-  void drawOccupancyGrid(game_engine::OccupancyGrid3D *grid);
   void drawPath(std::vector<Eigen::Vector3d> path, int id);
   void drawDot(Eigen::Vector3d pt, int id, bool good);
   void drawTrajectory(game_engine::Trajectory traj);
