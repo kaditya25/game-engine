@@ -29,18 +29,18 @@ blue_balloon_position: [-19.0, 17.0, -4.0]
 red_balloon_position:  [-26.0, 17.0, -2.0]
 
 move_blue: true
-blue_balloon_position_new: [-26.0, 17.0, -2.0]
-blue_balloon_max_move_time: 40.0
+blue_balloon_position_new: [-20.5, 19, -2.0]
+blue_balloon_max_move_time: 30.0
 
 move_red: true
-red_balloon_position_new:  [-19.0, 17.0, -4.0]
+red_balloon_position_new:  [-20.5, 15, -2.0]
 red_balloon_max_move_time: 40.0
 
 use_seed: true
 seed: 6
 
 # 0: zero, 1: mild, 2: stiff, 3: intense, 4: ludicrous
-wind_intensity: 3
+wind_intensity: 2
 
 goal_position: [-12.0, 17.0, -4.0]
 
