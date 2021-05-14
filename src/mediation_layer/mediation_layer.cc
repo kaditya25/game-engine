@@ -25,7 +25,7 @@ namespace game_engine {
           quad_state_warden->Read(key, current_quad_state);
 
           static const Eigen::Vector3d freeze_quad_position = current_quad_state.Position();
-
+	  
           const double current_time =
             std::chrono::duration_cast<std::chrono::duration<double>>
             (std::chrono::system_clock::now().time_since_epoch()).count();
@@ -46,6 +46,7 @@ namespace game_engine {
           const Trajectory freeze_trajectory(freeze_trajectory_vector);
 
           trajectory_warden_pub->Write(key, freeze_trajectory_vector, trajectory_publishers);
+          std::this_thread::sleep_for(std::chrono::milliseconds(200));
           continue;
         }
 

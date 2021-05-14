@@ -139,13 +139,14 @@ int main(int argc, char** argv) {
     const std::string& quad_name = kv.first;
     quad_state_warden->Register(quad_name);
 
-    const Eigen::Vector3d initial_quad_pos = initial_quad_positions[quad_name];
+    Eigen::Vector3d initial_quad_pos;;
     const QuadState initial_quad_state(
         (Eigen::Matrix<double, 13, 1>() <<
           initial_quad_pos(0), initial_quad_pos(1), initial_quad_pos(2),
           0,0,0,
           1,0,0,0,
           0,0,0).finished());
+    
     quad_state_warden->Write(quad_name, initial_quad_state);
   }
 

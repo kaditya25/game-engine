@@ -34,7 +34,7 @@ namespace game_engine {
         bool infraction_occurred = 
              !inflated_map.IsFreeSpace(current_position) 
           || !inflated_map.Contains(current_position);
-
+	
         if(true == infraction_occurred) {
           std::cerr 
             << quad_name 

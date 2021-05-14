@@ -38,12 +38,16 @@ namespace game_engine {
           Eigen::Vector3d& balloon_position,
           Eigen::Vector3d& new_balloon_position,
           double max_move_time,
-          std::mt19937& gen);
+          std::mt19937& gen,
+          const std::string& topic);
 
       // Stop this thread
       void Stop();
 
+      void ManualCallback(const std_msgs::Bool& msg);
+	
     private:
+      volatile bool manualPop = false;
       volatile std::atomic_bool ok_{true};
       Options options_;
 

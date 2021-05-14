@@ -1,6 +1,7 @@
 #include <chrono>
 #include <thread>
 
+#include <ros/ros.h>
 #include "balloon_watchdog.h"
 #include "balloon_status.h"
 
@@ -13,7 +14,8 @@ namespace game_engine {
       Eigen::Vector3d& balloon_position,
       Eigen::Vector3d& new_balloon_position,
       double max_move_time,
-      std::mt19937& gen) {
+      std::mt19937& gen,
+      const std::string& topic) {
 
     // Data to be populated when balloon is popped
     bool balloon_popped = false;
@@ -29,6 +31,15 @@ namespace game_engine {
     bool started = false; // set to true after SAP starts
 
     Eigen::Vector3d position = balloon_position;
+
+
+    std::cout << "Setting up subscriber" << std::endl;
+    ros::NodeHandle node_handle_ = ros::NodeHandle("/game_engine/");
+    ros::Subscriber subscriber_ = node_handle_.subscribe(
+        topic, 
+        1, 
+        &BalloonWatchdog::ManualCallback, 
+        this);
 
     // Main loop
     while(true == this->ok_) {
@@ -53,12 +64,13 @@ namespace game_engine {
         for(const std::string& quad_name: quad_names) {
           QuadState quad_state;
           quad_state_warden->Read(quad_name, quad_state);
-
+	
           const Eigen::Vector3d quad_pos = quad_state.Position();
           const double distance_to_balloon = (quad_pos - position).norm();
 
-          if(this->options_.pop_distance >= distance_to_balloon) {
+          if(manualPop || this->options_.pop_distance >= distance_to_balloon) {
             if(false == balloon_popped) {
+              ROS_INFO_STREAM("Balloon popped @ elapsed: " << elapsed_sec);
               balloon_popped = true;
               
               balloon_pop_time = elapsed_sec;
@@ -88,4 +100,10 @@ namespace game_engine {
     this->ok_ = false;
   }
 
+
+  void BalloonWatchdog::ManualCallback(const std_msgs::Bool& msg) {
+  	if(msg.data) {this->manualPop = true; 
+  	ROS_WARN("Received manual pop request");
+  	}
+  }
 }

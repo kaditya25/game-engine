@@ -21,7 +21,7 @@ namespace game_engine {
       struct Options {
         // Distance from the center of the goal that a quad must achieve to
         // reach a goal, in meters
-        double reach_distance = 0.20;
+        double reach_distance = 0.40;
 
         // quad speed must be less than this amount to reach goal
         double reach_speed = 0.1;

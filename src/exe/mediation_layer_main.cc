@@ -322,7 +322,8 @@ int main(int argc, char** argv) {
             red_balloon_position,
             red_balloon_position_new,
             red_balloon_max_move_time,
-            gen);
+            gen,
+            "manual_red_pop");
       }
   );
 
@@ -336,7 +337,8 @@ int main(int argc, char** argv) {
             blue_balloon_position,
             blue_balloon_position_new,
             blue_balloon_max_move_time,
-            gen);
+            gen,
+            "manual_blue_pop");
       }
   );
 
