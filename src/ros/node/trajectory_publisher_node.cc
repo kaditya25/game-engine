@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 #include "trajectory_publisher_node.h"
 

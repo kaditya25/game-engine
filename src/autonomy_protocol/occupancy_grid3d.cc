@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "occupancy_grid3d.h"
 #include <iostream>
 

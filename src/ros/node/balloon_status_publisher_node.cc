@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 #include "balloon_status_publisher_node.h"
 #include <chrono>

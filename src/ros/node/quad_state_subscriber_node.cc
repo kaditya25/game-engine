@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 #include "quad_state_subscriber_node.h"
 

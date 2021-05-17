@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 #include "map3d.h"
 

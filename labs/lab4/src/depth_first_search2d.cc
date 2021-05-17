@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <stack>
 
 #include "depth_first_search2d.h"

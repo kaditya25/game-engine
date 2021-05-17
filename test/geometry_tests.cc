@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 // Prevent assert from being optimized out
 #undef NDEBUG

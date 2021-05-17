@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 #include "polyhedron_view.h"
 

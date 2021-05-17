@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "gui2d.h"
 
 namespace game_engine {

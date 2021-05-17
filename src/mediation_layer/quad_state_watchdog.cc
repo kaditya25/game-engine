@@ -36,10 +36,6 @@ namespace game_engine {
           || !inflated_map.Contains(current_position);
 	
         if(true == infraction_occurred) {
-          std::cerr 
-            << quad_name 
-            << " has violated the obstacle/boundary constraints. Current position is: " 
-            << current_position.transpose() << std::endl;
           quad_state_watchdog_status->Write(quad_name, true);
         }
       }
@@ -52,5 +48,4 @@ namespace game_engine {
   void QuadStateWatchdog::Stop() {
     this->ok_ = false;
   }
-
 }

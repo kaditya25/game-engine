@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "polygon.h"
 
 namespace game_engine {

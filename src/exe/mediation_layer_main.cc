@@ -412,7 +412,6 @@ int main(int argc, char** argv) {
         ros::shutdown();
 
         mediation_layer->Stop();
-
         trajectory_warden_srv->Stop();
         trajectory_warden_pub->Stop();
         quad_state_warden->Stop();

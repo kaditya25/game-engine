@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 #include "marker_publisher_node.h"
 

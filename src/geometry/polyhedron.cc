@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "polyhedron.h"
 
 namespace game_engine {

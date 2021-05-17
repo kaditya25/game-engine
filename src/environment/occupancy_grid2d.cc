@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 #include "occupancy_grid2d.h"
 

@@ -32,8 +32,7 @@ namespace game_engine {
 
     Eigen::Vector3d position = balloon_position;
 
-
-    std::cout << "Setting up subscriber" << std::endl;
+    // Set up subscriber for manual pop of balloon
     ros::NodeHandle node_handle_ = ros::NodeHandle("/game_engine/");
     ros::Subscriber subscriber_ = node_handle_.subscribe(
         topic, 

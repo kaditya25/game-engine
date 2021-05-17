@@ -1,10 +1,5 @@
 #include <chrono>
 
-#include "osqp.h"
-#include "polynomial_sampler.h"
-#include "polynomial_solver.h"
-#include "../dependencies/P4/examples/gnuplot-iostream.h"
-
 #include "example_autonomy_protocol.h"
 #include "occupancy_grid3d.h"
 #include "graph.h"
@@ -155,27 +150,50 @@ namespace game_engine {
       return trajectory_map;
     }
 
-    // Halt at goal position when close
+    // Halt at goal position when close enough
     constexpr double goal_arrival_threshold_meters = 0.3;
     const Eigen::Vector3d dv = current_pos - goal_position_;
     // TrajectoryVector3D is an std::vector object defined in trajectory.h
     TrajectoryVector3D trajectory_vector;
+    if (halt ||
+        (remaining_chrono_time < std::chrono::seconds(duration_sec - 10) &&
+         dv.norm() < goal_arrival_threshold_meters)) {
+      halt = true;
+      for (size_t idx = 0; idx < 20; ++idx) {
+        const std::chrono::duration<double> flight_chrono_time
+          = current_chrono_time.time_since_epoch() + idx * dt_chrono;
+        const double flight_time = flight_chrono_time.count();
+        trajectory_vector.push_back((Eigen::Matrix<double, 11, 1>() <<
+                                     goal_position_.x(),
+                                     goal_position_.y(),
+                                     goal_position_.z(),
+                                     0,0,0,
+                                     0,0,0,
+                                     0,
+                                     flight_time).finished());
+      }
+      Trajectory trajectory(trajectory_vector);
+      visualizer.drawTrajectory(trajectory);
+      trajectory_map[quad_name] = trajectory;
+      return trajectory_map;
+    }
 
-    // Radius of circular example trajectory in meters
-    const double radius = 0.3;
+    // Set the radius of the circular example trajectory in meters
+    const double radius = 0.75;
 
-    // Angular speed of circular example trajectory in radians/s 
+    // Set the angular rate of the circular example trajectory in radians/s 
     constexpr double omega = 2*M_PI/duration_sec;
 
     // Place the center of the circle 1 radius in the y-direction from the
     // goal position
-    const Eigen::Vector3d circle_center = goal_position_;
+    const Eigen::Vector3d circle_center =
+      goal_position_ + Eigen::Vector3d(0, radius, 0);
 
     // Transform the current position into an angle
     const Eigen::Vector3d r = current_pos - circle_center;
     const double theta_start = std::atan2(r.y(), r.x());
 
-    // Generate remaining circular trajectory
+    // Generate the remaining circular trajectory
     for (size_t idx = 0; idx < N; ++idx) {
       // chrono::duration<double> maintains high-precision floating point time
       // in seconds use the count function to cast into floating point

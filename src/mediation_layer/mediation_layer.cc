@@ -19,19 +19,23 @@ namespace game_engine {
         // Determine if quad has violated state constraints. If it has, freeze
         // it in place
         if(true == quad_state_watchdog_status->Read(key)) {
-          std::cout << key << " has flown too close to obstacle or boundary. Freezing." << std::endl;
-
+         
           QuadState current_quad_state;
           quad_state_warden->Read(key, current_quad_state);
 
           static const Eigen::Vector3d freeze_quad_position = current_quad_state.Position();
-	  
+
+          std::cerr
+            << key 
+            << " has violated the obstacle/boundary constraints.  Freezing at current position: " 
+            << freeze_quad_position.transpose() << std::endl;
+          	  
           const double current_time =
             std::chrono::duration_cast<std::chrono::duration<double>>
             (std::chrono::system_clock::now().time_since_epoch()).count();
 
           TrajectoryVector3D freeze_trajectory_vector;
-          for(size_t idx = 0; idx < 100; ++idx) {
+          for(size_t idx = 0; idx < 150; ++idx) {
             freeze_trajectory_vector.push_back((Eigen::Matrix<double, 11, 1>() <<
                                                 freeze_quad_position.x(),
                                                 freeze_quad_position.y(),
@@ -44,10 +48,9 @@ namespace game_engine {
                                                 );
           }
           const Trajectory freeze_trajectory(freeze_trajectory_vector);
-
+          
           trajectory_warden_pub->Write(key, freeze_trajectory_vector, trajectory_publishers);
-          std::this_thread::sleep_for(std::chrono::milliseconds(200));
-          continue;
+          std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 
         // Determine if trajectory has violated constraints

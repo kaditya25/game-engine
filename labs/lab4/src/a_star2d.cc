@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <queue>
 
 #include "a_star2d.h"

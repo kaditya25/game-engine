@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <queue>
 
 #include "dijkstra2d.h"

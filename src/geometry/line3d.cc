@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "line3d.h"
 
 namespace game_engine {

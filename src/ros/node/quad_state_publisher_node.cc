@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 #include "quad_state_publisher_node.h"
 

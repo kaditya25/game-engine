@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #undef NDEBUG
 #include <cassert>
 

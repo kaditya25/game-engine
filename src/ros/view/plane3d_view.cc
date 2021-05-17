@@ -1,4 +1,4 @@
-// Author: Tucker Haydon
+
 
 #include "plane3d_view.h"
 

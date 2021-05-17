@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "plane3d.h"
 
 namespace game_engine {

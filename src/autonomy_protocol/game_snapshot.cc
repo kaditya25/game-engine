@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include "game_snapshot.h"
 
 namespace game_engine {

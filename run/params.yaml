@@ -42,9 +42,9 @@ seed: 31
 # 0: zero, 1: mild, 2: stiff, 3: intense, 4: ludicrous
 wind_intensity: 2
 
-goal_position: [-12.0, 14.0, -4.0]
+goal_position: [-12.4, 13.5, -4.0]
 
 initial_quad_positions:
-  "apollo": "-12.0 14.0 -4.0"
+  "apollo": "-12.4 13.5 -4.0"
 
 

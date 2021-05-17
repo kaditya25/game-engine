@@ -1,5 +1,3 @@
-// Author: Tucker Haydon
-
 #include <vector>
 #include <memory>
 
