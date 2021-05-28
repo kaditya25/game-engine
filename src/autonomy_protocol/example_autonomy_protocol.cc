@@ -239,16 +239,23 @@ namespace game_engine {
     // Construct a trajectory from the trajectory vector
     Trajectory trajectory(trajectory_vector);
 
+    // Before submission of the trajectory, you can use this prevetting interface to determine if the trajectory
+    // violates any mediation layer enforced constraints. This interface can be found in
+    // presubmission_trajectory_vetter.h. The PreVet function returns type TrajectoryCode which contains
+    // three values:
+    // 1) The mediation layer code that specifies success or the failure
+    // 2) The failure value. If the velocity constraint is 4.0 m/s and you submit 5.0 m/s, the value is returned as 5.0.
+    // 3) The failure index. This is the violation index that caused the mediation layer to kick back an error code.
+    //    The index is the sampled index (specified from the P4 sampling process), so you can figure out the
+    //    waypoint index by a simple math transformation.
     TrajectoryCode check_trajectory_before_submission = prevetter_->PreVet(quad_name, trajectory, map3d_);
     switch (check_trajectory_before_submission.code) {
         case MediationLayerCode::Success:
             // You probably won't need to do anything in response to Success.
-            std::cout << "Prevet: Successful. Ready for submission to mediation layer." << std::endl;
             break;
         case MediationLayerCode::TimeBetweenPointsExceedsMaxTime: {
-            // Suppose your AP initially submits a trajectory with a time that
-            // exceeds the maximum allowed time between points. You could fix the
-            // problem as shown below.
+            // Suppose your AP intends to submit a trajectory with a time that exceeds the maximum allowed time
+            // between points. The prevetter would catch this before you submit to the mediation layer.
             std::cout << "Prevet: Shorten time between trajectory points." << std::endl;
             std::cout << "Prevet: Time violation: " << check_trajectory_before_submission.value << std::endl;
             break;
