@@ -44,25 +44,25 @@ namespace game_engine {
         Warden(){};
 
         // Add a key-value pair to the map
-        TrajectoryCode Register(const std::string &key) {
+        MediationLayerCode Register(const std::string &key) {
             // If this key already exists, return false
             if (this->map_.end() != this->map_.find(key)) {
                 std::cerr << "Warden::Register -- Key already exists." << std::endl;
-                return TrajectoryCode::KeyAlreadyExists;
+                return MediationLayerCode::KeyAlreadyExists;
             }
 
             this->map_[key] = std::make_shared<Warden::Container>(T());
             // std::cout << "Quad: " << key << " successfully registered on the map." << std::endl;
             keys_.insert(key);
-            return TrajectoryCode::Success;
+            return MediationLayerCode::Success;
         };
 
         // Copy the latest type T associated with a key
-        TrajectoryCode Read(const std::string &key, T &type) {
+        MediationLayerCode Read(const std::string &key, T &type) {
             // If key does not exist, return false
             if (this->map_.end() == this->map_.find(key)) {
                 std::cerr << "Warden::Read -- Key does not exist." << std::endl;
-                return TrajectoryCode::KeyDoesNotExist;
+                return MediationLayerCode::KeyDoesNotExist;
             }
             std::shared_ptr <Container> &container = this->map_[key];
 
@@ -71,14 +71,14 @@ namespace game_engine {
                 type = container->type_;
             }
 
-            return TrajectoryCode::Success;
+            return MediationLayerCode::Success;
         };
 
         // Await a change to the state associated with the key
-        TrajectoryCode Await(const std::string &key, T &type) {
+        MediationLayerCode Await(const std::string &key, T &type) {
             if (this->map_.end() == this->map_.find(key)) {
                 std::cerr << "Warden::Await -- Key does not exist." << std::endl;
-                return TrajectoryCode::KeyDoesNotExist;
+                return MediationLayerCode::KeyDoesNotExist;
             }
             std::shared_ptr <Container> &container = this->map_[key];
 
@@ -91,7 +91,7 @@ namespace game_engine {
 
                 // Termination
                 if (false == this->ok_) {
-                    return TrajectoryCode::ThreadStopped;
+                    return MediationLayerCode::ThreadStopped;
                 }
 
                 type = container->type_;
@@ -99,7 +99,7 @@ namespace game_engine {
                 lock.unlock();
             }
 
-            return TrajectoryCode::Success;
+            return MediationLayerCode::Success;
         };
 
         // Getter
@@ -130,7 +130,7 @@ namespace game_engine {
     class TrajectoryWardenServer : public Warden<Trajectory> {
     private:
         volatile std::atomic<bool> statusUpdated_{false};
-        TrajectoryCode trajectoryStatus_{TrajectoryCode::Success};
+        TrajectoryCode trajectoryStatus_;
         TrajectoryCode GetLastTrajectoryStatus(bool blocking);
     public:
         TrajectoryWardenServer(){};
@@ -144,7 +144,7 @@ namespace game_engine {
     class TrajectoryWardenClient : public Warden<Trajectory> {
     private:
         volatile std::atomic<bool> statusUpdated_{false};
-        TrajectoryCode trajectoryStatus_{TrajectoryCode::Success};
+        TrajectoryCode trajectoryStatus_;
     public:
         TrajectoryWardenClient(){};
         TrajectoryCode Write(const std::string& key,
@@ -158,14 +158,14 @@ namespace game_engine {
     class TrajectoryWardenSubscriber : public Warden<Trajectory> {
     public:
         TrajectoryWardenSubscriber(){};
-        TrajectoryCode Write(const std::string& key,
+        MediationLayerCode Write(const std::string& key,
                              const Trajectory& trajectory);
     };
 
     class TrajectoryWardenPublisher : public Warden<Trajectory> {
     public:
         TrajectoryWardenPublisher(){};
-        TrajectoryCode Write(const std::string& key,
+        MediationLayerCode Write(const std::string& key,
                              const Trajectory& trajectory,
                              std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> publisher);
     };
@@ -173,7 +173,7 @@ namespace game_engine {
     class QuadStateWarden : public Warden<QuadState> {
     public:
         QuadStateWarden(){};
-        TrajectoryCode Write(const std::string& key,
+        MediationLayerCode Write(const std::string& key,
                              const QuadState& state);
     };
 }
