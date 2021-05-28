@@ -16,15 +16,15 @@ namespace game_engine {
   // UpdateTrajectories creates and returns a proposed trajectory.  The
   // proposed trajectory gets submitted to the mediation_layer (ML), which
   // responds by setting the data member trajectoryCode_.  See the header file
-  // game-engine/src/util/trajectory_codes.h for a list of possible codes.
+  // game-engine/src/util/trajectory_code.h for a list of possible codes.
   //
-  // Any code other than TrajectoryCode::Success indicates that the ML has
+  // Any code other than MediationLayer::Success indicates that the ML has
   // rejected the submitted trajectory.
   //
-  // trajectoryCode_ is initialized with TrajectoryCode::Success, so this will
+  // trajectoryCode_ is initialized with MediationLayerCode::Success, so this will
   // be its value the first time this function is called (before any
   // trajectories have been submitted).  Thereafter, trajectoryCode_ will
-  // indicate the TrajectoryCode for the most recently submitted trajectory.
+  // indicate the MediationLayerCode for the most recently submitted trajectory.
   std::unordered_map<std::string, Trajectory>
   ExampleAutonomyProtocol::UpdateTrajectories() {
 
@@ -96,25 +96,28 @@ namespace game_engine {
     }
 
     // You can fill out this switch statement with case statements tailored to
-    // each TrajectoryCode.
-    switch (trajectoryCode_) {
-    case TrajectoryCode::Success:
+    // each MediationLayerCode.
+    switch (trajectoryCode_.code) {
+    case MediationLayerCode::Success:
       // You probably won't need to do anything in response to Success.
       break;
-    case TrajectoryCode::TimeBetweenPointsExceedsMaxTime: {
+    case MediationLayerCode::TimeBetweenPointsExceedsMaxTime: {
       // Suppose your AP initially submits a trajectory with a time that
       // exceeds the maximum allowed time between points. You could fix the
       // problem as shown below.
       std::cout << "Replanning trajectory: "
         "Shortening time between trajectory points." << std::endl;
+      std::cout << "Value: " << trajectoryCode_.value << std::endl;
       dt_chrono = dt_chrono - std::chrono::milliseconds(15);
       break;
     }
     default:
-      // If you want to see a numerical TrajectoryCode value, you can cast and
+      // If you want to see a numerical MediationLayerCode value, you can cast and
       // print the code as shown below.
-      std::cout << "TrajectoryCode: " <<
-        static_cast<int>(trajectoryCode_) << std::endl;
+      std::cout << "MediationLayerCode: " <<
+        static_cast<int>(trajectoryCode_.code) << std::endl;
+      std::cout << "Value: " << trajectoryCode_.value << std::endl;
+      std::cout << "Index: " << trajectoryCode_.index << std::endl;
     }
     
     // Always use the chrono::system_clock for time. Trajectories require time
@@ -235,6 +238,27 @@ namespace game_engine {
     }
     // Construct a trajectory from the trajectory vector
     Trajectory trajectory(trajectory_vector);
+
+    TrajectoryCode check_trajectory_before_submission = prevetter_->PreVet(quad_name, trajectory, map3d_);
+    switch (check_trajectory_before_submission.code) {
+        case MediationLayerCode::Success:
+            // You probably won't need to do anything in response to Success.
+            std::cout << "Prevet: Successful. Ready for submission to mediation layer." << std::endl;
+            break;
+        case MediationLayerCode::TimeBetweenPointsExceedsMaxTime: {
+            // Suppose your AP initially submits a trajectory with a time that
+            // exceeds the maximum allowed time between points. You could fix the
+            // problem as shown below.
+            std::cout << "Prevet: Shorten time between trajectory points." << std::endl;
+            std::cout << "Prevet: Time violation: " << check_trajectory_before_submission.value << std::endl;
+            break;
+        }
+        default:
+            std::cout << "Prevet code: " << static_cast<int>(check_trajectory_before_submission.code) << std::endl;
+            std::cout << "Prevet value: " << check_trajectory_before_submission.value << std::endl;
+            std::cout << "Prevet index: " << check_trajectory_before_submission.index << std::endl;
+    }
+
     // Invoke the visualizer to see the proposed trajectory, which will be
     // displayed in violet. See student_game_engine_visualizer.h for other
     // visualization options: you can visualize a short path, a single point,
