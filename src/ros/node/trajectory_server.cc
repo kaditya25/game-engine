@@ -38,8 +38,10 @@ namespace game_engine {
     data.push_back(local_instant);
   }
 
-  TrajectoryCode status = warden_->Write(this->key_, Trajectory(data), true);
-  res.status = static_cast<unsigned int>(status);
+  TrajectoryCode trajectory_status = warden_->Write(this->key_, Trajectory(data), true);
+  res.code = static_cast<unsigned int>(trajectory_status.code);
+  res.value = trajectory_status.value;
+  res.index = trajectory_status.index;
   // if(status == Success) {
   //   res.status = Success;
   //   ROS_INFO("Server: ACCEPTED trajectory. Response: %d ", res.status);

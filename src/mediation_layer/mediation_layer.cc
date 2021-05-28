@@ -62,12 +62,11 @@ namespace game_engine {
         if(trajectory_warden_srv->modifiedStatus(key)){
           Trajectory trajectory;
           trajectory_warden_srv->Await(key, trajectory);
-          TrajectoryCode trajectoryCode =
-          trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
+          TrajectoryCode trajectoryCode = trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
           trajectory_warden_srv->SetTrajectoryStatus(trajectoryCode);
-          if (trajectoryCode != TrajectoryCode::Success) {
+          if (trajectoryCode.code != MediationLayerCode::Success) {
             std::cerr << "Trajectory did not pass vetting: rejected with code "
-                      << static_cast<unsigned int>(trajectoryCode) <<
+                      << static_cast<unsigned int>(trajectoryCode.code) <<
                       "." << std::endl;
             continue;
           }

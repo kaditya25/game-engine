@@ -17,10 +17,11 @@
 #include "balloon_status.h"
 #include "trajectory_code.h"
 #include "wind_intensity.h"
+#include "presubmission_trajectory_vetter.h"
 
 namespace game_engine {
   // AutonomyProtocol interfaces with MediationLayer the and enables an actor
-  // to read limited game state informatino and dictate intended future
+  // to read limited game state information and dictate intended future
   // actions for specific quadcopters.
   //
   // This class is an interface --- it should not be constructed as a standalone
@@ -46,14 +47,15 @@ namespace game_engine {
     std::vector<std::string> enemy_names_;
     std::shared_ptr<GameSnapshot> snapshot_;
     std::shared_ptr<TrajectoryWardenClient> trajectory_warden_client_;
+    std::shared_ptr<PreSubmissionTrajectoryVetter> prevetter_;
     Map3D map3d_;
     std::shared_ptr<BalloonStatus> red_balloon_status_;
     std::shared_ptr<BalloonStatus> blue_balloon_status_;
     Eigen::Vector3d goal_position_;
-    WindIntensity wind_intensity_;    
+    WindIntensity wind_intensity_;
 
     volatile std::atomic<bool> ok_{true};
-    TrajectoryCode trajectoryCode_{TrajectoryCode::Success};
+    TrajectoryCode trajectoryCode_;
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -62,6 +64,7 @@ namespace game_engine {
                      const std::vector<std::string>& enemy_names,
                      const std::shared_ptr<GameSnapshot> snapshot,
                      const std::shared_ptr<TrajectoryWardenClient> trajectory_warden_client,
+                     const std::shared_ptr<PreSubmissionTrajectoryVetter> prevetter,
                      const Map3D& map3d,
                      const std::shared_ptr<BalloonStatus> red_balloon_status,
                      const std::shared_ptr<BalloonStatus> blue_balloon_status,
@@ -71,6 +74,7 @@ namespace game_engine {
       enemy_names_(enemy_names),
       snapshot_(snapshot),
       trajectory_warden_client_(trajectory_warden_client),
+      prevetter_(prevetter),
       map3d_(map3d),
       red_balloon_status_(red_balloon_status),
       blue_balloon_status_(blue_balloon_status),

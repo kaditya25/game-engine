@@ -28,12 +28,17 @@
          = (trajectory.Time(idx) - std::floor(trajectory.Time(idx))) * 1e9;
        srv.request.trajectory.push_back(instant);
        }
-       if (client_.call(srv)) {
+
+     TrajectoryCode trajectoryCode;
+     if (client_.call(srv)) {
          // ROS_INFO("Client: Successfully called service. Response: %d ", srv.response.status);
-         return static_cast<TrajectoryCode>(srv.response.status);
-       } else {
+         trajectoryCode.code = static_cast<MediationLayerCode>(srv.response.code);
+         trajectoryCode.value = srv.response.value;
+         trajectoryCode.index = srv.response.index;
+     } else {
          ROS_ERROR("Client: Failed to call service.");
-         return TrajectoryCode::FailedToCallService;
-       }
+         trajectoryCode.code = MediationLayerCode::FailedToCallService;
+     }
+     return trajectoryCode;
     }
  }

@@ -12,7 +12,7 @@ namespace game_engine {
             continue;
         }
         this->statusUpdated_ = false;
-        return static_cast<TrajectoryCode>(trajectoryStatus_);
+        return trajectoryStatus_;
     };
 
     TrajectoryCode TrajectoryWardenServer::Write(const std::string& key,
@@ -21,7 +21,9 @@ namespace game_engine {
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
             std::cerr << "TrajectoryWardenIn::Write -- Key does not exist." << std::endl;
-            return TrajectoryCode::KeyDoesNotExist;
+            TrajectoryCode tc;
+            tc.code = MediationLayerCode::KeyDoesNotExist;
+            return tc;
         }
 
         std::shared_ptr <Warden<Trajectory>::Container> &container = this->map_[key];
@@ -39,9 +41,9 @@ namespace game_engine {
         return status;
     };
 
-    void TrajectoryWardenServer::SetTrajectoryStatus(TrajectoryCode status) {
+    void TrajectoryWardenServer::SetTrajectoryStatus(TrajectoryCode trajectory_status) {
         // Set the two variables to true if the status was updated and the value of the status
-        this->trajectoryStatus_ = status;
+        this->trajectoryStatus_ = trajectory_status;
         this->statusUpdated_ = true;
     };
 
@@ -58,7 +60,9 @@ namespace game_engine {
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
             std::cerr << "TrajectoryWardenOut::Write -- Key does not exist." << std::endl;
-            return TrajectoryCode::KeyDoesNotExist;
+            TrajectoryCode tc;
+            tc.code = MediationLayerCode::KeyDoesNotExist;
+            return tc;
         }
 
         std::shared_ptr <Warden<Trajectory>::Container> &container = this->map_[key];
@@ -81,20 +85,20 @@ namespace game_engine {
         return status;
     };
 
-    void TrajectoryWardenClient::SetTrajectoryStatus(TrajectoryCode status) {
-        this->trajectoryStatus_ = status;
+    void TrajectoryWardenClient::SetTrajectoryStatus(TrajectoryCode trajectory_status) {
+        this->trajectoryStatus_ = trajectory_status;
         this->statusUpdated_ = true;
     };
 
     //====================================
     //     TrajectoryWardenSubscriber
     //====================================
-    TrajectoryCode TrajectoryWardenSubscriber::Write(const std::string& key,
-                                                     const Trajectory& trajectory) {
+    MediationLayerCode TrajectoryWardenSubscriber::Write(const std::string& key,
+                                                         const Trajectory& trajectory) {
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
             std::cerr << "TrajectoryWardenIn::Write -- Key does not exist." << std::endl;
-            return TrajectoryCode::KeyDoesNotExist;
+            return MediationLayerCode::KeyDoesNotExist;
         }
 
         std::shared_ptr <Warden<Trajectory>::Container> &container = this->map_[key];
@@ -106,14 +110,14 @@ namespace game_engine {
             container->modified_cv_.notify_all();
         }
 
-        return TrajectoryCode::Success;
+        return MediationLayerCode::Success;
     };
 
     //=====================================
     //     TrajectoryWardenPublisher
     //=====================================
 
-    TrajectoryCode TrajectoryWardenPublisher::Write(
+    MediationLayerCode TrajectoryWardenPublisher::Write(
             const std::string& key,
             const Trajectory& trajectory,
             std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> publisher) {
@@ -121,7 +125,7 @@ namespace game_engine {
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
             std::cerr << "TrajectoryWardenOut_PubSub::Write -- Key does not exist." << std::endl;
-            return TrajectoryCode::KeyDoesNotExist;
+            return MediationLayerCode::KeyDoesNotExist;
         }
 
         std::shared_ptr <Warden<Trajectory>::Container> &container = this->map_[key];
@@ -136,19 +140,19 @@ namespace game_engine {
         // publish trajectory
         publisher[key]->Publish(trajectory);
 
-        return TrajectoryCode::Success;
+        return MediationLayerCode::Success;
     };
 
     //============================
     //     QuadStateWarden
     //============================
 
-    TrajectoryCode QuadStateWarden::Write(const std::string& key,
+    MediationLayerCode QuadStateWarden::Write(const std::string& key,
                                           const QuadState& state) {
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
             std::cerr << "QuadStateWarden::Write -- Key does not exist." << std::endl;
-            return TrajectoryCode::KeyDoesNotExist;
+            return MediationLayerCode::KeyDoesNotExist;
         }
         std::shared_ptr <Warden<QuadState>::Container> &container = this->map_[key];
 
@@ -159,6 +163,6 @@ namespace game_engine {
             container->modified_cv_.notify_all();
         }
 
-        return TrajectoryCode::Success;
+        return MediationLayerCode::Success;
     };
 }

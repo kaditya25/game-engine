@@ -12,6 +12,9 @@ namespace game_engine {
       const std::string& quad_name
       ) const {
 
+    // Define return variable
+    TrajectoryCode trajectory_code_;
+
     const size_t trajectory_size = trajectory.Size();
     if(trajectory_size < 2) {
       std::cerr << "Specified trajectory for "
@@ -20,7 +23,8 @@ namespace game_engine {
                 << trajectory_size
                 << ". Trajectories must have a size of 2 or greater. Rejecting."
                 << std::endl;
-      return TrajectoryCode::NotEnoughTrajectoryPoints;
+      trajectory_code_.code = MediationLayerCode::NotEnoughTrajectoryPoints;
+      return trajectory_code_;
     }
 
     // Initial position constraints
@@ -40,7 +44,9 @@ namespace game_engine {
         << this->options_.max_distance_from_current_position
         << " meters"
         << std::endl;
-      return TrajectoryCode::StartPointFarFromCurrentPosition;
+      trajectory_code_.code = MediationLayerCode::StartPointFarFromCurrentPosition;
+      trajectory_code_.value = (initial_position - current_position).norm();
+      return trajectory_code_;
     }
 
     // Position constraints
@@ -52,7 +58,10 @@ namespace game_engine {
           << point.transpose()
           << "] exceeded map bounds"
           << std::endl;
-        return TrajectoryCode::PointExceedsMapBounds;
+
+        trajectory_code_.code = MediationLayerCode::PointExceedsMapBounds;
+        trajectory_code_.index = idx;
+        return trajectory_code_;
       }
       if(false == map.IsFreeSpace(point)) {
         std::cerr
@@ -60,7 +69,10 @@ namespace game_engine {
           << point.transpose()
           << "] is contained within an obstacle"
           << std::endl;
-        return TrajectoryCode::PointWithinObstacle;
+
+        trajectory_code_.code = MediationLayerCode::PointWithinObstacle;
+        trajectory_code_.index = idx;
+        return trajectory_code_;
       }
     }
 
@@ -74,7 +86,10 @@ namespace game_engine {
           << this->options_.max_velocity_magnitude
           << " m/s"
           << std::endl;
-        return TrajectoryCode::ExceedsMaxVelocity;
+        trajectory_code_.code = MediationLayerCode::ExceedsMaxVelocity;
+        trajectory_code_.value = vel.norm();
+        trajectory_code_.index = idx;
+        return trajectory_code_;
       }
     }
 
@@ -93,7 +108,11 @@ namespace game_engine {
           << this->options_.max_velocity_magnitude
           << " m/s"
           << std::endl;
-        return TrajectoryCode::MeanValueExceedsMaxVelocity;
+
+        trajectory_code_.code = MediationLayerCode::MeanValueExceedsMaxVelocity;
+        trajectory_code_.value = mean_value_velocity;
+        trajectory_code_.index = idx;
+        return trajectory_code_;
       }
     }
 
@@ -107,9 +126,10 @@ namespace game_engine {
           << this->options_.max_acceleration_magnitude
           << " m/s^2"
           << std::endl;
-        std::cout << acc.transpose() << std::endl;
-        std::cout << acc.norm() << std::endl;
-        return TrajectoryCode::ExceedsMaxAcceleration;
+        trajectory_code_.code = MediationLayerCode::ExceedsMaxAcceleration;
+        trajectory_code_.value = acc.norm();
+        trajectory_code_.index = idx;
+        return trajectory_code_;
       }
     }
 
@@ -128,7 +148,10 @@ namespace game_engine {
           << this->options_.max_acceleration_magnitude
           << " m/s"
           << std::endl;
-        return TrajectoryCode::MeanValueExceedsMaxAcceleration;
+        trajectory_code_.code = MediationLayerCode::MeanValueExceedsMaxAcceleration;
+        trajectory_code_.value = mean_value_acceleration;
+        trajectory_code_.index = idx;
+        return trajectory_code_;
       }
     }
 
@@ -142,7 +165,10 @@ namespace game_engine {
         std::cerr
           << "Trajectory timestamps must be monotonically increasing"
           << std::endl;
-        return TrajectoryCode::TimestampsNotIncreasing;
+
+        trajectory_code_.code = MediationLayerCode::TimestampsNotIncreasing;
+        trajectory_code_.index = idx;
+        return trajectory_code_;
       }
 
       if(this->options_.max_delta_t < delta_time) {
@@ -152,10 +178,14 @@ namespace game_engine {
           << this->options_.max_delta_t
           << " seconds."
           << std::endl;
-        return TrajectoryCode::TimeBetweenPointsExceedsMaxTime;
+        trajectory_code_.code = MediationLayerCode::TimeBetweenPointsExceedsMaxTime;
+        trajectory_code_.value = delta_time;
+        trajectory_code_.index = idx;
+        return trajectory_code_;
       }
     }
 
-    return TrajectoryCode::Success;
+    trajectory_code_.code = MediationLayerCode::Success;
+    return trajectory_code_;
   }
 }

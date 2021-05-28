@@ -30,6 +30,7 @@
 #include "game_snapshot.h"
 #include "example_autonomy_protocol.h"
 #include "map3d.h"
+#include "presubmission_trajectory_vetter.h"
 
 using namespace game_engine;
 
@@ -168,6 +169,8 @@ int main(int argc, char** argv) {
       quad_state_warden,
       GameSnapshot::Options());
 
+  auto prevetter = std::make_shared<PreSubmissionTrajectoryVetter>(quad_state_warden);
+
   // Initialize the Trajectory Client
   std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients;
   for(const auto& kv: proposed_trajectory_topics) {
@@ -241,6 +244,7 @@ int main(int argc, char** argv) {
       red_quad_names,
       game_snapshot,
       trajectory_warden_client,
+      prevetter,
       map3d,
       red_balloon_status,
       blue_balloon_status,

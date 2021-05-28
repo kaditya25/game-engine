@@ -45,7 +45,7 @@ namespace game_engine {
       std::shared_ptr<QuadStateGuard> guard) {
     while(this->ok_) {
       QuadState state;
-      if(TrajectoryCode::Success == warden->Await(key, state)) {
+      if(MediationLayerCode::Success == warden->Await(key, state)) {
         guard->Write(state);
       }
     }
