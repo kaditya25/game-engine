@@ -17,20 +17,20 @@ void test_TrajectoryWarden() {
 
     Trajectory dummy_trajectory;
     assert(0 == warden.Keys().size());
-    assert(TrajectoryCode::Success == warden.Read("", dummy_trajectory));
-    assert(TrajectoryCode::Success == warden.Write("", dummy_trajectory));
-    assert(TrajectoryCode::Success == warden.Await("", dummy_trajectory));
+    assert(MediationLayerCode::Success == warden.Read("", dummy_trajectory));
+    assert(MediationLayerCode::Success == warden.Write("", dummy_trajectory));
+    assert(MediationLayerCode::Success == warden.Await("", dummy_trajectory));
   }
 
   { // Test read/write
     TrajectoryWardenSubscriber warden;
 
     Trajectory trajectory_write({(Eigen::Matrix<double, 11, 1>() << 1,1,1,1,1,1,1,1,1,1,1).finished()});
-    assert(TrajectoryCode::Success == warden.Register("test"));
-    assert(TrajectoryCode::Success == warden.Write("test", trajectory_write));
+    assert(MediationLayerCode::Success == warden.Register("test"));
+    assert(MediationLayerCode::Success == warden.Write("test", trajectory_write));
 
     Trajectory trajectory_read;
-    assert(TrajectoryCode::Success == warden.Read("test", trajectory_read));
+    assert(MediationLayerCode::Success == warden.Read("test", trajectory_read));
     assert(trajectory_read.Size() == trajectory_write.Size());
     assert(trajectory_read.PVAYT(0).isApprox(trajectory_write.PVAYT(0)));
   }
@@ -73,20 +73,20 @@ void test_QuadStateWarden() {
 
     QuadState dummy_state;
     assert(0 == warden.Keys().size());
-    assert(TrajectoryCode::Success == warden.Read("", dummy_state));
-    assert(TrajectoryCode::Success == warden.Write("", dummy_state));
-    assert(TrajectoryCode::Success == warden.Await("", dummy_state));
+    assert(MediationLayerCode::Success == warden.Read("", dummy_state));
+    assert(MediationLayerCode::Success == warden.Write("", dummy_state));
+    assert(MediationLayerCode::Success == warden.Await("", dummy_state));
   }
 
   { // Test read/write
     QuadStateWarden warden;
 
     QuadState state_write({(Eigen::Matrix<double, 13, 1>() << 0,0,0,0,0,0,1,0,0,0,0,0,0).finished()});
-    assert(TrajectoryCode::Success == warden.Register("test"));
-    assert(TrajectoryCode::Success == warden.Write("test", state_write));
+    assert(MediationLayerCode::Success == warden.Register("test"));
+    assert(MediationLayerCode::Success == warden.Write("test", state_write));
 
     QuadState state_read;
-    assert(TrajectoryCode::Success == warden.Read("test", state_read));
+    assert(MediationLayerCode::Success == warden.Read("test", state_read));
     assert(state_read.Position().isApprox(state_write.Position()));
     assert(state_read.Velocity().isApprox(state_write.Velocity()));
     assert(state_read.Orientation().isApprox(state_write.Orientation()));
