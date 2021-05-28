@@ -13,7 +13,6 @@ namespace game_engine {
         }
         this->statusUpdated_ = false;
         return trajectoryStatus_;
-//        return static_cast<MediationLayerCode>(trajectoryStatus_);
     };
 
     TrajectoryCode TrajectoryWardenServer::Write(const std::string& key,
