@@ -32,6 +32,7 @@ namespace game_engine {
             const std::string& quad_name,
             const Trajectory& trajectory,
             const Map3D& map) {
+            // Vet is part of trajectory_vetter.h in the mediation layer.
             return Vet(trajectory, map, quad_state_warden_, quad_name);
     }
 }
