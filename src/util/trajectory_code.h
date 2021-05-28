@@ -1,7 +1,8 @@
-#pragma once
+#ifndef TRAJECTORY_CODE_H
+#define TRAJECTORY_CODE_H
 
 namespace game_engine {
-  enum class TrajectoryCode {
+  enum class MediationLayerCode {
     Success = 0,
     
     // Vetter Codes
@@ -24,4 +25,12 @@ namespace game_engine {
     // Client Codes
     FailedToCallService = 14,
   };
+
+  struct TrajectoryCode {
+      MediationLayerCode code = MediationLayerCode::Success;
+      double value = 0.0;
+      int index = 0;
+  };
 }
+
+#endif
