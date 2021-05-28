@@ -26,6 +26,7 @@ namespace game_engine {
     FailedToCallService = 14,
   };
 
+  // TrajectoryCode is used for returning the code, value, and index for violations. Initialized with Success and 0's.
   struct TrajectoryCode {
       MediationLayerCode code = MediationLayerCode::Success;
       double value = 0.0;
