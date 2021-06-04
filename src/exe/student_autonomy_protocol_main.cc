@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
   std::signal(SIGINT, SigIntHandler);
 
   // Start ROS
-  ros::init(argc, argv, "autonomy_protocol", ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, "student_autonomy_protocol", ros::init_options::NoSigintHandler);
   ros::NodeHandle nh("/game_engine/");
 
   // Read ROS data
@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
   // The AutonomyProtocol
-  std::shared_ptr<AutonomyProtocol> autonomy_protocol
+  std::shared_ptr<AutonomyProtocol> student_autonomy_protocol
     = std::make_shared<StudentAutonomyProtocol>(
       blue_quad_names,
       red_quad_names,
@@ -252,11 +252,29 @@ int main(int argc, char** argv) {
       goal_position,
       wind_intensity);
 
+//  std::shared_ptr<AutonomyProtocol> example_autonomy_protocol
+//    = std::make_shared<ExampleAutonomyProtocol>(
+//      blue_quad_names,
+//      red_quad_names,
+//      game_snapshot,
+//      trajectory_warden_client,
+//      prevetter,
+//      map3d,
+//      red_balloon_status,
+//      blue_balloon_status,
+//      goal_position,
+//      wind_intensity);
+
   // Start the autonomy protocol
-  std::thread ap_thread(
+  std::thread ap_thread_student(
       [&]() {
-        autonomy_protocol->Run(proposed_trajectory_clients);
+        student_autonomy_protocol->Run(proposed_trajectory_clients);
       });
+//
+//  std::thread ap_thread_example(
+//      [&]() {
+//         example_autonomy_protocol->Run(proposed_trajectory_clients);
+//      });
 
   // Start the kill thread
   std::thread kill_thread(
@@ -271,7 +289,8 @@ int main(int argc, char** argv) {
 
         ros::shutdown();
 
-        autonomy_protocol->Stop();
+        student_autonomy_protocol->Stop();
+//        example_autonomy_protocol->Stop();
         quad_state_warden->Stop();
         trajectory_warden_client->Stop();
       });
@@ -281,7 +300,8 @@ int main(int argc, char** argv) {
 
   // Wait for program termination via ctl-c
   kill_thread.join();
-  ap_thread.join();
+  ap_thread_student.join();
+//  ap_thread_example.join();
 
   return EXIT_SUCCESS;
 }
