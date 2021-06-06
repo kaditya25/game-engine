@@ -27,8 +27,8 @@
 
 #include "quad_state_guard.h"
 
+#include "aerial_robotics/example_autonomy_protocol.h"
 #include "game_snapshot.h"
-#include "example_autonomy_protocol.h"
 #include "map3d.h"
 #include "presubmission_trajectory_vetter.h"
 

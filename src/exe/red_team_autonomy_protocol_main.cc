@@ -27,7 +27,7 @@
 
 #include "quad_state_guard.h"
 
-#include "aerial_robotics/student_autonomy_protocol.h"
+#include "machine_games/red_team_autonomy_protocol.h"
 #include "game_snapshot.h"
 #include "map3d.h"
 #include "presubmission_trajectory_vetter.h"
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
   std::signal(SIGINT, SigIntHandler);
 
   // Start ROS
-  ros::init(argc, argv, "student_autonomy_protocol", ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, "red_team_autonomy_protocol", ros::init_options::NoSigintHandler);
   ros::NodeHandle nh("/game_engine/");
 
   // Read ROS data
@@ -239,8 +239,8 @@ int main(int argc, char** argv) {
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
   // The AutonomyProtocol
-  std::shared_ptr<AutonomyProtocol> student_autonomy_protocol
-    = std::make_shared<StudentAutonomyProtocol>(
+  std::shared_ptr<AutonomyProtocol> red_team_autonomy_protocol
+    = std::make_shared<RedTeamAutonomyProtocol>(
       blue_quad_names,
       red_quad_names,
       game_snapshot,
@@ -253,9 +253,9 @@ int main(int argc, char** argv) {
       wind_intensity);
 
   // Start the autonomy protocol
-  std::thread ap_thread_student(
+  std::thread ap_thread_red_team(
       [&]() {
-        student_autonomy_protocol->Run(proposed_trajectory_clients);
+        red_team_autonomy_protocol->Run(proposed_trajectory_clients);
       });
 
   // Start the kill thread
@@ -271,7 +271,7 @@ int main(int argc, char** argv) {
 
         ros::shutdown();
 
-        student_autonomy_protocol->Stop();
+        red_team_autonomy_protocol->Stop();
         quad_state_warden->Stop();
         trajectory_warden_client->Stop();
       });
@@ -281,7 +281,7 @@ int main(int argc, char** argv) {
 
   // Wait for program termination via ctl-c
   kill_thread.join();
-  ap_thread_student.join();
+  ap_thread_red_team.join();
 
   return EXIT_SUCCESS;
 }

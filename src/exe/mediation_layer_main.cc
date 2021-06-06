@@ -21,7 +21,6 @@
 
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
-//#include "quad_state_dispatcher.h"
 #include "quad_state_guard.h"
 
 #include "mediation_layer.h"
