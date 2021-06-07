@@ -35,8 +35,8 @@ namespace game_engine {
             Container(const T &type) : type_(type) {}
         };
 
-        std::unordered_map <std::string, std::shared_ptr<Warden::Container>> map_;
-        std::set <std::string> keys_;
+        std::unordered_map<std::string, std::shared_ptr<Warden::Container>> map_;
+        std::set<std::string> keys_;
         volatile std::atomic<bool> ok_{true};
 
     public:
@@ -52,7 +52,6 @@ namespace game_engine {
             }
 
             this->map_[key] = std::make_shared<Warden::Container>(T());
-            // std::cout << "Quad: " << key << " successfully registered on the map." << std::endl;
             keys_.insert(key);
             return MediationLayerCode::Success;
         };
@@ -159,21 +158,21 @@ namespace game_engine {
     public:
         TrajectoryWardenSubscriber(){};
         MediationLayerCode Write(const std::string& key,
-                             const Trajectory& trajectory);
+                                 const Trajectory& trajectory);
     };
 
     class TrajectoryWardenPublisher : public Warden<Trajectory> {
     public:
         TrajectoryWardenPublisher(){};
         MediationLayerCode Write(const std::string& key,
-                             const Trajectory& trajectory,
-                             std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> publisher);
+                                 const Trajectory& trajectory,
+                                 std::shared_ptr<TrajectoryPublisherNode> publisher);
     };
 
     class QuadStateWarden : public Warden<QuadState> {
     public:
         QuadStateWarden(){};
         MediationLayerCode Write(const std::string& key,
-                             const QuadState& state);
+                                 const QuadState& state);
     };
 }

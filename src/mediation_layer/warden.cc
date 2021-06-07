@@ -120,7 +120,7 @@ namespace game_engine {
     MediationLayerCode TrajectoryWardenPublisher::Write(
             const std::string& key,
             const Trajectory& trajectory,
-            std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> publisher) {
+            std::shared_ptr<TrajectoryPublisherNode> publisher) {
 
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
@@ -138,7 +138,7 @@ namespace game_engine {
         }
 
         // publish trajectory
-        publisher[key]->Publish(trajectory);
+        publisher->Publish(trajectory);
 
         return MediationLayerCode::Success;
     };
