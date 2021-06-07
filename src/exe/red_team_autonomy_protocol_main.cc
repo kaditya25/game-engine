@@ -140,7 +140,9 @@ int main(int argc, char** argv) {
     const std::string& quad_name = kv.first;
     quad_state_warden->Register(quad_name);
 
-    Eigen::Vector3d initial_quad_pos;;
+    Eigen::Vector3d initial_quad_pos((initial_quad_positions[quad_name])(0),
+                                     (initial_quad_positions[quad_name])(1),
+                                     (initial_quad_positions[quad_name])(2));
     const QuadState initial_quad_state(
         (Eigen::Matrix<double, 13, 1>() <<
           initial_quad_pos(0), initial_quad_pos(1), initial_quad_pos(2),
@@ -165,8 +167,8 @@ int main(int argc, char** argv) {
 
   // Initialize the GameSnapshot
   auto game_snapshot = std::make_shared<GameSnapshot>(
-      blue_quad_names,
       red_quad_names,
+      blue_quad_names,
       quad_state_warden,
       GameSnapshot::Options());
 
@@ -177,15 +179,18 @@ int main(int argc, char** argv) {
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
     const std::string& topic = kv.second;
-    proposed_trajectory_clients[quad_name] =
-      std::make_shared<TrajectoryClientNode>(topic);
+    if(std::find(red_quad_names.begin(), red_quad_names.end(), quad_name) != red_quad_names.end()) {
+      proposed_trajectory_clients[quad_name] = std::make_shared<TrajectoryClientNode>(topic);
+    }
   }
 
   // Initialize the TrajectoryWarden
   auto trajectory_warden_client = std::make_shared<TrajectoryWardenClient>();
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
-    trajectory_warden_client->Register(quad_name);
+    if(std::find(red_quad_names.begin(), red_quad_names.end(), quad_name) != red_quad_names.end()) {
+      trajectory_warden_client->Register(quad_name);
+    }
   }
 
   // Balloon Status
@@ -241,8 +246,8 @@ int main(int argc, char** argv) {
   // The AutonomyProtocol
   std::shared_ptr<AutonomyProtocol> red_team_autonomy_protocol
     = std::make_shared<RedTeamAutonomyProtocol>(
-      blue_quad_names,
       red_quad_names,
+      blue_quad_names,
       game_snapshot,
       trajectory_warden_client,
       prevetter,

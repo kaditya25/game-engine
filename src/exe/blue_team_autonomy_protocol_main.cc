@@ -139,8 +139,9 @@ int main(int argc, char** argv) {
   for(const auto& kv: quad_state_topics) {
     const std::string& quad_name = kv.first;
     quad_state_warden->Register(quad_name);
-
-    Eigen::Vector3d initial_quad_pos;;
+    Eigen::Vector3d initial_quad_pos((initial_quad_positions[quad_name])(0),
+                                     (initial_quad_positions[quad_name])(1),
+                                     (initial_quad_positions[quad_name])(2));
     const QuadState initial_quad_state(
         (Eigen::Matrix<double, 13, 1>() <<
           initial_quad_pos(0), initial_quad_pos(1), initial_quad_pos(2),
@@ -177,15 +178,18 @@ int main(int argc, char** argv) {
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
     const std::string& topic = kv.second;
-    proposed_trajectory_clients[quad_name] =
-      std::make_shared<TrajectoryClientNode>(topic);
+    if(std::find(blue_quad_names.begin(), blue_quad_names.end(), quad_name) != blue_quad_names.end()) {
+      proposed_trajectory_clients[quad_name] = std::make_shared<TrajectoryClientNode>(topic);
+    }
   }
 
   // Initialize the TrajectoryWarden
   auto trajectory_warden_client = std::make_shared<TrajectoryWardenClient>();
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
-    trajectory_warden_client->Register(quad_name);
+    if(std::find(blue_quad_names.begin(), blue_quad_names.end(), quad_name) != blue_quad_names.end()) {
+      trajectory_warden_client->Register(quad_name);
+    }
   }
 
   // Balloon Status
