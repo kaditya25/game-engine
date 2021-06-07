@@ -107,21 +107,23 @@ namespace game_engine {
       const std::unordered_map<std::string, Trajectory> trajectories =
         UpdateTrajectories();
 
+      // TODO: consider creating a local thread pool here to iterate through the trajectory_clients
+
       // For every friendly quad, push the intended trajectory to the trajectory
       // warden
       for(const std::string& quad_name: friendly_names_) {
         try {
           const Trajectory trajectory = trajectories.at(quad_name);
           TrajectoryCode trajectoryCode =
-            trajectory_warden_client_->Write(quad_name, trajectory,
-                                             proposed_trajectory_clients,
-                                             true);
+              trajectory_warden_client_->Write(quad_name,
+                                               trajectory,
+                                               proposed_trajectory_clients,
+                                               true);
           trajectoryCode_ = trajectoryCode;
         } catch(const std::out_of_range& e) {
           continue;
         }
       }
-
       // Sleep for 200 ms. This essentially creates a loop that runs at 5 Hz. A
       // new trajectory may be specified once every 200 ms.
       std::this_thread::sleep_for(std::chrono::milliseconds(200));
