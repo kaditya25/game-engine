@@ -98,21 +98,20 @@ int main(int argc, char** argv) {
   // gets trajectories from the AP client.
   std::unordered_map<std::string, std::shared_ptr<TrajectoryServerNode>> trajectory_servers;
   for(const auto& kv: proposed_trajectory_topics) {
-      const std::string& quad_name = kv.first;
-      const std::string& topic = kv.second;
-      trajectory_servers[quad_name] = std::make_shared<TrajectoryServerNode>(topic,
-                                                                             quad_name,
-                                                                             trajectory_warden_srv);
+    const std::string& quad_name = kv.first;
+    const std::string& topic = kv.second;
+    trajectory_servers[quad_name] = std::make_shared<TrajectoryServerNode>(topic,
+                                                                           quad_name,
+                                                                           trajectory_warden_srv);
   }
 
-    // For every quad, publish to its corresponding updated_trajectory topic
-    std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers;
-    for(const auto& kv: updated_trajectory_topics) {
-        const std::string& quad_name = kv.first;
-        const std::string& topic = kv.second;
-        trajectory_publishers[quad_name] = std::make_shared<TrajectoryPublisherNode>(topic);
-    }
-
+  // For every quad, publish to its corresponding updated_trajectory topic
+  std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers;
+  for(const auto& kv: updated_trajectory_topics) {
+    const std::string& quad_name = kv.first;
+    const std::string& topic = kv.second;
+    trajectory_publishers[quad_name] = std::make_shared<TrajectoryPublisherNode>(topic);
+  }
 
     std::map<std::string, std::string> quad_state_topics;
   if(false == nh.getParam("quad_state_topics", quad_state_topics)) {
