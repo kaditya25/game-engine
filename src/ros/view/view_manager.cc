@@ -49,19 +49,19 @@ namespace game_engine {
       if(p.first == "red") {
         QuadView::Options view_options;
         view_options.mesh_resource = quad_view_options.quad_mesh_file_path;
-        // UT blue-grey
-        view_options.r = 0.2f;
-        view_options.g = 0.247f;
-        view_options.b = 0.28f;
+        // burnt orange
+        view_options.r = 0.75f;
+        view_options.g = 0.34;
+        view_options.b = 0.0f;
         quad_views.emplace_back(p.second, view_options);
       }
       else if(p.first == "blue") {
         QuadView::Options view_options;
         view_options.mesh_resource = quad_view_options.quad_mesh_file_path;
-        // burnt orange
-        view_options.r = 0.75f;
-        view_options.g = 0.34;
-        view_options.b = 0.0f;
+        // UT blue-grey
+        view_options.r = 0.2f;
+        view_options.g = 0.247f;
+        view_options.b = 0.28f;
         quad_views.emplace_back(p.second, view_options);
       }
     }
