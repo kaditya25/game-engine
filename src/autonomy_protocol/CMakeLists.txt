@@ -11,7 +11,6 @@ set(SOURCE_FILES
   machine_games/red_team_autonomy_protocol.cc
   machine_games/blue_team_autonomy_protocol.cc
   game_snapshot.cc
-  occupancy_grid3d.cc
   student_game_engine_visualizer.cc
   )
 
