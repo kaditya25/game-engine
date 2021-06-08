@@ -51,4 +51,4 @@ goal_position: [-12.4, 13.5, -4.0]
 
 initial_quad_positions:
   "apollo": "-12.4 13.5 -4.0"
-  "zeus": "-14.4 17.5 -4.0"
+  "zeus": "-16.4 15.5 -4.0"
