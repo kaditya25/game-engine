@@ -1,18 +1,20 @@
-#include "continuous_quad_monitor.h"
+#include "trajectory_watchdog.h"
 
 #include <Eigen/Core>
 #include <iostream>
 
 namespace game_engine {
 
-    MediationLayerCode ContinuousQuadMonitor::
-    SimulateForward(const Trajectory& trajectory,
-                    const Map3D& map,
-                    const std::shared_ptr<QuadStateWarden> quad_state_warden,
-                    const std::string& quad_name,
-                    const std::vector<std::string>& other_quad_names) const {
+    void TrajectoryWatchdog::Run(const Trajectory& trajectory,
+                                 const Map3D& map,
+                                 const std::shared_ptr<QuadStateWarden> quad_state_warden,
+                                 const std::vector<std::string>& quad_names) {
 
+      // TODO: fill out with intersecting trajectories!!
 
-      return MediationLayerCode::Success;
+    }
+
+    void TrajectoryWatchdog::Stop() {
+      this->ok_ = false;
     }
 }
