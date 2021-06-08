@@ -27,7 +27,7 @@
 
 #include "quad_state_guard.h"
 
-#include "aerial_robotics/student_autonomy_protocol.h"
+#include "machine_games/blue_team_autonomy_protocol.h"
 #include "game_snapshot.h"
 #include "map3d.h"
 #include "presubmission_trajectory_vetter.h"
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
   std::signal(SIGINT, SigIntHandler);
 
   // Start ROS
-  ros::init(argc, argv, "student_autonomy_protocol", ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, "blue_team_autonomy_protocol", ros::init_options::NoSigintHandler);
   ros::NodeHandle nh("/game_engine/");
 
   // Read ROS data
@@ -139,8 +139,9 @@ int main(int argc, char** argv) {
   for(const auto& kv: quad_state_topics) {
     const std::string& quad_name = kv.first;
     quad_state_warden->Register(quad_name);
-
-    Eigen::Vector3d initial_quad_pos;;
+    Eigen::Vector3d initial_quad_pos((initial_quad_positions[quad_name])(0),
+                                     (initial_quad_positions[quad_name])(1),
+                                     (initial_quad_positions[quad_name])(2));
     const QuadState initial_quad_state(
         (Eigen::Matrix<double, 13, 1>() <<
           initial_quad_pos(0), initial_quad_pos(1), initial_quad_pos(2),
@@ -177,15 +178,18 @@ int main(int argc, char** argv) {
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
     const std::string& topic = kv.second;
-    proposed_trajectory_clients[quad_name] =
-      std::make_shared<TrajectoryClientNode>(topic);
+    if(std::find(blue_quad_names.begin(), blue_quad_names.end(), quad_name) != blue_quad_names.end()) {
+      proposed_trajectory_clients[quad_name] = std::make_shared<TrajectoryClientNode>(topic);
+    }
   }
 
   // Initialize the TrajectoryWarden
   auto trajectory_warden_client = std::make_shared<TrajectoryWardenClient>();
   for(const auto& kv: proposed_trajectory_topics) {
     const std::string& quad_name = kv.first;
-    trajectory_warden_client->Register(quad_name);
+    if(std::find(blue_quad_names.begin(), blue_quad_names.end(), quad_name) != blue_quad_names.end()) {
+      trajectory_warden_client->Register(quad_name);
+    }
   }
 
   // Balloon Status
@@ -239,8 +243,8 @@ int main(int argc, char** argv) {
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
   // The AutonomyProtocol
-  std::shared_ptr<AutonomyProtocol> student_autonomy_protocol
-    = std::make_shared<StudentAutonomyProtocol>(
+  std::shared_ptr<AutonomyProtocol> blue_team_autonomy_protocol
+    = std::make_shared<BlueTeamAutonomyProtocol>(
       blue_quad_names,
       red_quad_names,
       game_snapshot,
@@ -253,9 +257,9 @@ int main(int argc, char** argv) {
       wind_intensity);
 
   // Start the autonomy protocol
-  std::thread ap_thread_student(
+  std::thread ap_thread_blue_team(
       [&]() {
-        student_autonomy_protocol->Run(proposed_trajectory_clients);
+        blue_team_autonomy_protocol->Run(proposed_trajectory_clients);
       });
 
   // Start the kill thread
@@ -271,7 +275,7 @@ int main(int argc, char** argv) {
 
         ros::shutdown();
 
-        student_autonomy_protocol->Stop();
+        blue_team_autonomy_protocol->Stop();
         quad_state_warden->Stop();
         trajectory_warden_client->Stop();
       });
@@ -281,7 +285,7 @@ int main(int argc, char** argv) {
 
   // Wait for program termination via ctl-c
   kill_thread.join();
-  ap_thread_student.join();
+  ap_thread_blue_team.join();
 
   return EXIT_SUCCESS;
 }

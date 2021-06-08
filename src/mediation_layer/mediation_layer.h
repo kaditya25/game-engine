@@ -19,14 +19,12 @@ namespace game_engine {
   // trajectories might cause quads to fly into each other, walls, or other
   // obstacles in the environment.
   //
-  // TODO: Modify trajectories to prevent quads from flying into obstacles
-  // TODO: Vet trajectories and ensure that they do not exceed prescribed bounds
   class MediationLayer {
     private:
       volatile std::atomic_bool ok_{true};
 
-      // Transfers data associated with key from trajectory_warden_in to
-      // trajectory_warden_out
+      // Transfers data associated with key from trajectory_warden_srv to
+      // trajectory_warden_pub
       void TransferData(
           const std::string& key,
           const Map3D& map,
@@ -34,7 +32,7 @@ namespace game_engine {
           std::shared_ptr<TrajectoryWardenPublisher> trajectory_warden_pub,
           std::shared_ptr<QuadStateWarden> quad_state_warden,
           std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-          std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers);
+          std::shared_ptr<TrajectoryPublisherNode> publisher);
 
     public:
       MediationLayer() {}

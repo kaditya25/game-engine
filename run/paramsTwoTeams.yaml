@@ -1,0 +1,54 @@
+team_assignments:
+  "apollo": "blue"
+  "zeus": "red"
+
+quad_state_topics:
+  "apollo": "/apollo/state"
+  "zeus": "/zeus/state"
+
+proposed_trajectory_topics:
+  "apollo": "/apollo/proposed_trajectory"
+  "zeus": "/zeus/proposed_trajectory"
+
+updated_trajectory_topics:
+  "apollo": "/apollo/updated_trajectory"
+  "zeus": "/zeus/updated_trajectory"
+
+visualization_trajectory_topics:
+  "apollo": "/apollo/visualization_trajectory"
+  "zeus": "/zeus/visualization_trajectory"
+
+balloon_status_topics:
+  "red": "/game_engine/red_balloon_status"
+  "blue": "/game_engine/blue_balloon_status"
+
+goal_status_topics:
+  "home": "/game_engine/home_status"
+
+map_file_path: "/home/aerial-robotics/Workspace/game-engine/resources/maps/woods.map"
+quad_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/quad.stl"
+balloon_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/balloon.stl"
+goal_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/torus.stl"
+
+blue_balloon_position: [-16.95, 18.05, -3.5]
+red_balloon_position:  [-25.05, 19.5, -2.65]
+
+move_blue: false
+blue_balloon_position_new: [-20.5, 15.5, -4.4]
+blue_balloon_max_move_time: 60.0
+
+move_red: false
+red_balloon_position_new:  [-20.5, 16.5, -4.4]
+red_balloon_max_move_time: 60.0
+
+use_seed: true
+seed: 31
+
+# 0: zero, 1: mild, 2: stiff, 3: intense, 4: ludicrous
+wind_intensity: 1
+
+goal_position: [-12.4, 13.5, -4.0]
+
+initial_quad_positions:
+  "apollo": "-12.4 13.5 -4.0"
+  "zeus": "-16.4 15.5 -4.0"

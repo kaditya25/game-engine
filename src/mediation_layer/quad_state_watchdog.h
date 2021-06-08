@@ -17,6 +17,7 @@ namespace game_engine {
       struct Options {
         // Minimum l-infinity distance from all obstacles that a quad may fly
         double min_distance = 0.40;
+        double min_distance_btwn_quads = 1.0;
 
         Options() {}
       };

@@ -6,6 +6,7 @@ set(SOURCE_FILES
   map2d.cc
   map3d.cc
   occupancy_grid2d.cc
+  occupancy_grid3d.cc
 )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})

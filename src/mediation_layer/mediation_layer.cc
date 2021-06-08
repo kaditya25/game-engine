@@ -12,7 +12,7 @@ namespace game_engine {
        std::shared_ptr<TrajectoryWardenPublisher> trajectory_warden_pub,
        std::shared_ptr<QuadStateWarden> quad_state_warden,
        std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
-       std::unordered_map<std::string, std::shared_ptr<TrajectoryPublisherNode>> trajectory_publishers) {
+       std::shared_ptr<TrajectoryPublisherNode> publisher) {
 
       TrajectoryVetter trajectory_vetter;
       while(true == this->ok_) {
@@ -23,7 +23,7 @@ namespace game_engine {
           QuadState current_quad_state;
           quad_state_warden->Read(key, current_quad_state);
 
-          static const Eigen::Vector3d freeze_quad_position = current_quad_state.Position();
+          const Eigen::Vector3d freeze_quad_position = current_quad_state.Position();
 
           std::cerr
             << key 
@@ -43,13 +43,11 @@ namespace game_engine {
                                                 0,0,0,
                                                 0,0,0,
                                                 0,
-                                                current_time + idx * 0.01
-                                                ).finished()
-                                                );
+                                                current_time + idx * 0.01).finished());
           }
           const Trajectory freeze_trajectory(freeze_trajectory_vector);
           
-          trajectory_warden_pub->Write(key, freeze_trajectory_vector, trajectory_publishers);
+          trajectory_warden_pub->Write(key, freeze_trajectory_vector, publisher);
           std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 
@@ -70,7 +68,7 @@ namespace game_engine {
                       "." << std::endl;
             continue;
           }
-          trajectory_warden_pub->Write(key, trajectory, trajectory_publishers);
+          trajectory_warden_pub->Write(key, trajectory, publisher);
         }
     }
   }
@@ -98,20 +96,20 @@ namespace game_engine {
                        trajectory_warden_pub,
                        quad_state_warden,
                        quad_state_watchdog_status,
-                       trajectory_publishers);})));
+                       trajectory_publishers[key]);})));
     }
 
     // Wait for this thread to receive a stop command
     std::thread kill_thread([&, this]() {
-                              while(true) {
-                                if(false == ok_) {
-                                  break;
-                                } else {
-                                  std::this_thread::
-                                    sleep_for(std::chrono::milliseconds(1000));
-                                }
-                              }
-                            });
+      while(true) {
+        if(false == ok_) {
+          break;
+        } else {
+          std::this_thread::
+          sleep_for(std::chrono::milliseconds(1000));
+        }
+      }
+    });
 
     kill_thread.join();
 

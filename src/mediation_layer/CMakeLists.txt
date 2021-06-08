@@ -17,6 +17,7 @@ set(SOURCE_FILES
   goal_watchdog.cc
   quad_state_watchdog.cc
   quad_state_watchdog_status.cc
+  trajectory_watchdog.cc
 )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})

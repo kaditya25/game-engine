@@ -27,8 +27,8 @@
 
 #include "quad_state_guard.h"
 
+#include "aerial_robotics/example_autonomy_protocol.h"
 #include "game_snapshot.h"
-#include "example_autonomy_protocol.h"
 #include "map3d.h"
 #include "presubmission_trajectory_vetter.h"
 
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
   std::signal(SIGINT, SigIntHandler);
 
   // Start ROS
-  ros::init(argc, argv, "autonomy_protocol", ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, "example_autonomy_protocol", ros::init_options::NoSigintHandler);
   ros::NodeHandle nh("/game_engine/");
 
   // Read ROS data
@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
   // The AutonomyProtocol
-  std::shared_ptr<AutonomyProtocol> autonomy_protocol
+  std::shared_ptr<AutonomyProtocol> example_autonomy_protocol
     = std::make_shared<ExampleAutonomyProtocol>(
       blue_quad_names,
       red_quad_names,
@@ -252,9 +252,9 @@ int main(int argc, char** argv) {
       wind_intensity);
 
   // Start the autonomy protocol
-  std::thread ap_thread(
+  std::thread ap_thread_example(
       [&]() {
-        autonomy_protocol->Run(proposed_trajectory_clients);
+          example_autonomy_protocol->Run(proposed_trajectory_clients);
       });
 
   // Start the kill thread
@@ -270,7 +270,7 @@ int main(int argc, char** argv) {
 
         ros::shutdown();
 
-        autonomy_protocol->Stop();
+        example_autonomy_protocol->Stop();
         quad_state_warden->Stop();
         trajectory_warden_client->Stop();
       });
@@ -280,7 +280,7 @@ int main(int argc, char** argv) {
 
   // Wait for program termination via ctl-c
   kill_thread.join();
-  ap_thread.join();
+  ap_thread_example.join();
 
   return EXIT_SUCCESS;
 }

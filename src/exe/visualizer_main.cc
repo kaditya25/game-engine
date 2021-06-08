@@ -165,8 +165,7 @@ int main(int argc, char** argv) {
     for(const auto& kp: visualization_trajectory_topics) {
       if(kp.first == quad_name) {
         const std::string& topic_publish = kp.second;
-        trajectory_visualizers[quad_name] =
-          std::make_shared<TrajectoryVisualizerNode>(topic_subscribe, topic_publish);
+        trajectory_visualizers[quad_name] = std::make_shared<TrajectoryVisualizerNode>(topic_subscribe, topic_publish);
       }
     }
   }

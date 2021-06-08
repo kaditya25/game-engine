@@ -24,6 +24,10 @@ namespace game_engine {
 
     // Client Codes
     FailedToCallService = 14,
+
+    // Multi-Quad Scenario Codes
+    QuadTooCloseToAnotherQuad = 15,
+    QuadTrajectoryCollidesWithAnotherQuad = 16,
   };
 
   // TrajectoryCode is used for returning the code, value, and index for violations. Initialized with Success and 0's.

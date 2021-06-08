@@ -5,10 +5,12 @@ set(TARGET lib_autonomy_protocol)
 find_package (Eigen3 3.3 NO_MODULE)
 
 set(SOURCE_FILES
-  example_autonomy_protocol.cc
+  aerial_robotics/example_autonomy_protocol.cc
+  aerial_robotics/student_autonomy_protocol.cc
+  machine_games/multi_quad_autonomy_protocol.cc
+  machine_games/red_team_autonomy_protocol.cc
+  machine_games/blue_team_autonomy_protocol.cc
   game_snapshot.cc
-  student_autonomy_protocol.cc
-  occupancy_grid3d.cc
   student_game_engine_visualizer.cc
   )
 

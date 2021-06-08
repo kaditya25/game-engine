@@ -105,3 +105,63 @@ set_target_properties(student_autonomy_protocol
   CXX_EXTENSIONS NO
   RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
+
+add_executable(multi_quad_autonomy_protocol multi_quad_autonomy_protocol_main.cc)
+target_include_directories(multi_quad_autonomy_protocol PUBLIC ${catkin_INCLUDE_DIRS})
+target_link_libraries(multi_quad_autonomy_protocol
+        lib_geometry
+        lib_environment
+        lib_util
+        lib_mediation_layer
+        lib_ros_node
+        lib_ros_view
+        lib_autonomy_protocol
+        yaml-cpp
+        ${catkin_LIBRARIES})
+set_target_properties(multi_quad_autonomy_protocol
+        PROPERTIES
+        CXX_STANDARD 14
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+        )
+
+add_executable(red_team_autonomy_protocol red_team_autonomy_protocol_main.cc)
+target_include_directories(red_team_autonomy_protocol PUBLIC ${catkin_INCLUDE_DIRS})
+target_link_libraries(red_team_autonomy_protocol
+        lib_geometry
+        lib_environment
+        lib_util
+        lib_mediation_layer
+        lib_ros_node
+        lib_ros_view
+        lib_autonomy_protocol
+        yaml-cpp
+        ${catkin_LIBRARIES})
+set_target_properties(red_team_autonomy_protocol
+        PROPERTIES
+        CXX_STANDARD 14
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+        )
+
+add_executable(blue_team_autonomy_protocol blue_team_autonomy_protocol_main.cc)
+target_include_directories(blue_team_autonomy_protocol PUBLIC ${catkin_INCLUDE_DIRS})
+target_link_libraries(blue_team_autonomy_protocol
+        lib_geometry
+        lib_environment
+        lib_util
+        lib_mediation_layer
+        lib_ros_node
+        lib_ros_view
+        lib_autonomy_protocol
+        yaml-cpp
+        ${catkin_LIBRARIES})
+set_target_properties(blue_team_autonomy_protocol
+        PROPERTIES
+        CXX_STANDARD 14
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+        )
