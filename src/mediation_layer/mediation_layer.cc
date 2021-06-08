@@ -43,9 +43,7 @@ namespace game_engine {
                                                 0,0,0,
                                                 0,0,0,
                                                 0,
-                                                current_time + idx * 0.01
-                                                ).finished()
-                                                );
+                                                current_time + idx * 0.01).finished());
           }
           const Trajectory freeze_trajectory(freeze_trajectory_vector);
           
@@ -103,15 +101,15 @@ namespace game_engine {
 
     // Wait for this thread to receive a stop command
     std::thread kill_thread([&, this]() {
-                              while(true) {
-                                if(false == ok_) {
-                                  break;
-                                } else {
-                                  std::this_thread::
-                                    sleep_for(std::chrono::milliseconds(1000));
-                                }
-                              }
-                            });
+      while(true) {
+        if(false == ok_) {
+          break;
+        } else {
+          std::this_thread::
+          sleep_for(std::chrono::milliseconds(1000));
+        }
+      }
+    });
 
     kill_thread.join();
 
