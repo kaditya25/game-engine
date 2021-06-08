@@ -19,7 +19,7 @@ namespace game_engine {
     // ROS node handle
     ros::NodeHandle node_handle_;
 
-    // ROS subscriebr
+    // ROS subscriber
     ros::Subscriber subscriber_;
 
     // Path

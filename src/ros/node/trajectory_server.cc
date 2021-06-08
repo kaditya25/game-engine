@@ -42,13 +42,6 @@ namespace game_engine {
   res.code = static_cast<unsigned int>(trajectory_status.code);
   res.value = trajectory_status.value;
   res.index = trajectory_status.index;
-  // if(status == Success) {
-  //   res.status = Success;
-  //   ROS_INFO("Server: ACCEPTED trajectory. Response: %d ", res.status);
-  // } else {
-  //   res.status = status;
-  //   ROS_INFO("Server: REJECTED trajectory. Response: %d ", res.status);
-  // }
   return true;
   }
 }
