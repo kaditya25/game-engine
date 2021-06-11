@@ -16,8 +16,6 @@
 #define DISCRETE_LENGTH .4 // The length of one side of a cube in meters in the occupancy grid
 #define SAFETY_BOUNDS .8  // How big the bubble around obstacles will be
 
-void write_csv(std::string filename, std::vector<std::pair<std::string, std::vector<double>>> dataset);
-
 namespace game_engine {
 
   namespace {
@@ -128,14 +126,18 @@ namespace game_engine {
           continue;
         }
 
-        if(*(node_to_explore->node_ptr) == *end_ptr){
+        if(*(node_to_explore->node_ptr) == *end_ptr)
+        {
           break;
-        }else {
+        }
+        else 
+        {
           explored.insert(node_to_explore->node_ptr);
           const std::vector<DirectedEdge3D> edges = 
             graphOfArena.Edges(node_to_explore->node_ptr);
 
-          for(const DirectedEdge3D& edge: edges){
+          for(const DirectedEdge3D& edge: edges)
+          {
             const std::shared_ptr<Node3D>& sink_ptr = edge.Sink();
             const double cost = edge.Cost();
 
@@ -147,7 +149,6 @@ namespace game_engine {
             neighbor->cost = node_to_explore->cost + cost;
             to_explore.push(neighbor);
           }
-
         }
 
       }
@@ -191,7 +192,7 @@ namespace game_engine {
       return pruned_path;
     }
 
-    TrajectoryVector3D peFour(Eigen::Vector3d current_pos, Eigen::Vector3d current_vel, 
+    TrajectoryVector3D peFour(Eigen::Vector3d current_position, Eigen::Vector3d current_velocity, 
       std::vector<Eigen::Vector3d> path_points, std::vector<double> times, int target){
 
       const std::chrono::time_point<std::chrono::system_clock> current_chrono_time
@@ -199,12 +200,12 @@ namespace game_engine {
 
       std::vector<p4::NodeEqualityBound> node_equality_bounds = {
       // The first node must constrain position, velocity, and acceleration
-      p4::NodeEqualityBound(0,0,0,current_pos(0)),
-      p4::NodeEqualityBound(1,0,0,current_pos(1)),
-      p4::NodeEqualityBound(2,0,0,current_pos(2)),
-      p4::NodeEqualityBound(0,0,1,current_vel(0)),
-      p4::NodeEqualityBound(1,0,1,current_vel(1)),
-      p4::NodeEqualityBound(2,0,1,current_vel(2)),
+      p4::NodeEqualityBound(0,0,0,current_position(0)),
+      p4::NodeEqualityBound(1,0,0,current_position(1)),
+      p4::NodeEqualityBound(2,0,0,current_position(2)),
+      p4::NodeEqualityBound(0,0,1,current_velocity(0)),
+      p4::NodeEqualityBound(1,0,1,current_velocity(1)),
+      p4::NodeEqualityBound(2,0,1,current_velocity(2)),
       };
 
       for(int i=0; i<path_points.size(); i++)
@@ -294,156 +295,138 @@ namespace game_engine {
   std::unordered_map<std::string, Trajectory>
   MultiQuadAutonomyProtocol::UpdateTrajectories() 
   {
-  
-  	std::unordered_map<std::string, Trajectory> trajectory_map;
-  
+  	const int M = friendly_names_.size();
+
+	static OccupancyGrid3D occupancy_grid;
+	static Graph3D graphOfArena;
+	static std::vector<Student_game_engine_visualizer> visualizer(M);
+	static std::vector<bool> initialize(M,true);
+	static std::vector<bool> firstTime(M,true);
+
+	static std::vector<Eigen::Vector3d> current_pos(M);
+	static std::vector<Eigen::Vector3d> current_vel(M);
+	static std::vector<Eigen::Vector3d> home_pos(M);
+	static Eigen::Vector3d red_balloon_pos;
+	static Eigen::Vector3d blue_balloon_pos;
+	static std::shared_ptr<Node3D> home_ptr;
+	static std::shared_ptr<Node3D> red_ptr;
+	static std::shared_ptr<Node3D> blue_ptr;
+	static std::vector<std::shared_ptr<Node3D>> current_ptr(M);
+	static std::vector<int> target(M,0);
+	static std::vector<std::shared_ptr<Node3D>> target_ptr(M);
+	static std::vector<char> target_color(M);
+	static std::vector<std::vector<std::shared_ptr<Node3D>>> path(M);
+
+	static std::vector<bool> send_it(M,false);
+	static std::vector<int> next_up(M,0);
+	
+	static std::vector<double> seg_time(M,4);
+	static std::vector<double> seg_adder(M,1);
+
+	//if the quad comes within 1 meters of a node, consider it traveled to
+	static const double threshold = 1.4; //1.4
+	static const int nodes_in_traj = 5; //5 worked
+	static const int nodes_to_search = 10;
+	static const double def_seg_time = 6.5;
+	static const double def_seg_adder = 1.5;
+	static const double seg_time_send = 2;
+	static const double seg_adder_send = 1;
+
+	TrajectoryVector3D trajectory_vector;
+
+	std::unordered_map<std::string, Trajectory> trajectory_map;
+
   	for(size_t ii=0; ii<friendly_names_.size(); ii++)
   	{	
-
-	    static OccupancyGrid3D occupancy_grid;
-	    static Graph3D graphOfArena;
-	    static Student_game_engine_visualizer visualizer;
-	    static bool firstTime_one = true; 
-	    static bool firstTime_two = true;
-	    static bool initialize = true;
 	    std::string& quad_name = friendly_names_[ii];
-	    static Eigen::Vector3d current_pos;
-	    static Eigen::Vector3d current_vel;
-	    static Eigen::Vector3d home_pos;
-	    static Eigen::Vector3d red_balloon_pos;
-	    static Eigen::Vector3d blue_balloon_pos;
-	    static std::shared_ptr<Node3D> home_ptr;
-	    static std::shared_ptr<Node3D> red_ptr;
-	    static std::shared_ptr<Node3D> blue_ptr;
-	    static std::shared_ptr<Node3D> current_ptr;
-	    static std::shared_ptr<Node3D> target1_ptr;
-	    static std::shared_ptr<Node3D> target2_ptr;
-	    static char target1_color;
-	    static char target2_color;
-	    static std::vector<std::shared_ptr<Node3D>> path_one;
-	    static std::vector<std::shared_ptr<Node3D>> path_two;
-	    static std::vector<std::shared_ptr<Node3D>> path_three;
-	    static std::vector<std::shared_ptr<Node3D>> path_tot;
-	    //if the quad comes within 1 meters of a node, consider it traveled to
-	    static const double threshold = 1.4; //1.4
-	    //look ahead 3 nodes
-	    static const int nodes_in_traj = 5; //5 worked
-	    static const int nodes_to_search = 10;
-	    //start at the first target
-	    static int target;
-	    static bool send_it_1 = false;
-	    static bool send_it_2 = false;
-	    static int next_up_1 = 0;
-	    static int next_up_2 = 0;
-	    
-	    static double seg_time_1 = 4;
-	    static double seg_time_2 = 4;
-	    static double seg_adder_1 = 1;
-	    static double seg_adder_2 = 1;
-	    
-	    static const double def_seg_time = 6.5;
-	    static const double def_seg_adder = 1.5;
-	    static const double seg_time_send = 2;
-	    static const double seg_adder_send = 1;
-	    TrajectoryVector3D trajectory_vector;
-
-	    this->snapshot_->Position(quad_name, current_pos);
-
-	    if (initialize)
+	    this->snapshot_->Position(quad_name, current_pos[ii]);
+	    if (initialize[ii])
 	    {
-	      initialize = false;
+	      initialize[ii] = false;
 	      trajectoryCode_.code = MediationLayerCode::NotEnoughTrajectoryPoints;
 
 	      //create the grid/graph and visualize
 	      occupancy_grid.LoadFromMap(map3d_, DISCRETE_LENGTH, SAFETY_BOUNDS);
 	      graphOfArena = occupancy_grid.AsGraph();  // You can run Astar on this graph
-	      visualizer.startVisualizing("/game_engine/environment");
+	      visualizer[ii].startVisualizing("/game_engine/environment");
 
 	      //get the home position of the quad and positions of the balloons
-	      home_pos = current_pos;
+	      home_pos[ii] = current_pos[ii];
 	      red_balloon_pos = red_balloon_status_->position;
 	      blue_balloon_pos = blue_balloon_status_->position;
-
 	      //convert them to grid coords for Astar
-	      std::tuple<int,int,int> home_grid = occupancy_grid.mapToGridCoordinates(home_pos);
+	      std::tuple<int,int,int> home_grid = occupancy_grid.mapToGridCoordinates(home_pos[ii]);
 	      home_ptr = std::make_shared<Node3D>(Eigen::Vector3d(
-		std::get<0>(home_grid),std::get<1>(home_grid),std::get<2>(home_grid)));
+			std::get<0>(home_grid),std::get<1>(home_grid),std::get<2>(home_grid)));
 	      std::tuple<int,int,int> red_grid = occupancy_grid.mapToGridCoordinates(red_balloon_pos);
 	      red_ptr = std::make_shared<Node3D>(Eigen::Vector3d(
-		std::get<0>(red_grid),std::get<1>(red_grid),std::get<2>(red_grid)));
+			std::get<0>(red_grid),std::get<1>(red_grid),std::get<2>(red_grid)));
 	      std::tuple<int,int,int> blue_grid = occupancy_grid.mapToGridCoordinates(blue_balloon_pos);
 	      blue_ptr = std::make_shared<Node3D>(Eigen::Vector3d(
-		std::get<0>(blue_grid),std::get<1>(blue_grid),std::get<2>(blue_grid)));
-	      
-	      //target 1 is the red balloon and target 2 is the blue balloon
-	      target1_ptr = red_ptr;
-	      target1_color = 'r';
-	      target2_ptr = blue_ptr;
-	      target2_color = 'b';
+			std::get<0>(blue_grid),std::get<1>(blue_grid),std::get<2>(blue_grid)));
 	    }
 	    
 	    //Make it so apollo is heading for target 1 (red balloon) and
 	    //zeus is heading for target 2 (blue balloon)
-	    if(quad_name == "apollo")
+	    if(quad_name == "apollo" || "caesar")
 	    {
-	    	target = 1;
+	    	target_ptr[ii] = red_ptr;
+	    	target_color[ii] = 'r';
+	    	target[ii] = 1;
 	    }
-	    if(quad_name == "zeus")
+	    if(quad_name == "zeus" || quad_name == "hermes")
 	    {
-	    	target = 2;
+	    	target_ptr[ii] = blue_ptr;
+	    	target_color[ii] = 'b';
+	    	target[ii] = 2;
 	    }
 
-
-	    if (target == 1)
+	    if (firstTime[ii]) 
 	    {
-	      if (firstTime_one) 
-	      {
-		firstTime_one = false;
-		std::tuple<int,int,int> cur_grid = occupancy_grid.mapToGridCoordinates(current_pos);
-		current_ptr = std::make_shared<Node3D>(Eigen::Vector3d(
+		firstTime[ii] = false;
+		std::tuple<int,int,int> cur_grid = occupancy_grid.mapToGridCoordinates(current_pos[ii]);
+		current_ptr[ii] = std::make_shared<Node3D>(Eigen::Vector3d(
 		  std::get<0>(cur_grid),std::get<1>(cur_grid),std::get<2>(cur_grid)));
-		path_one = Astar3D(current_ptr, target1_ptr, graphOfArena);
+		path[ii] = Astar3D(current_ptr[ii], target_ptr[ii], graphOfArena);
 		std::cout << "ASTAR COMPLETE" << std::endl;
-		path_one = prune(path_one);
-		next_up_1 = 0;
-		seg_time_1 = def_seg_time;
-		seg_adder_1 = def_seg_adder;
+		path[ii] = prune(path[ii]);
+		next_up[ii] = 0;
+		seg_time[ii] = def_seg_time;
+		seg_adder[ii] = def_seg_adder;
 		trajectoryCode_.code = MediationLayerCode::NotEnoughTrajectoryPoints;
-	      }
+	    }
 
-	      const int N = path_one.size();
-	      std::cout << "nodes in traj: " << N << std::endl;
+	      int N = path[ii].size();
 	      int target_node = N-1;
 	      //current quad position
-	      this->snapshot_->Velocity(quad_name, current_vel);
+	      this->snapshot_->Velocity(quad_name, current_vel[ii]);
 	      //start looking at the next waypoint
-	      int i0 = next_up_1;
+	      int i0 = next_up[ii];
 	      for(int i = i0; i<(i0+nodes_to_search); i++){
 		if (i>=N-1) break;
 		// Check if point has been hit
-		Eigen::Vector3d path_point = occupancy_grid.boxCenter(path_one[i]->Data().x(),
-		  path_one[i]->Data().y(), path_one[i]->Data().z());
-		Eigen::Vector3d diff = path_point - current_pos;
+		Eigen::Vector3d path_point = occupancy_grid.boxCenter(path[ii][i]->Data().x(),
+		  path[ii][i]->Data().y(), path[ii][i]->Data().z());
+		Eigen::Vector3d diff = path_point - current_pos[ii];
 		if(diff.norm() < threshold)
 		{
-		  next_up_1 = i+1;
-		  seg_time_1 = def_seg_time;
-		  seg_adder_1 = def_seg_adder;
+		  next_up[ii] = i+1;
+		  seg_time[ii] = def_seg_time;
+		  seg_adder[ii] = def_seg_adder;
 		  std::cout << "-----------------------------------------"<< std::endl;
-		  std::cout << "         NEXT UP: " << next_up_1 << std::endl;
+		  std::cout << "         NEXT UP: " << next_up[ii] << std::endl;
 		  std::cout << "-----------------------------------------"<< std::endl;
-		  if (next_up_1 == target_node) 
+		  if (next_up[ii] == target_node) 
 		  {
-		    send_it_1 = true;
-		    seg_time_1 = 1;
-		    seg_time_1 = seg_time_send;
-		    seg_adder_1 = seg_adder_send;
+		    send_it[ii] = true;
+		    seg_time[ii] = seg_time_send;
+		    seg_adder[ii] = seg_adder_send;
 		  } 
 		  else 
 		  {
-		    Eigen::Vector3d path_point_np1 = occupancy_grid.boxCenter(path_one[i+2]->Data().x(),
-		      path_one[i+2]->Data().y(), path_one[i+2]->Data().z());
-		    double time_dist = (path_point_np1 - current_pos).norm();
+		    Eigen::Vector3d path_point_np1 = occupancy_grid.boxCenter(path[ii][i+2]->Data().x(),
+		      path[ii][i+2]->Data().y(), path[ii][i+2]->Data().z());
+		    double time_dist = (path_point_np1 - current_pos[ii]).norm();
 		    std::cout << "Distance from current pos to end node: " << time_dist << std::endl;
 		  }
 		}
@@ -458,55 +441,52 @@ namespace game_engine {
 	      if (trajectoryCode_.code == MediationLayerCode::Success)
 	      {
 		std::cout << "SUCCESSFUL TRJECTORY SUBMISSION" << std::endl;
-		seg_time_1 = 1;
-		seg_adder_1  = 0;
+		seg_time[ii] = 1;
+		seg_adder[ii]  = 0;
 	      }
 	      if ((trajectoryCode_.code == MediationLayerCode::ExceedsMaxVelocity) ||
 		  (trajectoryCode_.code == MediationLayerCode::MeanValueExceedsMaxVelocity) ||
 		  (trajectoryCode_.code == MediationLayerCode::ExceedsMaxAcceleration) ||
 		  (trajectoryCode_.code == MediationLayerCode::MeanValueExceedsMaxAcceleration)) 
 	      {
-		seg_time_1 = seg_time_1 + seg_adder_1;
+		seg_time[ii] = seg_time[ii] + seg_adder[ii];
 		std::cout << "TOO FAST. NEW SEG TIME" << std::endl;
 	      }
 
-	      std::cout << "seg_time: " << seg_time_1 << std::endl;
-	      std::cout << "seg_adder: "<< seg_adder_1 << std::endl;
-
 	      int segs;
-	      if (next_up_1 == N-1) {
+	      if (next_up[ii] == N-1) {
 		segs = 1;
-	      } else if (next_up_1 == N-2) {
+	      } else if (next_up[ii] == N-2) {
 		segs = 2;
 	      } else {
 		segs = 3;
 	      }
 
-	      double time_between_nodes = seg_time_1/segs;
+	      double time_between_nodes = seg_time[ii]/segs;
 	      std::vector<double> times = {0};
 	      std::vector<Eigen::Vector3d> path_points;
 
-	      if (!send_it_1)
+	      if (!send_it[ii])
 	      {
 
 		for(int i=0; i<nodes_in_traj; i++)
 		{
-		  if (next_up_1+i >= N) break;
+		  if (next_up[ii]+i >= N) break;
 		  times.push_back((i+1)*time_between_nodes);
-		  path_points.push_back(occupancy_grid.boxCenter(path_one[next_up_1+i]->Data().x(),
-		    path_one[next_up_1+i]->Data().y(), path_one[next_up_1+i]->Data().z()));
+		  path_points.push_back(occupancy_grid.boxCenter(path[ii][next_up[ii]+i]->Data().x(),
+		    path[ii][next_up[ii]+i]->Data().y(), path[ii][next_up[ii]+i]->Data().z()));
 		}
 
-		trajectory_vector = peFour(current_pos, current_vel, path_points, times, target);
+		trajectory_vector = peFour(current_pos[ii], current_vel[ii], path_points, times, target[ii]);
 
 	      }
-	      else 
-	      {
+	    else 
+	    {
 		//go straight at target
 		std::cout << "SENDING IT TO TARGET" << std::endl;
 
 		times.push_back(time_between_nodes);
-		if (target1_color == 'b')
+		if (target_color[ii] == 'b')
 		{
 		  path_points.push_back(blue_balloon_pos);
 		} 
@@ -514,132 +494,13 @@ namespace game_engine {
 		{
 		  path_points.push_back(red_balloon_pos);
 		}
-		trajectory_vector = peFour(current_pos, current_vel, path_points, times, target);
-	      }
-	    }
-
-	   //SECOND TARGET
-	   if (target == 2)
-	   {	      
-	   std::cout << "Begin Updating Zeus Trajectory" << std::endl;
-	      if (firstTime_two) 
-	      {
-		firstTime_two = false;
-		std::tuple<int,int,int> cur_grid = occupancy_grid.mapToGridCoordinates(current_pos);
-		current_ptr = std::make_shared<Node3D>(Eigen::Vector3d(
-		  std::get<0>(cur_grid),std::get<1>(cur_grid),std::get<2>(cur_grid)));
-		path_two = Astar3D(current_ptr, target2_ptr, graphOfArena);
-		std::cout << "ASTAR COMPLETE" << std::endl;
-		path_two = prune(path_two);
-		next_up_2 = 0;
-		seg_time_2 = def_seg_time;
-		seg_adder_2 = def_seg_adder;
-		trajectoryCode_.code = MediationLayerCode::NotEnoughTrajectoryPoints;
-	      }
-
-	      const int N = path_two.size();
-	      std::cout << "nodes in traj: " << N << std::endl;
-	      int target_node = N-1;
-	      //current quad position
-	      this->snapshot_->Velocity(quad_name, current_vel);
-	      //start looking at the next waypoint
-	      int i0 = next_up_2;
-	      for(int i = i0; i<(i0+nodes_to_search); i++){
-		if (i>=N-1) break;
-		// Check if point has been hit
-		Eigen::Vector3d path_point = occupancy_grid.boxCenter(path_two[i]->Data().x(),
-		  path_two[i]->Data().y(), path_two[i]->Data().z());
-		Eigen::Vector3d diff = path_point - current_pos;
-		if(diff.norm() < threshold){
-		  next_up_2 = i+1;
-		  seg_time_2 = def_seg_time;
-		  seg_adder_2 = def_seg_adder;
-		  std::cout << "-----------------------------------------"<< std::endl;
-		  std::cout << "         NEXT UP: " << next_up_2 << std::endl;
-		  std::cout << "-----------------------------------------"<< std::endl;
-		  if (next_up_2 == target_node) {
-		    send_it_2 = true;
-		    seg_time_2 = seg_time_send;
-		    seg_adder_2 = seg_adder_send;
-		  } else {
-		    Eigen::Vector3d path_point_np1 = occupancy_grid.boxCenter(path_two[i+2]->Data().x(),
-		      path_two[i+2]->Data().y(), path_two[i+2]->Data().z());
-		    double time_dist = (path_point_np1 - current_pos).norm();
-		    std::cout << "Distance from current pos to end node: " << time_dist << std::endl;
-		  }
-		}
-	      }// end for loop    
-
-	      //guess the sesgment time as very low. if the last one was a success, start low again
-	      if (trajectoryCode_.code != MediationLayerCode::Success) {
-		std::cout << "Response code: " <<
-		  static_cast<unsigned int>(trajectoryCode_.code) << std::endl;
-	      }
-	      if (trajectoryCode_.code == MediationLayerCode::Success){
-		std::cout << "SUCCESSFUL TRJECTORY SUBMISSION" << std::endl;
-		seg_time_2 = 1;
-		seg_adder_2  = 0;
-	      }
-	      if ((trajectoryCode_.code == MediationLayerCode::ExceedsMaxVelocity) ||
-		  (trajectoryCode_.code == MediationLayerCode::MeanValueExceedsMaxVelocity) ||
-		  (trajectoryCode_.code == MediationLayerCode::ExceedsMaxAcceleration) ||
-		  (trajectoryCode_.code == MediationLayerCode::MeanValueExceedsMaxAcceleration)) {
-		seg_time_2 = seg_time_2 + seg_adder_2;
-		std::cout << "TOO FAST. NEW SEG TIME" << std::endl;
-	      }
-
-	      std::cout << "seg_time: " << seg_time_2 << std::endl;
-	      std::cout << "seg_adder: "<< seg_adder_2 << std::endl;  
-
-	      int segs;
-	      if (next_up_2 == N-1) {
-		segs = 1;
-	      } else if (next_up_2 == N-2) {
-		segs = 2;
-	      } else {
-		segs = 3;
-	      }
-
-	      double time_between_nodes = seg_time_2/segs;
-	      std::vector<double> times = {0};
-	      std::vector<Eigen::Vector3d> path_points;
-
-	      if (!send_it_2)
-	      {
-		for(int i=0; i<nodes_in_traj; i++)
-		{
-		  if (next_up_2+i >= N) break;
-		  times.push_back((i+1)*time_between_nodes);
-		  path_points.push_back(occupancy_grid.boxCenter(path_two[next_up_2+i]->Data().x(),
-		    path_two[next_up_2+i]->Data().y(), path_two[next_up_2+i]->Data().z()));
-		}
-
-		trajectory_vector = peFour(current_pos, current_vel, path_points, times, target);
-
-	      }
-	      else 
-	      {
-		//go straight at target
-		std::cout << "SENDING IT TO TARGET" << std::endl;
-
-		times.push_back(time_between_nodes);
-		if (target2_color == 'b')
-		{
-		  path_points.push_back(blue_balloon_pos);
-		} 
-		else
-		{
-		  path_points.push_back(red_balloon_pos);
-		}
-
-		trajectory_vector = peFour(current_pos, current_vel, path_points, times, target);
-	      }
+		trajectory_vector = peFour(current_pos[ii], current_vel[ii], path_points, times, target[ii]);
 	    }
 
 	    Trajectory trajectory(trajectory_vector);
-	    visualizer.drawTrajectory(trajectory);
+	    visualizer[ii].drawTrajectory(trajectory);
 	    trajectory_map[quad_name] = trajectory;
-    	}//End for loop
-    	return trajectory_map;
+    }//End for loop
+    return trajectory_map;
   }
 }
