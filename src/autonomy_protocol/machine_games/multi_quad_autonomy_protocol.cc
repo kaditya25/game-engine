@@ -300,20 +300,29 @@ namespace game_engine {
 	static std::vector<char> target_color(M);
 	static std::vector<std::vector<std::shared_ptr<Node3D>>> path(M);
 
-	static std::vector<bool> straightToTarget(M,false);
-	static std::vector<int> next_up(M,0);
+	static std::vector<bool> straight_to_target(M,false);
+	static std::vector<int> next_path_node(M,0);
 	
 	static std::vector<double> seg_time(M,4);
 	static std::vector<double> seg_adder(M,1);
 
 	//if the quad comes within 1 meters of a node, consider it traveled to
-	static const double threshold = 1.4; //1.4
-	static const int nodes_in_traj = 5; //5 worked
+	static const double threshold = 1.4;
+	//Number of upcoming nodes that the quad uses to generate a trajectory
+	static const int nodes_in_traj = 5;
+	//Total number of nodes that will be planned by A star
 	static const int nodes_to_search = 10;
+	//The base segment time in seconds
 	static const double def_seg_time = 6.5;
+	//Amount of time added to def_seg_time if the trajectory is
+	//rejected for vel/accel reasons
 	static const double def_seg_adder = 1.5;
-	static const double seg_time_send = 2;
-	static const double seg_adder_send = 1;
+
+	//Segment time when the quad goes straight for the target
+	static const double seg_time_straight_to_target = 2;
+	//Amount of time added to seg_time_straight_to_target
+	//if trajectory is rejected for vel/accel reasons
+	static const double seg_adder_straight_to_target = 1;
 
 	TrajectoryVector3D trajectory_vector;
 
@@ -376,7 +385,7 @@ namespace game_engine {
 			path[ii] = Astar3D(current_ptr[ii], target_ptr[ii], graphOfArena);
 			std::cout << "ASTAR COMPLETE" << std::endl;
 			path[ii] = PrunePath(path[ii]);
-			next_up[ii] = 0;
+			next_path_node[ii] = 0;
 			seg_time[ii] = def_seg_time;
 			seg_adder[ii] = def_seg_adder;
 			trajectoryCodeMap_[quad_name].code = MediationLayerCode::NotEnoughTrajectoryPoints;
@@ -387,7 +396,7 @@ namespace game_engine {
 	    //current quad position
 	    this->snapshot_->Velocity(quad_name, current_vel[ii]);
 	    //start looking at the next waypoint
-	    int i0 = next_up[ii];
+	    int i0 = next_path_node[ii];
 	    
 	    for(int i = i0; i<(i0+nodes_to_search); i++)
 	    {
@@ -398,17 +407,17 @@ namespace game_engine {
 			Eigen::Vector3d diff = path_point - current_pos[ii];
 			if(diff.norm() < threshold)
 			{
-				next_up[ii] = i+1;
+				next_path_node[ii] = i+1;
 				seg_time[ii] = def_seg_time;
 				seg_adder[ii] = def_seg_adder;
 
-				std::cout << "         NEXT UP: " << next_up[ii] << std::endl;
+				std::cout << "         NEXT UP: " << next_path_node[ii] << std::endl;
 
-				if (next_up[ii] == target_node) 
+				if (next_path_node[ii] == target_node) 
 				{
-					straightToTarget[ii] = true;
-					seg_time[ii] = seg_time_send;
-					seg_adder[ii] = seg_adder_send;
+					straight_to_target[ii] = true;
+					seg_time[ii] = seg_time_straight_to_target;
+					seg_adder[ii] = seg_adder_straight_to_target;
 				} 
 				else 
 				{
@@ -441,32 +450,32 @@ namespace game_engine {
 			std::cout << "TOO FAST. NEW SEG TIME" << std::endl;
 	    }
 
-	    int segs;
-	    if (next_up[ii] == N-1)
+	    int segs_until_end;
+	    if (next_path_node[ii] == N-1)
 	    {
-			segs = 1;
+			segs_until_end = 1;
 	    } 
-	    else if (next_up[ii] == N-2)
+	    else if (next_path_node[ii] == N-2)
 		{
-			segs = 2;
+			segs_until_end = 2;
 	    } 
 	    else
 	    {
-			segs = 3;
+			segs_until_end = 3;
 	    }
 
-	    double time_between_nodes = seg_time[ii]/segs;
+	    double time_between_nodes = seg_time[ii]/segs_until_end;
 	    std::vector<double> times = {0};
 	    std::vector<Eigen::Vector3d> path_points;
 
-	    if (!StraightToTarget[ii])
+	    if (!straight_to_target[ii])
 	    {
 			for(int i=0; i<nodes_in_traj; i++)
 			{
-				if (next_up[ii]+i >= N) break;
+				if (next_path_node[ii]+i >= N) break;
 				times.push_back((i+1)*time_between_nodes);
-				path_points.push_back(occupancy_grid.boxCenter(path[ii][next_up[ii]+i]->Data().x(),
-		  		  path[ii][next_up[ii]+i]->Data().y(), path[ii][next_up[ii]+i]->Data().z()));
+				path_points.push_back(occupancy_grid.boxCenter(path[ii][next_path_node[ii]+i]->Data().x(),
+		  		  path[ii][next_path_node[ii]+i]->Data().y(), path[ii][next_path_node[ii]+i]->Data().z()));
 			}
 
 		trajectory_vector = Trajectory2P4(current_pos[ii], current_vel[ii], path_points, times, target[ii]);
