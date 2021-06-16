@@ -55,7 +55,7 @@ namespace game_engine {
     WindIntensity wind_intensity_;
 
     volatile std::atomic<bool> ok_{true};
-    TrajectoryCode trajectoryCode_;
+    std::map<std::string, TrajectoryCode> trajectoryCodeMap_;
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -119,7 +119,7 @@ namespace game_engine {
                                                trajectory,
                                                proposed_trajectory_clients,
                                                true);
-          trajectoryCode_ = trajectoryCode;
+          trajectoryCodeMap_[quad_name] = trajectoryCode;
         } catch(const std::out_of_range& e) {
           continue;
         }

@@ -15,15 +15,15 @@ namespace game_engine {
 
   // UpdateTrajectories creates and returns a proposed trajectory.  The
   // proposed trajectory gets submitted to the mediation_layer (ML), which
-  // responds by setting the data member trajectoryCode_.  See the header file
+  // responds by setting the data member trajectoryCodeMap_.  See the header file
   // game-engine/src/util/trajectory_code.h for a list of possible codes.
   //
   // Any code other than MediationLayer::Success indicates that the ML has
   // rejected the submitted trajectory.
   //
-  // trajectoryCode_ is initialized with MediationLayerCode::Success, so this will
+  // trajectoryCodeMap_ is initialized with MediationLayerCode::Success, so this will
   // be its value the first time this function is called (before any
-  // trajectories have been submitted).  Thereafter, trajectoryCode_ will
+  // trajectories have been submitted).  Thereafter, trajectoryCodeMap_ will
   // indicate the MediationLayerCode for the most recently submitted trajectory.
   std::unordered_map<std::string, Trajectory>
   ExampleAutonomyProtocol::UpdateTrajectories() {
@@ -97,7 +97,7 @@ namespace game_engine {
 
     // You can fill out this switch statement with case statements tailored to
     // each MediationLayerCode.
-    switch (trajectoryCode_.code) {
+    switch (trajectoryCodeMap_[quad_name].code) {
     case MediationLayerCode::Success:
       // You probably won't need to do anything in response to Success.
       break;
@@ -107,7 +107,7 @@ namespace game_engine {
       // problem as shown below.
       std::cout << "Replanning trajectory: "
         "Shortening time between trajectory points." << std::endl;
-      std::cout << "Value: " << trajectoryCode_.value << std::endl;
+      std::cout << "Value: " << trajectoryCodeMap_[quad_name].value << std::endl;
       dt_chrono = dt_chrono - std::chrono::milliseconds(15);
       break;
     }
@@ -115,9 +115,9 @@ namespace game_engine {
       // If you want to see a numerical MediationLayerCode value, you can cast and
       // print the code as shown below.
       std::cout << "MediationLayerCode: " <<
-        static_cast<int>(trajectoryCode_.code) << std::endl;
-      std::cout << "Value: " << trajectoryCode_.value << std::endl;
-      std::cout << "Index: " << trajectoryCode_.index << std::endl;
+        static_cast<int>(trajectoryCodeMap_[quad_name].code) << std::endl;
+      std::cout << "Value: " << trajectoryCodeMap_[quad_name].value << std::endl;
+      std::cout << "Index: " << trajectoryCodeMap_[quad_name].index << std::endl;
     }
     
     // Always use the chrono::system_clock for time. Trajectories require time
