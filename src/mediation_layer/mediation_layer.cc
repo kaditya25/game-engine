@@ -16,6 +16,7 @@ namespace game_engine {
 
       TrajectoryVetter trajectory_vetter;
       while(true == this->ok_) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         // Determine if quad has violated state constraints. If it has, freeze
         // it in place
         if(true == quad_state_watchdog_status->Read(key)) {

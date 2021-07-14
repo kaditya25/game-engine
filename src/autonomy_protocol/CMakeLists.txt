@@ -12,6 +12,7 @@ set(SOURCE_FILES
   machine_games/blue_team_autonomy_protocol.cc
   game_snapshot.cc
   student_game_engine_visualizer.cc
+  machine_games/asset_games/asset_games_protocol.cc
   )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})
@@ -26,6 +27,7 @@ target_link_libraries(${TARGET} PUBLIC
   lib_environment
   lib_util
   lib_p4
+  lib_asset_games
   ${Boost_LIBRARIES}
   Eigen3::Eigen)
 
@@ -38,3 +40,4 @@ set_target_properties(${TARGET} PROPERTIES
 target_compile_options(${TARGET} PRIVATE
   -Wfatal-errors
 )
+add_subdirectory(machine_games/asset_games/realtime_game_theoretic_planner)

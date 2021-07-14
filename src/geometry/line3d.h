@@ -32,6 +32,9 @@ namespace game_engine {
       // Expresses the line as a 3D vector
       Vec3D AsVector() const;
 
+      // Determines a point on the bounded line that is closest to the test point
+      Point3D ClosestBoundedPoint(const Point3D& point) const;
+
   };
 }
 
