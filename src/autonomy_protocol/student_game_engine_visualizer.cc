@@ -63,12 +63,12 @@ void Student_game_engine_visualizer::drawPath(std::vector<Eigen::Vector3d> path,
   publisher_.publish(msg2);
 }
 
-void Student_game_engine_visualizer::drawTrajectory(game_engine::Trajectory trajectory) {
+void Student_game_engine_visualizer::drawTrajectory(game_engine::Trajectory trajectory,int id_offset) {
 
   // Draw position points as a LineStrip
   visualization_msgs::Marker msg;
   msg.header.frame_id = "world";
-  msg.id = 12348;
+  msg.id = 12348+id_offset;
   msg.ns = "trajectory";
   msg.type = visualization_msgs::Marker::LINE_STRIP;
   msg.action = visualization_msgs::Marker::ADD;

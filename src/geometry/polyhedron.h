@@ -58,6 +58,10 @@ namespace game_engine {
       // vertices are expanded by the same distance. As a result, aspect ratio
       // is not necessarily conserved.
       Polyhedron Expand(const double distance) const;
+
+      // Return the point on the surface of the polyhedron 
+      // closest to the given point
+      Point3D ClosestPoint(const Point3D& point) const;
   };
 }
 

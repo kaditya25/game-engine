@@ -165,3 +165,24 @@ set_target_properties(blue_team_autonomy_protocol
         CXX_EXTENSIONS NO
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
         )
+
+add_executable(asset_games_protocol asset_games_protocol_main.cc)
+target_include_directories(asset_games_protocol PUBLIC ${catkin_INCLUDE_DIRS})
+target_link_libraries(asset_games_protocol
+        lib_geometry
+        lib_environment
+        lib_util
+        lib_mediation_layer
+        lib_ros_node
+        lib_ros_view
+        lib_autonomy_protocol
+        yaml-cpp
+        ${catkin_LIBRARIES})
+set_target_properties(asset_games_protocol
+        PROPERTIES
+        CXX_STANDARD 14
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+        )
+

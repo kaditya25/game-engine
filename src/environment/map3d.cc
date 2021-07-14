@@ -103,4 +103,22 @@ namespace game_engine {
       std::make_pair(min_z, max_z)
     };
   }
+
+  Point3D Map3D::ClosestPoint(const Point3D& point) const {
+    std::vector<Eigen::Vector3d> candidate_points;
+
+    auto nearest = [&point]
+                    ( const Eigen::Vector3d& p1,
+                      const Eigen::Vector3d& p2 )
+                    {return (p1-point).lpNorm<Eigen::Infinity>() < (p2-point).lpNorm<Eigen::Infinity>(); };
+
+
+    candidate_points.push_back(boundary_.ClosestPoint(point));
+
+    for (const Polyhedron& obstacle : obstacles_)
+    { candidate_points.push_back(obstacle.ClosestPoint(point)); }
+
+    std::sort(candidate_points.begin(),candidate_points.end(),nearest);
+    return candidate_points[0];
+  }
 }

@@ -1,5 +1,3 @@
-
-
 #pragma once 
 
 #include <vector>
@@ -62,6 +60,10 @@ namespace game_engine {
       // directions equally, therefore object aspect ratios are not guaranteed
       // to stay the same.
       Map3D Inflate(const double distance) const;
+
+      // Returns the point closest to the given point that is either on the 
+      // map boundary or any obstacle
+      Point3D ClosestPoint(const Point3D& point) const;
   };
 }
 
