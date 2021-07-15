@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
   mg_msgs
+  sensor_msgs
 )
 
 set(SOURCE_FILES
@@ -23,6 +24,7 @@ set(SOURCE_FILES
   trajectory_subscriber_node.cc
   trajectory_client.cc
   trajectory_server.cc
+  joy_subscriber_node.cc
 )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})
@@ -34,6 +36,7 @@ target_include_directories(${TARGET} PUBLIC
 
 target_link_libraries(${TARGET} PUBLIC
   lib_mediation_layer
+  lib_joy
   ${catkin_LIBRARIES}
 )
 

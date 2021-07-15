@@ -477,9 +477,7 @@ namespace game_engine {
 				path_points.push_back(occupancy_grid.boxCenter(path[ii][next_path_node[ii]+i]->Data().x(),
 		  		  path[ii][next_path_node[ii]+i]->Data().y(), path[ii][next_path_node[ii]+i]->Data().z()));
 			}
-
-		trajectory_vector = Trajectory2P4(current_pos[ii], current_vel[ii], path_points, times, target[ii]);
-
+			trajectory_vector = Trajectory2P4(current_pos[ii], current_vel[ii], path_points, times, target[ii]);
 	    }
 	    else 
 	    {
