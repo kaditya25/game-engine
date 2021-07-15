@@ -10,6 +10,7 @@ set(SOURCE_FILES
   machine_games/multi_quad_autonomy_protocol.cc
   machine_games/red_team_autonomy_protocol.cc
   machine_games/blue_team_autonomy_protocol.cc
+  machine_games/manual_control_protocol.cc
   game_snapshot.cc
   student_game_engine_visualizer.cc
   machine_games/asset_games/asset_games_protocol.cc
@@ -27,6 +28,7 @@ target_link_libraries(${TARGET} PUBLIC
   lib_environment
   lib_util
   lib_p4
+  lib_joy
   lib_asset_games
   ${Boost_LIBRARIES}
   Eigen3::Eigen)
