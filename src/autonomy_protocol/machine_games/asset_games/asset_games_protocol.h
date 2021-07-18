@@ -153,15 +153,15 @@ namespace game_engine {
       const double obstacle_gain_      = 1;
 
       // acceleration and velocity constraints
-      const double acc_max_pursuer_  = 0.3;
-      const double acc_max_evader_  = 0.3;
-      const double vel_max_pursuer_  = 1.25;
-      const double vel_max_evader_  = 1.25;
+      const double acc_max_pursuer_  = 0.35;
+      const double acc_max_evader_  = 0.35;
+      const double vel_max_pursuer_  = 1.95;
+      const double vel_max_evader_  = 1.95;
       // discrete time system parameters
       const double dt_       = 1.25;
       const int K_steps_      = 2;
-      const int num_pursuer_enum_   = 8;
-      const int num_evader_enum_    = 8;
+      const int num_pursuer_enum_   = 10;
+      const int num_evader_enum_    = 10;
       // not actually used, but could be potentially useful
       int K_start_            = 1;
 
@@ -184,6 +184,7 @@ namespace game_engine {
       double evader_height_ = 0;
 
       Student_game_engine_visualizer vis_;
+      bool stop_flag_ = false;
 
       // functor via std::bind
       costFunction pursuer_cost_functor_ = std::bind(&game_engine::AssetGamesProtocol::jCostPursuer,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4,std::placeholders::_5);
@@ -212,6 +213,8 @@ namespace game_engine {
 
       // generate a trajectory until dt_ time from a constant acceleration over the timeframe
       void trajectoryConstAcc(TrajectoryVector3D& traj, const Eigen::Vector3d& acc,Eigen::Matrix<double,6,1> state, Role role);
+
+      void trajectoryStationary( TrajectoryVector3D& trajectory_vector, const Eigen::Matrix<double,6,1>& state );
 
       // generate acceleration vectors of constant acceleration pointing around the unit circle
       std::vector<Eigen::VectorXd> constAccCtrlInput(double acc,int num);

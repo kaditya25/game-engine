@@ -231,6 +231,25 @@ namespace game_engine {
     }
   }
 
+  void AssetGamesProtocol::trajectoryStationary( TrajectoryVector3D& trajectory_vector, const Eigen::Matrix<double,6,1>& state )
+  {
+    auto realtime_now = std::chrono::system_clock::now();
+    double sample_period = 0.01; // seconds
+    int num_samples = (int)(dt_/sample_period) + 1;
+    std::chrono::duration<double> time_sample;
+
+    for (int idx=0; idx < num_samples; idx++)
+    {
+      time_sample = realtime_now.time_since_epoch() + std::chrono::duration<double>(dt_*idx/num_samples);
+      trajectory_vector.push_back(
+          (Eigen::Matrix<double, 11, 1>() << 
+           state.head<3>(),Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), 
+           0,
+           time_sample.count()
+          ).finished());
+    }
+  }
+
   std::unordered_map<std::string, Trajectory> AssetGamesProtocol::UpdateTrajectories() 
   {
     std::unordered_map<std::string, Trajectory> trajectory_map;
@@ -248,7 +267,6 @@ namespace game_engine {
 
       std::string pursuer = friendly_names_[0];
       std::string evader = friendly_names_[1];
-      std::cout << "pursuer is " << pursuer << "\n";
 
       Eigen::Vector3d pos,vel;
       this->snapshot_->Position(pursuer, pos);
@@ -272,11 +290,43 @@ namespace game_engine {
         target_ = (red_balloon_status_->position).head(2);
       }
 
+      if (stop_flag_) 
+      {
+        this->Stop();
+        exit(0);
+      }
+
+      if (red_balloon_status_->popped)
+      {
+        std::cout << "balloon has been popped!\n";
+        TrajectoryVector3D trajectory_vector;
+        trajectoryStationary(trajectory_vector,pursuer_total_state_);
+        Trajectory trajectory(trajectory_vector);
+        trajectory_map[pursuer] = trajectory;
+
+        TrajectoryVector3D trajectory_vector2;
+        trajectoryStationary(trajectory_vector2,evader_total_state_);
+        Trajectory trajectory2(trajectory_vector2);
+        trajectory_map[evader] = trajectory2;
+
+        vis_.drawDot(pursuer_total_state_.head<3>(),5678,0);
+        vis_.drawDot(evader_total_state_.head<3>(),5679,1);
+        stop_flag_ = true;
+        return trajectory_map;
+      }
+      else 
+      {
+        // no way to set action to delete!
+        vis_.drawDot(Eigen::Vector3d::Zero(),5678,0);
+        vis_.drawDot(Eigen::Vector3d::Zero(),5679,1);
+      }
+
       Eigen::Vector2d u;
       Eigen::Vector3d acc;
 
       // calculate controller output
       auto t_start = std::chrono::system_clock::now();
+      std::cout << "pursuer is " << pursuer << "\n";
       u = (controllers_[0]->calcControlInput());
       controllers_[0]->resetNextTimeStep();
       acc << u,0;
