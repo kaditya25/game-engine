@@ -74,8 +74,11 @@ namespace game_engine {
 
     // end condition: if target has been reached
     if (e_target.norm() < 1)
-    { cost_total += -2000/ (e_target.norm()+.1 ); }
-    // end condition: if evader has been caught
+    { 
+      cost_total += -2000/ (e_target.norm()+.1 );
+      cost_total += -2000* ( x_self.tail<2>().norm() );
+    }
+    // end condition: if evader has been caughtk
     if (e.norm() < 1.25)
     { cost_total += 1000/ (e.norm()+.1); }
 
