@@ -96,8 +96,8 @@ Eigen::VectorXd nashController::calcControlInput()
         value_matrix_other() );
     if (mix_nash)
     {
-      helper::print(mix_nash_eq[0].transpose());
-      helper::print(mix_nash_eq[1].transpose());
+      //helper::print(mix_nash_eq[0].transpose());
+      //helper::print(mix_nash_eq[1].transpose());
       int idx = draw_from_distr(mix_nash_eq[0]);
       u_opt = u_futures_self_[idx].data_[0];
     }

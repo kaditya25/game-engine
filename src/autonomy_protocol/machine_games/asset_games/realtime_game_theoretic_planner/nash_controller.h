@@ -24,7 +24,6 @@ using dynFunction = std::function<void(Eigen::VectorXd&, // x_k+1
 class nashController : public Controller
 {
   public:
-    Eigen::VectorXd& target_;
 
     nashController(
       std::vector<Eigen::VectorXd>& u_enum_self, 
@@ -36,7 +35,6 @@ class nashController : public Controller
       dynFunction& fDynPtr_other,
       costFunction& jCostPtr_self,
       costFunction& jCostPtr_other,
-      double vel_max, double acc_max, Eigen::VectorXd& target,
       const int num_tasks_per_th = 20,
       const int num_threads_per_pool = 500  ):
       x_dim_(x_0_self.size()), 
@@ -80,18 +78,13 @@ class nashController : public Controller
                     pool_futures_,
                     combinator_tasks_per_thread_ ),
 
-      vel_max_(vel_max),
-      acc_max_(acc_max),
-      target_(target),
-
       self_cost_calc_( cost_matrix_self_,
                         x_futures_self_,
                         u_futures_self_,
                         x_futures_other_,
                         u_futures_other_,
                         K_i_, K_steps_,
-                        dt_, jCostPtr_self_,
-                        vel_max_,acc_max_,target_
+                        dt_, jCostPtr_self_
           ),
 
       other_cost_calc_( cost_matrix_other_,
@@ -100,8 +93,7 @@ class nashController : public Controller
                         x_futures_self_,
                         u_futures_self_,
                         K_i_, K_steps_,
-                        dt_, jCostPtr_other_,
-                        vel_max_,acc_max_,target_
+                        dt_, jCostPtr_other_
           )
 
       {
@@ -164,8 +156,6 @@ class nashController : public Controller
     costCalculator self_cost_calc_;
     costCalculator other_cost_calc_;
 
-    double vel_max_;
-    double acc_max_;
 };
 
 #endif

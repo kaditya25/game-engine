@@ -49,10 +49,7 @@ class costCalculator
   std::vector<std::thread> vector_threads_;
   costFunction& jCostPtrSelf_;
 
-  double& vel_max_;
-  double& acc_max_;
   public:
-  Eigen::VectorXd& target_;
 
   public:
   costCalculator( 
@@ -64,18 +61,13 @@ class costCalculator
       int& K_start, 
       int& K_steps, 
       const double& t_step, 
-      costFunction& jCostPtr,
-      double& vel_max, double& acc_max, Eigen::VectorXd& target
-
+      costFunction& jCostPtr
       ):
     self_cost_matrix_(cost_matrix),
     x_self_futures_(X_s), u_self_futures_(U_s),
     x_other_futures_(X_o), u_other_futures_(U_o),
     K_i_(K_start), K_steps_(K_steps),
-    dt_(t_step), jCostPtrSelf_(jCostPtr),
-    vel_max_(vel_max),acc_max_(acc_max),
-    target_(target)
-
+    dt_(t_step), jCostPtrSelf_(jCostPtr)
   {
     reserve_thread_vector();
   };

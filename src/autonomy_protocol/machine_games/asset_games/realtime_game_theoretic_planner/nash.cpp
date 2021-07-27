@@ -307,7 +307,7 @@ namespace nash
         //player 1
         for(int idx=0; idx<n; idx++)// go over rows
         {
-          if(bases[0][idx]<n)  // variable is in the basis
+          if(bases[0][idx]<m)  // variable is in the basis
           {
             p1_strat[bases[0][idx]] = tableaux[0](idx,m+n)/tableaux[0](idx,bases[0][idx]);
           }

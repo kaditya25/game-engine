@@ -83,8 +83,7 @@ namespace game_engine {
                       pursuer_dyn_functor_,
                       evader_dyn_functor_,
                       pursuer_cost_functor_,
-                      evader_cost_functor_,
-                      vel_max_pursuer_, acc_max_pursuer_, target_
+                      evader_cost_functor_
                       ));
                 controllers_.push_back(std::move(ctrl));
                 break;
@@ -118,8 +117,7 @@ namespace game_engine {
                       evader_dyn_functor_,
                       pursuer_dyn_functor_,
                       evader_cost_functor_,
-                      pursuer_cost_functor_,
-                      vel_max_evader_, acc_max_evader_, target_
+                      pursuer_cost_functor_
                       ));
                 controllers_.push_back(std::move(ctrl));
                 break;
@@ -185,6 +183,9 @@ namespace game_engine {
 
       Student_game_engine_visualizer vis_;
       bool stop_flag_ = false;
+      bool initialized_ = false;
+      std::chrono::time_point<std::chrono::system_clock> t_begin_;
+      std::chrono::time_point<std::chrono::system_clock> t_end_;
 
       // functor via std::bind
       costFunction pursuer_cost_functor_ = std::bind(&game_engine::AssetGamesProtocol::jCostPursuer,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4,std::placeholders::_5);

@@ -31,9 +31,7 @@ namespace game_engine {
     x_1 = A*x_0 + B*u;
     return;
   }
-  
-  void AssetGamesProtocol::costBounds( double& cost_total,
-      const Eigen::VectorXd& pos ) {
+  void AssetGamesProtocol::costBounds( double& cost_total, const Eigen::VectorXd& pos ) {
     Eigen::Vector3d nearest_point = map3d_.ClosestPoint(pos);
     double dist = (nearest_point-pos).norm() ;
     // penalty scales with distance
@@ -107,7 +105,7 @@ namespace game_engine {
     double acc_max = acc_max_pursuer_+0.01;
     double vel_max = vel_max_pursuer_+0.01;
     Eigen::DiagonalMatrix<double,4> Q_pur;
-    Q_pur.diagonal() << 5,5,1,1;
+    Q_pur.diagonal() << 5,5,3,3;
     Eigen::DiagonalMatrix<double,2> R_pur;
     R_pur.diagonal() << 1,1;
     Eigen::DiagonalMatrix<double,2> Q_target;
@@ -226,7 +224,8 @@ namespace game_engine {
 
       trajectory_vector.push_back(
           (Eigen::Matrix<double, 11, 1>() << 
-           state.head<3>(),vel_final, acc_aug, 
+           //state.head<3>(),vel_final, acc_aug, 
+           state, acc_aug, 
            yaw,
            time_sample.count()
           ).finished());
@@ -291,12 +290,52 @@ namespace game_engine {
         pursuer_height_ = pursuer_total_state_[2];
         evader_height_ = evader_total_state_[2];
         target_ = (red_balloon_status_->position).head(2);
+        if (!initialized_)
+        {
+          initialized_ = true;
+          t_begin_ = std::chrono::system_clock::now();
+        }
       }
 
       if (stop_flag_) 
       {
+        t_end_ = std::chrono::system_clock::now();
+        std::chrono::duration<double> runtime = t_end_-t_begin_;
+        std::cout << "runtime was " << runtime.count() << "\n";
         this->Stop();
         exit(0);
+      }
+      
+      { std::cout << "mediation code is " <<
+          static_cast<int>(trajectoryCodeMap_[evader].code) << std::endl; };
+
+      switch (trajectoryCodeMap_[evader].code) {
+        case MediationLayerCode::Success:
+          // You probably won't need to do anything in response to Success.
+          std::cout << "success\n";
+          break;
+        case MediationLayerCode::QuadTooCloseToAnotherQuad: 
+          std::cout << "QuadTooCloseToAnotherQuad." << std::endl;
+          break;
+        }
+
+      if (trajectoryCodeMap_[evader].code==MediationLayerCode::QuadTooCloseToAnotherQuad || trajectoryCodeMap_[evader].code==MediationLayerCode::QuadTrajectoryCollidesWithAnotherQuad || trajectoryCodeMap_[evader].code==MediationLayerCode::FailedToCallService)
+      {
+        std::cout << "evader stopped!\n";
+        TrajectoryVector3D trajectory_vector;
+        trajectoryStationary(trajectory_vector,pursuer_total_state_);
+        Trajectory trajectory(trajectory_vector);
+        trajectory_map[pursuer] = trajectory;
+
+        TrajectoryVector3D trajectory_vector2;
+        trajectoryStationary(trajectory_vector2,evader_total_state_);
+        Trajectory trajectory2(trajectory_vector2);
+        trajectory_map[evader] = trajectory2;
+
+        vis_.drawDot(pursuer_total_state_.head<3>(),5678,0);
+        vis_.drawDot(evader_total_state_.head<3>(),5679,1);
+        stop_flag_ = true;
+        return trajectory_map;
       }
 
       if (red_balloon_status_->popped)
