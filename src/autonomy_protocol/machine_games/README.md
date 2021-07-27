@@ -20,14 +20,18 @@ the command to read in the joy inputs from the controller, given by:
 ```bash
 rosrun joy joy_node _autorepeat_rate:=20
 ```
+The autorepeat rate defines how quickly the controller joystick processes inputs.
+
 3. Next, run the manual autonomy protocol as
 ```bash
 ./manual_autonomy_protocol
 ```
+Moving the joysticks should now move the simulated quad. The yaw of the quad does
+change in simulation, but the visualizer is unable to display any changes in yaw. 
 
 ## Running the manual protocol on the physical quads
 1. Launch the shack mission control
-2. Load the rosparam file using
+2. Load the params file using
 ```bash
 rosparam load params.yaml /game_engine/
 ```
@@ -36,7 +40,7 @@ you would like to load. Also ensure within the parameters file that the name of
 the quad is the same as the name of the physical quad you would like to fly.
 Also ensure that the start point set within the params file is away from the 
 edges of the map. Loading the "arena empty squeezed" map will work best for
-the physical quads.
+the physical quads. Set joy_mode to true, set the quad safety limits to 2.
 
 3. Get the quad in the air: take off in yaw mode and switch to position mode.
 Ensure you are somewhere away from the boundaries of the arena.
@@ -60,11 +64,12 @@ tab and hit Ctrl+C to stop it. Then, start it again and switch back into ROS
 mode)
 
 ## Important values and information
-1. Refresh rate is 10 Hz
-2. Safety bounds should be set to 1.25 m in quad state watchdog
-(1 and 2 are changed by setting "joy_mode: true" in the params file)
-3. Maximum velocity and acceleration should be set to 3
+1. Trajectory refresh rate is 10 Hz
+2. Safety bounds are set to 1.25 m in quad state watchdog
+3. Maximum velocity and acceleration should be set to 3.0
 4. The arena_ empty _squeezed.map file is the best map file
    to load for flying the physical quads.
 5. A good starting point for the quad in the params file is (-20,16,-3)
+6. Ensure that "joy_mode: true" is set in the params file
+7. Ensure that "quad_safety_limits: 2" in the params file; extreme mode works best
 
