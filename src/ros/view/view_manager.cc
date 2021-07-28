@@ -29,7 +29,7 @@ namespace game_engine {
 
     std::thread trajectory_publisher_thread(
         [&]() {
-          RunTrajectoryPublisher(trajectory_view_options);
+            RunTrajectoryPublisher(trajectory_view_options);
         });
 
     quad_publisher_thread.join();
@@ -46,23 +46,23 @@ namespace game_engine {
     std::vector<QuadView> quad_views;
 
     for(const auto p: quad_view_options.quads) {
-      if(p.first == "red") {
+      if(p.first.first == "red") {
         QuadView::Options view_options;
         view_options.mesh_resource = quad_view_options.quad_mesh_file_path;
         // burnt orange
         view_options.r = 0.75f;
         view_options.g = 0.34;
         view_options.b = 0.0f;
-        quad_views.emplace_back(p.second, view_options);
+        quad_views.emplace_back(p.first.second, p.second, view_options);
       }
-      else if(p.first == "blue") {
+      else if(p.first.first == "blue") {
         QuadView::Options view_options;
         view_options.mesh_resource = quad_view_options.quad_mesh_file_path;
         // UT blue-grey
         view_options.r = 0.2f;
         view_options.g = 0.247f;
         view_options.b = 0.28f;
-        quad_views.emplace_back(p.second, view_options);
+        quad_views.emplace_back(p.first.second, p.second, view_options);
       }
     }
 
@@ -275,7 +275,7 @@ namespace game_engine {
     
     // Main loop @ 5 Hz to keep up with quickly-updating trajectories
     while(this->ok_) {
-      for(const auto& tr : trajectory_view_options.trajectories) {
+      for(const auto& tr: trajectory_view_options.trajectories) {
         tr.second->Publish();
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(200));

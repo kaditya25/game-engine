@@ -9,8 +9,10 @@ namespace game_engine {
         std::shared_ptr<QuadStateWarden> quad_state_warden_;
     public:
         PreSubmissionTrajectoryVetter(
+                const int& quad_safety_limits,
                 const std::shared_ptr<QuadStateWarden> quad_state_warden)
-                : quad_state_warden_(quad_state_warden) {}
+                : TrajectoryVetter(quad_safety_limits),
+                  quad_state_warden_(quad_state_warden) {}
 
         // Determines if a trajectory meets the trajectory requirements
         TrajectoryCode PreVet(

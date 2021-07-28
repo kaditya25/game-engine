@@ -4,7 +4,8 @@
 #include <string>
 
 #include "trajectory.h"
-#include "map3d.h"
+#include "trajectory_publisher_node.h"
+#include "trajectory_watchdog_status.h"
 #include "warden.h"
 #include "trajectory_code.h"
 
@@ -17,7 +18,7 @@ namespace game_engine {
         struct Options {
             // Lookahead time for simulation
             double simulation_forward_time = 5; //seconds
-
+            double collision_distance = 0.4; //meters
             Options() {}
         };
 
@@ -25,10 +26,11 @@ namespace game_engine {
             : options_(options) {}
 
         // Main thread function
-        void Run(const Trajectory& trajectory,
-                 const Map3D& map,
+        void Run(const std::vector<std::string>& quad_names,
                  const std::shared_ptr<QuadStateWarden> quad_state_warden,
-                 const std::vector<std::string>& quad_names) ;
+                 const std::shared_ptr<TrajectoryWardenServer> trajectory_warden_srv,
+                 const std::shared_ptr<TrajectoryWardenPublisher> trajectory_warden_pub,
+                 const std::shared_ptr<TrajectoryWatchdogStatus> trajectory_watchdog_status);
 
         // Stop this thread
         void Stop();

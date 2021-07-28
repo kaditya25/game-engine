@@ -38,7 +38,7 @@ namespace game_engine {
     data.push_back(local_instant);
   }
 
-  TrajectoryCode trajectory_status = warden_->Write(this->key_, Trajectory(data), true);
+  TrajectoryCode trajectory_status = warden_->Write(this->key_, Trajectory(data));
   res.code = static_cast<unsigned int>(trajectory_status.code);
   res.value = trajectory_status.value;
   res.index = trajectory_status.index;

@@ -8,8 +8,6 @@ set(SOURCE_FILES
   mediation_layer.cc
   physics_simulator.cc
   quad_state.cc
-  quad_state_dispatcher.cc
-  quad_state_guard.cc
   trajectory.cc
   warden.cc
   trajectory_vetter.cc
@@ -18,6 +16,9 @@ set(SOURCE_FILES
   quad_state_watchdog.cc
   quad_state_watchdog_status.cc
   trajectory_watchdog.cc
+  trajectory_watchdog_status.cc
+  safety_monitor.cc
+  safety_monitor_status.cc
 )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})

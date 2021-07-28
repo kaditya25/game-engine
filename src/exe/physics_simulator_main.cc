@@ -25,8 +25,6 @@
 #include "physics_simulator.h"
 #include "wind_intensity.h"
 
-#include "quad_state_guard.h"
-
 using namespace game_engine;
 
 namespace {

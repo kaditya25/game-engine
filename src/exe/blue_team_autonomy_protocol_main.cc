@@ -25,8 +25,6 @@
 #include "goal_status_subscriber_node.h"
 #include "goal_status.h"
 
-#include "quad_state_guard.h"
-
 #include "machine_games/blue_team_autonomy_protocol.h"
 #include "game_snapshot.h"
 #include "map3d.h"
@@ -102,6 +100,12 @@ int main(int argc, char** argv) {
   const WindIntensity wind_intensity =
     static_cast<WindIntensity>(wind_intensity_int);
 
+  int quad_safety_limits = 0;
+  if(false == nh.getParam("quad_safety_limits", quad_safety_limits)) {
+    std::cerr << "Required parameter not found on server: quad_safety_limits" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
   // Team Assignments
   std::vector<std::string> red_quad_names;
   std::vector<std::string> blue_quad_names;
@@ -171,7 +175,7 @@ int main(int argc, char** argv) {
       quad_state_warden,
       GameSnapshot::Options());
 
-  auto prevetter = std::make_shared<PreSubmissionTrajectoryVetter>(quad_state_warden);
+  auto prevetter = std::make_shared<PreSubmissionTrajectoryVetter>(quad_safety_limits, quad_state_warden);
 
     // Initialize the Trajectory Client
   std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients;

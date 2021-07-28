@@ -206,4 +206,4 @@ set_target_properties(asset_games_protocol
         CXX_EXTENSIONS NO
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
         )
-        
+

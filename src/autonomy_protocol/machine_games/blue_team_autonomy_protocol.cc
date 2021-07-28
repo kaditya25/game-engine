@@ -64,52 +64,36 @@ namespace game_engine {
         const bool red_balloon_popped = red_balloon_status_->popped;
         const bool blue_balloon_popped = blue_balloon_status_->popped;
 
-        // Condition some decisions on wind intensity
-        switch (wind_intensity_) {
-            case WindIntensity::Zero:
-                // Do something zero-ish
-                break;
-            case WindIntensity::Mild:
-                // Do something mild
-                break;
-            case WindIntensity::Stiff:
-                // Do something stiff
-                break;
-            case WindIntensity::Intense:
-                // Do something intense
-                break;
-            case WindIntensity::Ludicrous:
-                // Do something ludicrous
-                break;
-            default:
-                std::cerr << "Unrecognized WindIntensity value." << std::endl;
-                std::exit(EXIT_FAILURE);
+      static bool closeness = false;
+      // You can fill out this switch statement with case statements tailored to
+      // each MediationLayerCode.
+      switch (trajectoryCodeMap_[quad_name].code) {
+        case MediationLayerCode::Success:
+          // You probably won't need to do anything in response to Success.
+          break;
+        case MediationLayerCode::TimeBetweenPointsExceedsMaxTime: {
+          // Suppose your AP initially submits a trajectory with a time that
+          // exceeds the maximum allowed time between points. You could fix the
+          // problem as shown below.
+          std::cout << "Replanning trajectory: "
+                       "Shortening time between trajectory points." << std::endl;
+          std::cout << "Value: " << trajectoryCodeMap_[quad_name].value << std::endl;
+          dt_chrono = dt_chrono - std::chrono::milliseconds(15);
+          break;
         }
-
-        // You can fill out this switch statement with case statements tailored to
-        // each MediationLayerCode.
-        switch (trajectoryCodeMap_[quad_name].code) {
-            case MediationLayerCode::Success:
-                // You probably won't need to do anything in response to Success.
-                break;
-            case MediationLayerCode::TimeBetweenPointsExceedsMaxTime: {
-                // Suppose your AP initially submits a trajectory with a time that
-                // exceeds the maximum allowed time between points. You could fix the
-                // problem as shown below.
-                std::cout << "Replanning trajectory: "
-                             "Shortening time between trajectory points." << std::endl;
-                std::cout << "Value: " << trajectoryCodeMap_[quad_name].value << std::endl;
-                dt_chrono = dt_chrono - std::chrono::milliseconds(15);
-                break;
-            }
-            default:
-                // If you want to see a numerical MediationLayerCode value, you can cast and
-                // print the code as shown below.
-                std::cout << "MediationLayerCode: " <<
-                          static_cast<int>(trajectoryCodeMap_[quad_name].code) << std::endl;
-                std::cout << "Value: " << trajectoryCodeMap_[quad_name].value << std::endl;
-                std::cout << "Index: " << trajectoryCodeMap_[quad_name].index << std::endl;
+        case MediationLayerCode::QuadTooCloseToAnotherQuad: {
+          std::cout << "QuadTooCloseToAnotherQuad." << std::endl;
+          closeness = true;
+          break;
         }
+        default:
+          // If you want to see a numerical MediationLayerCode value, you can cast and
+          // print the code as shown below.
+          std::cout << "MediationLayerCode: " <<
+                    static_cast<int>(trajectoryCodeMap_[quad_name].code) << std::endl;
+          std::cout << "Value: " << trajectoryCodeMap_[quad_name].value << std::endl;
+          std::cout << "Index: " << trajectoryCodeMap_[quad_name].index << std::endl;
+      }
 
         // Always use the chrono::system_clock for time. Trajectories require time
         // points measured in floating point seconds from the Unix epoch.
@@ -187,46 +171,93 @@ namespace game_engine {
         const Eigen::Vector3d r = current_pos - circle_center;
         const double theta_start = std::atan2(r.y(), r.x());
 
+      if(closeness == false) {
+        std::cout << "Bigger than 1.0." << std::endl;
         // Generate the remaining circular trajectory
         for (size_t idx = 0; idx < N; ++idx) {
-            // chrono::duration<double> maintains high-precision floating point time
-            // in seconds use the count function to cast into floating point
-            const std::chrono::duration<double> flight_chrono_time
-                    = current_chrono_time.time_since_epoch() + idx * dt_chrono;
+          // chrono::duration<double> maintains high-precision floating point time
+          // in seconds use the count function to cast into floating point
+          const std::chrono::duration<double> flight_chrono_time
+              = current_chrono_time.time_since_epoch() + idx * dt_chrono;
 
-            // Angle in radians
-            const double theta = theta_start + omega * idx * dt;
+          // Angle in radians
+          const double theta = theta_start + omega * idx * dt;
 
-            // Circle
-            const double x = circle_center.x() + radius * std::cos(theta);
-            const double y = circle_center.y() + radius * std::sin(theta);
-            const double z = circle_center.z();
+          // Circle
+          const double x = circle_center.x() + radius * std::cos(theta);
+          const double y = circle_center.y() + radius * std::sin(theta);
+          const double z = circle_center.z();
 
-            // Chain rule
-            const double vx = -radius * std::sin(theta) * omega;
-            const double vy =  radius * std::cos(theta) * omega;
-            const double vz = 0.0;
+          // Chain rule
+          const double vx = -radius * std::sin(theta) * omega;
+          const double vy =  radius * std::cos(theta) * omega;
+          const double vz = 0.0;
 
-            // Chain rule
-            const double ax = -radius * std::cos(theta) * omega * omega;
-            const double ay = -radius * std::sin(theta) * omega * omega;
-            const double az = 0.0;
+          // Chain rule
+          const double ax = -radius * std::cos(theta) * omega * omega;
+          const double ay = -radius * std::sin(theta) * omega * omega;
+          const double az = 0.0;
 
-            const double yaw = 0.0;
+          const double yaw = 0.0;
 
-            // The trajectory requires the time to be specified as a floating point
-            // number that measures the number of seconds since the unix epoch.
-            const double flight_time = flight_chrono_time.count();
+          // The trajectory requires the time to be specified as a floating point
+          // number that measures the number of seconds since the unix epoch.
+          const double flight_time = flight_chrono_time.count();
 
-            // Push an Eigen instance onto the trajectory vector
-            trajectory_vector.push_back(
-                    (Eigen::Matrix<double, 11, 1>() <<
-                                                    x,   y,   z,
-                            vx,  vy,  vz,
-                            ax,  ay,  az,
-                            yaw,
-                            flight_time).finished());
+          // Push an Eigen instance onto the trajectory vector
+          trajectory_vector.push_back(
+              (Eigen::Matrix<double, 11, 1>() <<
+                                              x,   y,   z,
+                  vx,  vy,  vz,
+                  ax,  ay,  az,
+                  yaw,
+                  flight_time).finished());
         }
+      } else {
+        std::cout << "Smaller than 1.0." << std::endl;
+        const Eigen::Vector3d r = current_pos - circle_center;
+        const double theta_start = std::atan2(r.y(), r.x());
+        for (size_t idx = 0; idx < N; ++idx) {
+          // chrono::duration<double> maintains high-precision floating point time
+          // in seconds use the count function to cast into floating point
+          const std::chrono::duration<double> flight_chrono_time
+              = current_chrono_time.time_since_epoch() + idx * dt_chrono;
+
+          // Angle in radians
+          const double theta = theta_start - omega * idx * dt;
+
+          // Circle
+          const double x = circle_center.x() + radius * std::cos(theta);
+          const double y = circle_center.y() + radius * std::sin(theta);
+          const double z = circle_center.z();
+
+          // Chain rule
+          const double vx = radius * std::sin(theta) * omega;
+          const double vy =  -radius * std::cos(theta) * omega;
+          const double vz = 0.0;
+
+          // Chain rule
+          const double ax = -radius * std::cos(theta) * omega * omega;
+          const double ay = -radius * std::sin(theta) * omega * omega;
+          const double az = 0.0;
+
+          const double yaw = 0.0;
+
+          // The trajectory requires the time to be specified as a floating point
+          // number that measures the number of seconds since the unix epoch.
+          const double flight_time = flight_chrono_time.count();
+
+          // Push an Eigen instance onto the trajectory vector
+          trajectory_vector.push_back(
+              (Eigen::Matrix<double, 11, 1>() <<
+                                              x,   y,   z,
+                  vx,  vy,  vz,
+                  ax,  ay,  az,
+                  yaw,
+                  flight_time).finished());
+        }
+      }
+
         // Construct a trajectory from the trajectory vector
         Trajectory trajectory(trajectory_vector);
 
