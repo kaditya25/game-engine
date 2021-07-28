@@ -21,7 +21,6 @@
 
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
-#include "quad_state_guard.h"
 
 #include "mediation_layer.h"
 #include "view_manager.h"
@@ -29,6 +28,9 @@
 #include "balloon_watchdog.h"
 #include "quad_state_watchdog.h"
 #include "goal_watchdog.h"
+#include "trajectory_watchdog.h"
+#include "safety_monitor.h"
+#include "safety_monitor_status.h"
 
 using namespace game_engine;
 
@@ -147,7 +149,7 @@ int main(int argc, char** argv) {
   // Initialize the QuadStateWarden. The QuadStateWarden enables safe, multi-threaded
   // access to quadcopter state data. Internal components that require access to
   // state data should request access through QuadStateWarden.
-  auto quad_state_warden = std::make_shared<QuadStateWarden>();
+  auto quad_state_warden  = std::make_shared<QuadStateWarden>();
   for(const auto& kv: quad_state_topics) {
     const std::string& quad_name = kv.first;
     quad_state_warden->Register(quad_name);
@@ -160,6 +162,18 @@ int main(int argc, char** argv) {
           1,0,0,0,
           0,0,0
           ).finished()));
+  }
+
+  int revision_mode = 0;
+  if(false == nh.getParam("revision_mode", revision_mode)) {
+    std::cerr << "Required parameter not found on server: revision_mode" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  int quad_safety_limits = 0;
+  if(false == nh.getParam("quad_safety_limits", quad_safety_limits)) {
+    std::cerr << "Required parameter not found on server: quad_safety_limits" << std::endl;
+    std::exit(EXIT_FAILURE);
   }
 
   // For every quad, subscribe to its corresponding state topic
@@ -340,14 +354,17 @@ int main(int argc, char** argv) {
       }
   );
 
-  // State watchdog
+  // Status watchdogs
   auto quad_state_watchdog_status = std::make_shared<QuadStateWatchdogStatus>();
+  auto trajectory_watchdog_status = std::make_shared<TrajectoryWatchdogStatus>();
+  auto safety_monitor_status = std::make_shared<SafetyMonitorStatus>();
   for(const std::string& quad_name: quad_names) {
     quad_state_watchdog_status->Register(quad_name);
+    trajectory_watchdog_status->Register(quad_name);
+    safety_monitor_status->Register(quad_name);
   }
 
-
-  auto quad_state_watchdog        = std::make_shared<QuadStateWatchdog>();
+  auto quad_state_watchdog = std::make_shared<QuadStateWatchdog>(quad_safety_limits);
   std::thread quad_state_watchdog_thread(
       [&]() {
         quad_state_watchdog->Run(
@@ -358,6 +375,20 @@ int main(int argc, char** argv) {
             );
       }
   );
+
+  auto trajectory_watchdog = std::make_shared<TrajectoryWatchdog>();
+  std::thread trajectory_watchdog_thread(
+      [&]() {
+          trajectory_watchdog->Run(
+              quad_names,
+              quad_state_warden,
+              trajectory_warden_srv,
+              trajectory_warden_pub,
+              trajectory_watchdog_status
+          );
+      }
+  );
+
 
   auto goal_status = std::make_shared<GoalStatus>();
 
@@ -383,7 +414,7 @@ int main(int argc, char** argv) {
   // integrating the proposed trajectories and modifying them so that the
   // various agents will not crash into each other. Data is asynchonously read
   // and written from the TrajectoryWardens
-  auto mediation_layer = std::make_shared<MediationLayer>();
+  auto mediation_layer = std::make_shared<MediationLayer>(quad_safety_limits);
   std::thread mediation_layer_thread(
       [&]() {
         mediation_layer->Run(
@@ -392,6 +423,8 @@ int main(int argc, char** argv) {
             trajectory_warden_pub,
             quad_state_warden,
             quad_state_watchdog_status,
+            trajectory_watchdog_status,
+            safety_monitor_status,
             trajectory_publishers);
       });
 
@@ -417,6 +450,7 @@ int main(int argc, char** argv) {
         blue_balloon_watchdog->Stop();
         goal_watchdog->Stop();
         quad_state_watchdog->Stop();
+        trajectory_watchdog->Stop();
       });
 
   // Spin for ros subscribers
@@ -431,6 +465,7 @@ int main(int argc, char** argv) {
   blue_balloon_watchdog_thread.join();
   goal_watchdog_thread.join();
   quad_state_watchdog_thread.join();
+  trajectory_watchdog_thread.join();
 
   return EXIT_SUCCESS;
 }

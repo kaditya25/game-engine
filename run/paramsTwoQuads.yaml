@@ -47,6 +47,17 @@ seed: 31
 # 0: zero, 1: mild, 2: stiff, 3: intense, 4: ludicrous
 wind_intensity: 1
 
+# revision mode
+# 0: NONE, 1: TIME, 2: SHAPE, 3: WAYPOINT
+revision_mode: 0
+
+# quad safety limits
+# 0: leisure, 1: sport, 2: extreme
+quad_safety_limits: 0
+
+# change to true if running in joy stick mode
+joy_mode: false
+
 goal_position: [-12.4, 13.5, -4.0]
 
 initial_quad_positions:

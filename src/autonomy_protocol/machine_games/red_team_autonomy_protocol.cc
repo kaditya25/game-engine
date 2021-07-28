@@ -86,6 +86,7 @@ namespace game_engine {
                 std::exit(EXIT_FAILURE);
         }
 
+      static bool closeness = false;
         // You can fill out this switch statement with case statements tailored to
         // each MediationLayerCode.
         switch (trajectoryCodeMap_[quad_name].code) {
@@ -101,6 +102,11 @@ namespace game_engine {
                 std::cout << "Value: " << trajectoryCodeMap_[quad_name].value << std::endl;
                 dt_chrono = dt_chrono - std::chrono::milliseconds(15);
                 break;
+            }
+            case MediationLayerCode::QuadTooCloseToAnotherQuad: {
+              std::cout << "QuadTooCloseToAnotherQuad." << std::endl;
+              closeness = true;
+              break;
             }
             default:
                 // If you want to see a numerical MediationLayerCode value, you can cast and
@@ -173,7 +179,7 @@ namespace game_engine {
         }
 
         // Set the radius of the circular example trajectory in meters
-        const double radius = 0.75;
+        const double radius = 1.0;
 
         // Set the angular rate of the circular example trajectory in radians/s
         constexpr double omega = 2*M_PI/duration_sec;
@@ -181,52 +187,98 @@ namespace game_engine {
         // Place the center of the circle 1 radius in the y-direction from the
         // goal position
         const Eigen::Vector3d circle_center =
-            start_pos + Eigen::Vector3d(0, radius, 0);
+            start_pos + Eigen::Vector3d(0, -radius, 0);
 
         // Transform the current position into an angle
         const Eigen::Vector3d r = current_pos - circle_center;
         const double theta_start = std::atan2(r.y(), r.x());
 
+      if(closeness == false) {
+        std::cout << "Bigger than 1.0." << std::endl;
         // Generate the remaining circular trajectory
         for (size_t idx = 0; idx < N; ++idx) {
-            // chrono::duration<double> maintains high-precision floating point time
-            // in seconds use the count function to cast into floating point
-            const std::chrono::duration<double> flight_chrono_time
-                    = current_chrono_time.time_since_epoch() + idx * dt_chrono;
+          // chrono::duration<double> maintains high-precision floating point time
+          // in seconds use the count function to cast into floating point
+          const std::chrono::duration<double> flight_chrono_time
+              = current_chrono_time.time_since_epoch() + idx * dt_chrono;
 
-            // Angle in radians
-            const double theta = theta_start + omega * idx * dt;
+          // Angle in radians
+          const double theta = theta_start + omega * idx * dt;
 
-            // Circle
-            const double x = circle_center.x() + radius * std::cos(theta);
-            const double y = circle_center.y() + radius * std::sin(theta);
-            const double z = circle_center.z();
+          // Circle
+          const double x = circle_center.x() + radius * std::cos(theta);
+          const double y = circle_center.y() + radius * std::sin(theta);
+          const double z = circle_center.z();
 
-            // Chain rule
-            const double vx = -radius * std::sin(theta) * omega;
-            const double vy =  radius * std::cos(theta) * omega;
-            const double vz = 0.0;
+          // Chain rule
+          const double vx = -radius * std::sin(theta) * omega;
+          const double vy =  radius * std::cos(theta) * omega;
+          const double vz = 0.0;
 
-            // Chain rule
-            const double ax = -radius * std::cos(theta) * omega * omega;
-            const double ay = -radius * std::sin(theta) * omega * omega;
-            const double az = 0.0;
+          // Chain rule
+          const double ax = -radius * std::cos(theta) * omega * omega;
+          const double ay = -radius * std::sin(theta) * omega * omega;
+          const double az = 0.0;
 
-            const double yaw = 0.0;
+          const double yaw = 0.0;
 
-            // The trajectory requires the time to be specified as a floating point
-            // number that measures the number of seconds since the unix epoch.
-            const double flight_time = flight_chrono_time.count();
+          // The trajectory requires the time to be specified as a floating point
+          // number that measures the number of seconds since the unix epoch.
+          const double flight_time = flight_chrono_time.count();
 
-            // Push an Eigen instance onto the trajectory vector
-            trajectory_vector.push_back(
-                    (Eigen::Matrix<double, 11, 1>() <<
-                                                    x,   y,   z,
-                            vx,  vy,  vz,
-                            ax,  ay,  az,
-                            yaw,
-                            flight_time).finished());
+          // Push an Eigen instance onto the trajectory vector
+          trajectory_vector.push_back(
+              (Eigen::Matrix<double, 11, 1>() <<
+                                              x,   y,   z,
+                  vx,  vy,  vz,
+                  ax,  ay,  az,
+                  yaw,
+                  flight_time).finished());
         }
+      } else {
+        std::cout << "Smaller than 1.0." << std::endl;
+        const Eigen::Vector3d r = current_pos - circle_center;
+        const double theta_start = std::atan2(r.y(), r.x());
+        for (size_t idx = 0; idx < N; ++idx) {
+          // chrono::duration<double> maintains high-precision floating point time
+          // in seconds use the count function to cast into floating point
+          const std::chrono::duration<double> flight_chrono_time
+              = current_chrono_time.time_since_epoch() + idx * dt_chrono;
+
+          // Angle in radians
+          const double theta = theta_start - omega * idx * dt;
+
+          // Circle
+          const double x = circle_center.x() + radius * std::cos(theta);
+          const double y = circle_center.y() + radius * std::sin(theta);
+          const double z = circle_center.z();
+
+          // Chain rule
+          const double vx = radius * std::sin(theta) * omega;
+          const double vy =  -radius * std::cos(theta) * omega;
+          const double vz = 0.0;
+
+          // Chain rule
+          const double ax = -radius * std::cos(theta) * omega * omega;
+          const double ay = -radius * std::sin(theta) * omega * omega;
+          const double az = 0.0;
+
+          const double yaw = 0.0;
+
+          // The trajectory requires the time to be specified as a floating point
+          // number that measures the number of seconds since the unix epoch.
+          const double flight_time = flight_chrono_time.count();
+
+          // Push an Eigen instance onto the trajectory vector
+          trajectory_vector.push_back(
+              (Eigen::Matrix<double, 11, 1>() <<
+                                              x,   y,   z,
+                  vx,  vy,  vz,
+                  ax,  ay,  az,
+                  yaw,
+                  flight_time).finished());
+        }
+      }
         // Construct a trajectory from the trajectory vector
         Trajectory trajectory(trajectory_vector);
 

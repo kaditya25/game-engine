@@ -88,7 +88,8 @@ namespace game_engine {
 
     // Main loop for this thread
     void Run(std::unordered_map<std::string,
-             std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients);
+             std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients,
+             bool joy_mode = false);
 
     // Virtual function to be implemented as by an actor. Input is a snapshot
     // of the system, output is an intended trajectory for each of the
@@ -101,7 +102,8 @@ namespace game_engine {
   //  ******************
   inline void AutonomyProtocol::
   Run(std::unordered_map<std::string,
-      std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients) {
+      std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients,
+      bool joy_mode) {
     while(ok_) {
       // Request trajectory updates from the virtual function
       const std::unordered_map<std::string, Trajectory> trajectories =
@@ -117,16 +119,20 @@ namespace game_engine {
           TrajectoryCode trajectoryCode =
               trajectory_warden_client_->Write(quad_name,
                                                trajectory,
-                                               proposed_trajectory_clients,
-                                               true);
+                                               proposed_trajectory_clients);
           trajectoryCodeMap_[quad_name] = trajectoryCode;
         } catch(const std::out_of_range& e) {
           continue;
         }
       }
-      // Sleep for 200 ms. This essentially creates a loop that runs at 5 Hz. A
-      // new trajectory may be specified once every 200 ms.
-      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      if (joy_mode == true) {
+        // Sleep for 100 ms. This essentially creates a loop that runs at 10 Hz for the joy mode.
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      } else {
+        // Sleep for 200 ms. This essentially creates a loop that runs at 5 Hz. A
+        // new trajectory may be specified once every 200 ms.
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      }
     }
   }
 

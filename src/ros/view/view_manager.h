@@ -24,6 +24,8 @@
 
 #include "trajectory_visualizer_node.h"
 
+#include "warden.h"
+
 namespace game_engine {
   // The ViewManager is a convenience object that encapsulates all of the code
   // used to publish views to RViz. 
@@ -47,7 +49,7 @@ namespace game_engine {
 
       struct QuadViewOptions {
         std::string quad_mesh_file_path;
-        std::vector<std::pair<std::string, std::shared_ptr<QuadStateGuard>>> quads;
+        std::vector<std::pair<std::pair<std::string, std::string>, std::shared_ptr<QuadStateWarden>>> quads;
 
         QuadViewOptions() {}
       };

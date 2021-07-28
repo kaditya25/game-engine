@@ -3,7 +3,7 @@
 namespace game_engine {
   std::vector<visualization_msgs::Marker> QuadView::Markers() const {
     QuadState quad_state;
-    this->quad_state_guard_->Read(quad_state);
+    this->quad_state_warden_->Read(quad_name_, quad_state);
 
     const Eigen::Vector3d quad_position = quad_state.Position();
 

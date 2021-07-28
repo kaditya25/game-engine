@@ -4,23 +4,21 @@ namespace game_engine {
     //============================
     //     TrajectoryWardenIn
     //============================
-    TrajectoryCode TrajectoryWardenServer::GetLastTrajectoryStatus(bool blocking) {
-        // Checks to see if the status hasn't been updated yet and a blocking call is wanted.
-        // If a blocking call is wanted, then wait until the statusUpdated_ marker returns true.
-        // If a blocking call is not wanted, just return the most recently updated status.
-        while (this->statusUpdated_ == false && blocking == true) {
+    TrajectoryCode TrajectoryWardenServer::GetLastTrajectoryStatus(const std::string& key) {
+        // Checks to see if the status hasn't been updated yet.
+        // Wait until the statusUpdated_ marker returns true and return the status.
+        while (this->statusUpdated_[key] == false) {
             continue;
         }
-        this->statusUpdated_ = false;
-        return trajectoryStatus_;
+        this->statusUpdated_[key] = false;
+        return trajectoryStatus_[key];
     };
 
     TrajectoryCode TrajectoryWardenServer::Write(const std::string& key,
-                                                 const Trajectory& trajectory,
-                                                 bool blocking) {
+                                                 const Trajectory& trajectory) {
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
-            std::cerr << "TrajectoryWardenIn::Write -- Key does not exist." << std::endl;
+            std::cerr << "TrajectoryWardenServer::Write -- Key does not exist." << std::endl;
             TrajectoryCode tc;
             tc.code = MediationLayerCode::KeyDoesNotExist;
             return tc;
@@ -34,17 +32,16 @@ namespace game_engine {
             container->modified_ = true;
             container->modified_cv_.notify_all();
         }
-        // The TrajectoryWardenIn is a "read" warden that changes its behavior based on whether or not
-        // it is a blocking call. The GetLastTrajectoryStatus grabs the most recent status updated by
-        // the ML.
-        TrajectoryCode status = GetLastTrajectoryStatus(blocking);
+        // The GetLastTrajectoryStatus grabs the most recent status updated by the ML.
+        TrajectoryCode status = GetLastTrajectoryStatus(key);
         return status;
     };
 
-    void TrajectoryWardenServer::SetTrajectoryStatus(TrajectoryCode trajectory_status) {
+    void TrajectoryWardenServer::SetTrajectoryStatus(const std::string& key,
+                                                     TrajectoryCode trajectory_status) {
         // Set the two variables to true if the status was updated and the value of the status
-        this->trajectoryStatus_ = trajectory_status;
-        this->statusUpdated_ = true;
+        this->trajectoryStatus_[key] = trajectory_status;
+        this->statusUpdated_[key] = true;
     };
 
     //==============================
@@ -54,12 +51,11 @@ namespace game_engine {
     TrajectoryCode TrajectoryWardenClient::Write(
             const std::string& key,
             const Trajectory& trajectory,
-            std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client,
-            bool blocking) {
+            std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client) {
 
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
-            std::cerr << "TrajectoryWardenOut::Write -- Key does not exist." << std::endl;
+            std::cerr << "TrajectoryWardenClient::Write -- Key does not exist." << std::endl;
             TrajectoryCode tc;
             tc.code = MediationLayerCode::KeyDoesNotExist;
             return tc;
@@ -76,19 +72,18 @@ namespace game_engine {
 
         // The TrajectoryWardenOut gets sends out a call from the client to the server and gets the status back
         TrajectoryCode status = client[key]->Request(trajectory);
+        // Update the status so the In warden is released from it's block.
+        SetTrajectoryStatus(key, status);
 
-        // If blocking is true, update the status so the In warden is released from it's block.
-        if (blocking == true) {
-            // Update the status
-            SetTrajectoryStatus(status);
-        }
         return status;
     };
 
-    void TrajectoryWardenClient::SetTrajectoryStatus(TrajectoryCode trajectory_status) {
-        this->trajectoryStatus_ = trajectory_status;
-        this->statusUpdated_ = true;
+    void TrajectoryWardenClient::SetTrajectoryStatus(const std::string& key,
+                                                     TrajectoryCode trajectory_status) {
+      this->trajectoryStatus_[key] = trajectory_status;
+      this->statusUpdated_[key] = true;
     };
+
 
     //====================================
     //     TrajectoryWardenSubscriber
@@ -97,7 +92,7 @@ namespace game_engine {
                                                          const Trajectory& trajectory) {
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
-            std::cerr << "TrajectoryWardenIn::Write -- Key does not exist." << std::endl;
+            std::cerr << "TrajectoryWardenSubscriber::Write -- Key does not exist." << std::endl;
             return MediationLayerCode::KeyDoesNotExist;
         }
 
@@ -124,7 +119,7 @@ namespace game_engine {
 
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
-            std::cerr << "TrajectoryWardenOut_PubSub::Write -- Key does not exist." << std::endl;
+            std::cerr << "TrajectoryWardenPublisher::Write -- Key does not exist." << std::endl;
             return MediationLayerCode::KeyDoesNotExist;
         }
 
@@ -148,7 +143,7 @@ namespace game_engine {
     //============================
 
     MediationLayerCode QuadStateWarden::Write(const std::string& key,
-                                          const QuadState& state) {
+                                              const QuadState& state) {
         // If key does not exist, return false
         if (this->map_.end() == this->map_.find(key)) {
             std::cerr << "QuadStateWarden::Write -- Key does not exist." << std::endl;
@@ -166,3 +161,5 @@ namespace game_engine {
         return MediationLayerCode::Success;
     };
 }
+
+

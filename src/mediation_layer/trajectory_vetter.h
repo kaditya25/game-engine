@@ -24,15 +24,14 @@ namespace game_engine {
   //   6) The time between trajectory samples is no more than a specified
   //      maximum delta-time
   //
-  // TODO: Adjust max_distance_from_current_position
   class TrajectoryVetter {
     public:
       struct Options {
         // Maximum allowed velocity in any direction in m/s
-        double max_velocity_magnitude = 2.0;
+        double max_velocity_magnitude;
 
         // Maximum allowed l2 norm of acceleration, in m/s^2
-        double max_acceleration_magnitude = 0.4;
+        double max_acceleration_magnitude;
 
         // The maximum distance from a quad's current position that a
         // trajectory's first point may deviate in meters
@@ -44,8 +43,27 @@ namespace game_engine {
         Options() {}
       };
 
-      TrajectoryVetter(const Options& options = Options())
-        : options_(options) {}
+      int quad_safety_limits_;
+      Options options_;
+
+      TrajectoryVetter(const int& quad_safety_limits,
+                       const Options& options = Options())
+        : quad_safety_limits_(quad_safety_limits),
+          options_(options) {
+        if(quad_safety_limits_ == 1) {
+          // sport mode
+          options_.max_velocity_magnitude = 3.0;
+          options_.max_acceleration_magnitude = 1.5;
+        } else if(quad_safety_limits_ == 2) {
+          // extreme mode
+          options_.max_velocity_magnitude = 3.0;
+          options_.max_acceleration_magnitude = 3.0;
+        } else {
+            // safe and default
+            options_.max_velocity_magnitude = 2.0;
+            options_.max_acceleration_magnitude = 0.4;
+          }
+        }
 
       // Determines if a trajectory meets the trajectory requirements laid out
       // in the documentation
@@ -55,9 +73,5 @@ namespace game_engine {
           const std::shared_ptr<QuadStateWarden> quad_state_warden,
           const std::string& quad_name
           ) const;
-
-    private:
-      Options options_;
-
   };
 }

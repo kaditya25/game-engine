@@ -7,6 +7,7 @@
 #include "warden.h"
 #include "map3d.h"
 #include "quad_state_watchdog_status.h"
+#include "trajectory_code.h"
 
 namespace game_engine {
   // The state watchdog watches the positions of the quadcopters and determines
@@ -16,14 +17,28 @@ namespace game_engine {
     public:
       struct Options {
         // Minimum l-infinity distance from all obstacles that a quad may fly
-        double min_distance = 0.40;
+        double min_distance;
+        // Minimum l-infinity distance from all other quads that a quad may fly
         double min_distance_btwn_quads = 1.0;
 
         Options() {}
       };
 
-      QuadStateWatchdog(const Options& options = Options())
-        : options_(options) {}
+      QuadStateWatchdog(const int& quad_safety_limits,
+                       const Options& options = Options())
+          : quad_safety_limits_(quad_safety_limits),
+            options_(options) {
+        if (quad_safety_limits_ == 2) {
+          // extreme mode
+          options_.min_distance = 1.25;
+        } else if (quad_safety_limits_ == 1) {
+          // sport mode
+          options_.min_distance = 1.0;
+        } else {
+          // leisure mode and default
+          options_.min_distance = 0.4;
+        }
+      }
 
       // Main thread function
       void Run(
@@ -32,12 +47,16 @@ namespace game_engine {
           std::shared_ptr<QuadStateWatchdogStatus> quad_state_watchdog_status,
           const Map3D map);
 
+      Polyhedron CreateQuad(const Eigen::Vector3d cm);
+
       // Stop this thread
       void Stop();
 
     private:
       volatile std::atomic_bool ok_{true};
       Options options_;
+      int quad_safety_limits_;
+      std::unordered_map<std::string, bool> locked_freeze_;
 
   };
 }

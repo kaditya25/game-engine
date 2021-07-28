@@ -10,14 +10,13 @@ namespace game_engine {
       // The structure of the state is:
       //   [pos(3), vel(3), q(4), e_dot(3)]
       Eigen::Matrix<double, 13, 1> data_;
-
     public:
       // Required by Eigen
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-      QuadState(const Eigen::Matrix<double, 13, 1>& data 
-          = Eigen::Matrix<double, 13, 1>::Zero())
-        : data_(data) {}
+      QuadState(const Eigen::Matrix<double, 13, 1>& data =
+          Eigen::Matrix<double, 13, 1>::Zero())
+          : data_(data) {}
 
       // Getters
       Eigen::Vector3d Position() const;
