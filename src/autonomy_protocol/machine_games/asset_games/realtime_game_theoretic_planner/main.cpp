@@ -220,6 +220,8 @@ int main(int argc, char* argv[]) {
   dynFunction dynFuncPursuer = fDynPursuer;
   dynFunction dynFuncEvader = fDynEvader;
 
+  Eigen::VectorXd dumb(2);
+  dumb << 0,0;
 
   nashController nash_pursuer(
       u_enumerated,
@@ -243,7 +245,7 @@ int main(int argc, char* argv[]) {
       K_start, K_steps_evader, dt,
       x_evader, x_pursuer,
       dynFuncEvader, dynFuncPursuer,
-      costFuncEvader, costFuncPursuer
+      costFuncEvader, costFuncPursuer,
       );
 
   Eigen::VectorXd acc_pursuer, acc_evader;
