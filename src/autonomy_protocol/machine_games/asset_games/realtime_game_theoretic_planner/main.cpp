@@ -221,17 +221,14 @@ int main(int argc, char* argv[]) {
   dynFunction dynFuncEvader = fDynEvader;
 
 
-  Eigen::VectorXd dumb(2);
-  dumb << 0,0;
-
   nashController nash_pursuer(
       u_enumerated,
       u_enum_evader,
       K_start, K_steps, dt,
       x_pursuer, x_evader,
       dynFuncPursuer,dynFuncEvader,
-      costFuncPursuer,costFuncEvader,
-      vel_max,acc_max,dumb);
+      costFuncPursuer,costFuncEvader
+      );
 
 
   velMatchController velmatch_pursuer(
@@ -246,8 +243,8 @@ int main(int argc, char* argv[]) {
       K_start, K_steps_evader, dt,
       x_evader, x_pursuer,
       dynFuncEvader, dynFuncPursuer,
-      costFuncEvader, costFuncPursuer,
-      vel_max,acc_max,dumb);
+      costFuncEvader, costFuncPursuer
+      );
 
   Eigen::VectorXd acc_pursuer, acc_evader;
   std::chrono::duration<double>  t_runtime;
