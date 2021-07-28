@@ -3,7 +3,7 @@
 void costCalculator::reserve_thread_vector()
 {
   if(!self_cost_matrix_.cols())
-    std::cerr << "Warning: cost matrix not initialized yet";
+    //std::cerr << "Warning: cost matrix not initialized yet";
 
   vector_threads_ = std::vector<std::thread>(self_cost_matrix_.cols());
 }
