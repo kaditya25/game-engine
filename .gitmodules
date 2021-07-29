@@ -12,4 +12,9 @@
 [submodule "src/dependencies/joy-dependency"]
 	path = src/dependencies/joy-dependency
 	url = https://gitlab.com/radionavlab/machine-games/joy-dependency.git
+  branch = master
+
+[submodule "src/autonomy_protocol/machine_games/asset_games/asset-games-lib"]
+	path = src/autonomy_protocol/machine_games/asset_games/asset-games-lib
+	url = https://gitlab.com/radionavlab/machine-games/asset-games-lib.git
         branch = master
