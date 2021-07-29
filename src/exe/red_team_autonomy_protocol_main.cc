@@ -25,8 +25,6 @@
 #include "goal_status_subscriber_node.h"
 #include "goal_status.h"
 
-#include "quad_state_guard.h"
-
 #include "machine_games/red_team_autonomy_protocol.h"
 #include "game_snapshot.h"
 #include "map3d.h"
@@ -99,8 +97,15 @@ int main(int argc, char** argv) {
     std::cerr << "Required parameter not found on server: wind_intensity" << std::endl;
     std::exit(EXIT_FAILURE);
   }
+
   const WindIntensity wind_intensity =
     static_cast<WindIntensity>(wind_intensity_int);
+
+  int quad_safety_limits = 0;
+  if(false == nh.getParam("quad_safety_limits", quad_safety_limits)) {
+    std::cerr << "Required parameter not found on server: quad_safety_limits" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
 
   // Team Assignments
   std::vector<std::string> red_quad_names;
@@ -134,7 +139,9 @@ int main(int argc, char** argv) {
     initial_quad_positions[quad_name] = Eigen::Vector3d(x,y,z);
   }
 
-  // Initialize the QuadStateWarden
+  // Initialize the QuadStateWarden. The QuadStateWarden enables safe, multi-threaded
+  // access to quadcopter state data. Internal components that require access to
+  // state data should request access through QuadStateWarden.
   auto quad_state_warden  = std::make_shared<QuadStateWarden>();
   for(const auto& kv: quad_state_topics) {
     const std::string& quad_name = kv.first;
@@ -172,7 +179,7 @@ int main(int argc, char** argv) {
       quad_state_warden,
       GameSnapshot::Options());
 
-  auto prevetter = std::make_shared<PreSubmissionTrajectoryVetter>(quad_state_warden);
+  auto prevetter = std::make_shared<PreSubmissionTrajectoryVetter>(quad_safety_limits, quad_state_warden);
 
     // Initialize the Trajectory Client
   std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients;

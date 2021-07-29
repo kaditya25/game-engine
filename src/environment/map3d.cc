@@ -11,6 +11,26 @@ namespace game_engine {
     return this->obstacles_;
   }
 
+  // Obstacles accessor
+  void Map3D::AddInflatedDynamicObstacle(const std::string& quad_name, const Polyhedron& dynamic_obstacle, const double distance) {
+    const Polyhedron inflated_obstacle = dynamic_obstacle.Expand(distance);
+    this->dynamic_obstacles_[quad_name] = inflated_obstacle;
+  }
+
+    bool Map3D::IsFreeDynamicSpace(const std::string& quad_name, const Point3D& point) {
+      const Polyhedron dynamic_obstacle = this->dynamic_obstacles_.at(quad_name);
+//      std::cout << quad_name << "is a dynamic obstacle with center: " << dynamic_obstacle.InteriorPoint() << std::endl;
+      if(true == dynamic_obstacle.Contains(point)) {
+        return false;
+      }
+      return true;
+    }
+
+  // Obstacles accessor
+  void Map3D::ClearDynamicObstacles() {
+    this->dynamic_obstacles_.clear();
+  }
+
   bool Map3D::Contains(const Point3D& point) const {
     return this->boundary_.Contains(point);
   }

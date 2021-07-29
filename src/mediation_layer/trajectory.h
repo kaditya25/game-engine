@@ -8,7 +8,7 @@
 namespace game_engine {
   // Abstract class representing a continuous trajectory sampled in time. At the
   // most basic view, the class is just a list of Eigen::Vectors. Provides
-  // convienient methods for accessing the data.
+  // convenient methods for accessing the data.
   class Trajectory {
     private:
       // Underlying data structure. Formatted as follows:
@@ -46,7 +46,7 @@ namespace game_engine {
       const size_t Size() const;
   };
 
-  // Convienient type definitions
+  // Convenient type definitions
   using TrajectoryVector3D = std::vector<
     Eigen::Matrix<double, 11, 1>, 
     Eigen::aligned_allocator<Eigen::Matrix<double, 11, 1>>>;

@@ -5,6 +5,8 @@
 #include <iostream>
 #include <limits>
 #include <utility>
+#include <unordered_map>
+
 
 #include "polyhedron.h"
 #include "yaml-cpp/yaml.h"
@@ -21,6 +23,9 @@ namespace game_engine {
       // The obstacles in the map are represented by a list of convex polyhedra
       std::vector<Polyhedron> obstacles_;
 
+      // The dynamic obstacles in the map are represented by a list of convex polyhedra
+      std::unordered_map<std::string, Polyhedron> dynamic_obstacles_;
+
       // Forward-declare friend class for parsing
       friend class YAML::convert<Map3D>;
 
@@ -36,6 +41,15 @@ namespace game_engine {
 
       // Obstacles accessor
       const std::vector<Polyhedron>& Obstacles() const;
+
+      // Obstacles accessor
+      void AddInflatedDynamicObstacle(const std::string& quad_name, const Polyhedron& dynamic_obstacle, const double distance);
+
+      // Determines whether or not a point is considered in a free non dynamic spot.
+      bool IsFreeDynamicSpace(const std::string& quad_name, const Point3D& point);
+
+      // Clear dynamic obstacles
+      void ClearDynamicObstacles();
 
       // Determines whether or not a point is contained within the map
       bool Contains(const Point3D& point) const;

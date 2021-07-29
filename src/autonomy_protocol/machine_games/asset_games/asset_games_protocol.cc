@@ -338,6 +338,21 @@ namespace game_engine {
         return trajectory_map;
       }
 
+      switch (trajectoryCodeMap_[evader].code) {
+        case MediationLayerCode::Success:
+          // You probably won't need to do anything in response to Success.
+          break;
+        case MediationLayerCode::QuadTooCloseToAnotherQuad: {
+          std::cout << "QuadTooCloseToAnotherQuad." << std::endl;
+          break;
+        }
+        default:
+          // If you want to see a numerical MediationLayerCode value, you can cast and
+          // print the code as shown below.
+          std::cout << "MediationLayerCode: " <<
+                    static_cast<int>(trajectoryCodeMap_[evader].code) << std::endl;
+      }
+
       if (red_balloon_status_->popped)
       {
         std::cout << "balloon has been popped!\n";

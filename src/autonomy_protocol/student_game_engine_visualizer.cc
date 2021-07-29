@@ -106,7 +106,6 @@ void Student_game_engine_visualizer::drawTrajectory(game_engine::Trajectory traj
   publisher_.publish(msg);
 }
 
-
 void Student_game_engine_visualizer::drawDot(Eigen::Vector3d pt, int id, bool good) {
   visualization_msgs::Marker msg;
   msg.header.frame_id = "world";

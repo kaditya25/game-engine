@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "marker_view.h"
-#include "quad_state_guard.h"
+#include "warden.h"
 
 namespace game_engine {
   class QuadView : public MarkerView {
@@ -43,17 +43,20 @@ namespace game_engine {
       };
 
       QuadView(
-          std::shared_ptr<QuadStateGuard> quad_state_guard = nullptr,
+          std::string quad_name = "",
+          std::shared_ptr<QuadStateWarden> quad_state_warden = nullptr,
           const Options& options = Options())
-        : quad_state_guard_(quad_state_guard),
-          options_(options),
-          unique_id_(GenerateUniqueId()) {}
+          : quad_name_(quad_name),
+            quad_state_warden_(quad_state_warden),
+            options_(options),
+            unique_id_(GenerateUniqueId()) {}
 
       std::vector<visualization_msgs::Marker> Markers() const override;
 
     private: 
       Options options_;
-      std::shared_ptr<QuadStateGuard> quad_state_guard_;
+      std::string quad_name_;
+      std::shared_ptr<QuadStateWarden> quad_state_warden_;
       uint32_t unique_id_;
 
       static uint32_t GenerateUniqueId();

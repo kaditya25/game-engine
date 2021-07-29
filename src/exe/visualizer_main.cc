@@ -17,11 +17,8 @@
 
 #include "quad_state.h"
 #include "quad_state_subscriber_node.h"
-#include "quad_state_dispatcher.h"
-#include "quad_state_guard.h"
 
 #include "trajectory_visualizer_node.h"
-
 #include "view_manager.h"
 
 #include "balloon_watchdog.h"
@@ -106,26 +103,12 @@ int main(int argc, char** argv) {
     initial_quad_positions[quad_name] = Eigen::Vector3d(x,y,z);
   }
 
-  // Create quad state guards that will be accessed by the mediation layer
-  std::unordered_map<std::string, std::shared_ptr<QuadStateGuard>> quad_state_guards;
-  for(const auto& kv: quad_state_topics) {
-      const std::string& quad_name = kv.first;
-      const Eigen::Vector3d& initial_quad_position = initial_quad_positions[quad_name];
-      quad_state_guards[quad_name] = std::make_shared<QuadStateGuard>(QuadState(
-              (Eigen::Matrix<double, 13, 1>() <<
-              initial_quad_position(0), initial_quad_position(1), initial_quad_position(2),
-              0,0,0,
-              1,0,0,0,
-              0,0,0
-              ).finished()));
-    }
-
   // Initialize the QuadStateWarden. The QuadStateWarden enables safe, multi-threaded
   // access to quadcopter state data. Internal components that require access to
   // state data should request access through QuadStateWarden.
-  auto quad_state_warden = std::make_shared<QuadStateWarden>();
+  auto quad_state_warden  = std::make_shared<QuadStateWarden>();
   for(const auto& kv: quad_state_topics) {
-    const std::string& quad_name = kv.first;  
+    const std::string& quad_name = kv.first;
     quad_state_warden->Register(quad_name);
 
     const Eigen::Vector3d& initial_quad_position = initial_quad_positions[quad_name];
@@ -149,13 +132,6 @@ int main(int argc, char** argv) {
             quad_name, 
             quad_state_warden));
   }
-
-  // The quad state dispatcher pipes data from the state warden to any state
-  // guards
-  auto quad_state_dispatcher = std::make_shared<QuadStateDispatcher>();
-  std::thread quad_state_dispatcher_thread([&](){
-      quad_state_dispatcher->Run(quad_state_warden, quad_state_guards);
-    });
 
   // Set up trajectory visualization
   std::unordered_map<std::string, std::shared_ptr<TrajectoryVisualizerNode>> trajectory_visualizers;
@@ -230,7 +206,8 @@ int main(int argc, char** argv) {
   for(const auto& kv: team_assignments) {
     const std::string& color = kv.second;
     const std::string& quad_name = kv.first;
-    quad_view_options.quads.push_back(std::make_pair<>(color, quad_state_guards[quad_name]));
+    quad_view_options.quads.push_back(std::make_pair<>(std::make_pair<>(color, quad_name), quad_state_warden));
+//    quad_view_options.quads.push_back(std::make_pair<>(color, quad_state_guards[quad_name]));
   }
 
   ViewManager::BalloonViewOptions balloon_view_options;
@@ -279,7 +256,6 @@ int main(int argc, char** argv) {
         ros::shutdown();
 
         view_manager->Stop();
-        quad_state_dispatcher->Stop();
         quad_state_warden->Stop();
       });
 
@@ -290,7 +266,6 @@ int main(int argc, char** argv) {
   kill_thread.join();
 
   // Wait for other threads to die
-  quad_state_dispatcher_thread.join();
   view_manager_thread.join();
 
   return EXIT_SUCCESS;

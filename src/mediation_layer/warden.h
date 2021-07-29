@@ -15,8 +15,6 @@
 #include "trajectory_publisher_node.h"
 
 #include "quad_state.h"
-#include "quad_state_guard.h"
-
 
 namespace game_engine {
     // Warden encapsulates state data and provides thread-safe read, write,
@@ -106,7 +104,8 @@ namespace game_engine {
             return this->keys_;
         };
 
-        bool modifiedStatus(const std::string &key){
+        // Check if the container is modified
+        bool ModifiedStatus(const std::string &key){
             std::shared_ptr <Container> &container = this->map_[key];
             return container->modified_;
         };
@@ -128,30 +127,39 @@ namespace game_engine {
     //============================
     class TrajectoryWardenServer : public Warden<Trajectory> {
     private:
-        volatile std::atomic<bool> statusUpdated_{false};
-        TrajectoryCode trajectoryStatus_;
-        TrajectoryCode GetLastTrajectoryStatus(bool blocking);
+        std::unordered_map<std::string, volatile std::atomic<bool>> statusUpdated_;
+        std::unordered_map<std::string, TrajectoryCode> trajectoryStatus_;
+        TrajectoryCode GetLastTrajectoryStatus(const std::string& key);
     public:
-        TrajectoryWardenServer(){};
+        TrajectoryWardenServer(){
+//          const std::set<std::string> state_keys = Keys();
+          for(const std::string& key: Keys()) {
+            statusUpdated_[key] = false;
+          }
+        };
         TrajectoryCode Write(const std::string& key,
-                             const Trajectory& trajectory,
-                             bool blocking = false);
+                             const Trajectory& trajectory);
 
-        void SetTrajectoryStatus(TrajectoryCode status);
+        void SetTrajectoryStatus(const std::string& key,
+                                 TrajectoryCode status);
     };
 
     class TrajectoryWardenClient : public Warden<Trajectory> {
     private:
-        volatile std::atomic<bool> statusUpdated_{false};
-        TrajectoryCode trajectoryStatus_;
+        std::unordered_map<std::string, volatile std::atomic<bool>> statusUpdated_;
+        std::unordered_map<std::string, TrajectoryCode> trajectoryStatus_;
     public:
-        TrajectoryWardenClient(){};
+        TrajectoryWardenClient(){
+          for(const std::string& key: Keys()) {
+            statusUpdated_[key] = false;
+          }
+        };
         TrajectoryCode Write(const std::string& key,
                              const Trajectory& trajectory,
-                             std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client,
-                             bool blocking = false);
+                             std::unordered_map<std::string, std::shared_ptr<TrajectoryClientNode>> client);
 
-        void SetTrajectoryStatus(TrajectoryCode status);
+        void SetTrajectoryStatus(const std::string& key,
+                                 TrajectoryCode status);
     };
 
     class TrajectoryWardenSubscriber : public Warden<Trajectory> {
