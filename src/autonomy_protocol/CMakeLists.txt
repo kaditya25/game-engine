@@ -42,4 +42,4 @@ set_target_properties(${TARGET} PROPERTIES
 target_compile_options(${TARGET} PRIVATE
   -Wfatal-errors
 )
-add_subdirectory(machine_games/asset_games/realtime_game_theoretic_planner)
+add_subdirectory(machine_games/asset_games/asset-games-lib)

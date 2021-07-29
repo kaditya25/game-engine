@@ -8,10 +8,10 @@
 #include "occupancy_grid3d.h"
 #include "graph.h"
 #include "student_game_engine_visualizer.h"
-#include "realtime_game_theoretic_planner/helper.h"
-#include "realtime_game_theoretic_planner/controller.h"
-#include "realtime_game_theoretic_planner/nash_controller.h"
-#include "realtime_game_theoretic_planner/vel_match_controller.h"
+#include "asset-games-lib/helper.h"
+#include "asset-games-lib/controller.h"
+#include "asset-games-lib/nash_controller.h"
+#include "asset-games-lib/vel_match_controller.h"
 
 enum ControlCode 
 {
