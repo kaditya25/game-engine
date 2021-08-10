@@ -31,5 +31,9 @@ namespace game_engine {
                 wind_intensity) {}
 
         std::unordered_map<std::string, Trajectory> UpdateTrajectories() override;
+        
+        TrajectoryVector3D targetToTrajectory(Eigen::Vector3d current_position, Eigen::Vector3d current_velocity, 
+      		std::vector<Eigen::Vector3d> path_points, double yaw, std::vector<double> times);
+       
     };
 }
