@@ -58,18 +58,20 @@ It may produce a couple trajectory rejection messages initially; this is normal.
 ```
 SWITCH THE QUAD INTO ROS MODE BY PRESSING B. You should now be able to fly
 the quad in a safety mode where flying the quad too close to the net will
-cause the quad to freeze. (To unfreeze yourself, switch to position mode and 
-fly back towards the middle of the arena, then switch to the mediation layer
-tab and hit Ctrl+C to stop it. Then, start it again and switch back into ROS
-mode)
+cause the quad to freeze; pointing the joystick away from the wall should
+unfreeze you and allow you to continue flying. (If you do get fully frozen,
+switch into position mode and fly away from the wall, then switch back into
+ROS mode.)
 
-## Important values and information
-1. Trajectory refresh rate is 10 Hz
-2. Safety bounds are set to 1.25 m in quad state watchdog
-3. Maximum velocity and acceleration should be set to 3.0
-4. The arena_ empty _squeezed.map file is the best map file
+## Important values to change in params file
+1. The arena_ empty _squeezed.map file is the best map file
    to load for flying the physical quads.
-5. A good starting point for the quad in the params file is (-20,16,-3)
-6. Ensure that "joy_mode: true" is set in the params file
-7. Ensure that "quad_safety_limits: 2" in the params file; extreme mode works best
+2. A good starting point for the quad is (-20,16,-3)
+3. Ensure that "joy_mode: true" is set 
+4. Ensure that "quad_safety_limits: 2"; extreme mode works best
+
+### Important values resulting from above params file settings:
+1. Trajectory refresh rate is 10 Hz
+2. Safety bounds are set to 1.25 m
+3. Maximum velocity and acceleration are set to 3.0
 
