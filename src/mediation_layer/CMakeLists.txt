@@ -19,6 +19,7 @@ set(SOURCE_FILES
   trajectory_watchdog_status.cc
   safety_monitor.cc
   safety_monitor_status.cc
+  helper/potential_field.cc
 )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})

@@ -36,22 +36,19 @@ namespace game_engine {
     }
   }
 
-  void QuadStateWatchdogStatus::AllowExecution(const std::string& quad_name) {
-    std::lock_guard<std::mutex> lock(mtx_);
-    this->allow_execution_[quad_name] = true;
+  void QuadStateWatchdogStatus::SetExecution(const std::string& quad_name, const bool execution) {
+    this->allow_execution_[quad_name] = execution;
   }
 
   bool QuadStateWatchdogStatus::ReadExecution(const std::string& quad_name) {
-    std::lock_guard<std::mutex> lock(mtx_);
-    bool allow = false;
     try {
-      allow = this->allow_execution_.at(quad_name);
-      this->allow_execution_[quad_name] = false;
+      bool allow = this->allow_execution_.at(quad_name);
+      SetExecution(quad_name, false);
       return allow;
     } catch(std::out_of_range e) {
       std::cerr << "Quad with name " << quad_name
                 << " is not registered with the QuadStateWatchdog." << std::endl;
-      return allow;
+      return false;
     }
   }
 }

@@ -9,6 +9,7 @@ namespace game_engine {
   void BalloonWatchdog::Run(
       std::shared_ptr<BalloonStatusPublisherNode> balloon_status_publisher,
       std::shared_ptr<BalloonStatusSubscriberNode> balloon_status_subscriber,
+      std::shared_ptr<BalloonPositionPublisherNode> balloon_position_publisher,
       std::shared_ptr<QuadStateWarden> quad_state_warden,
       const std::vector<std::string>& quad_names,
       Eigen::Vector3d& balloon_position,
@@ -41,7 +42,7 @@ namespace game_engine {
         this);
 
     // Main loop
-    while(true == this->ok_) {
+    while(ok_) {
       // read start time from existing balloon_status
       set_start = balloon_status_subscriber->balloon_status_->set_start;
       if (set_start && !started){
@@ -84,11 +85,11 @@ namespace game_engine {
         .popped = balloon_popped,
         .popper = quad_popper,
         .pop_time = balloon_pop_time,
-        .position = position,
         .set_start = set_start // only set to true from SAP
       };
 
       balloon_status_publisher->Publish(balloon_status);
+      balloon_position_publisher->Publish(position);
 
       // 50 Hz
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -99,10 +100,10 @@ namespace game_engine {
     this->ok_ = false;
   }
 
-
   void BalloonWatchdog::ManualCallback(const std_msgs::Bool& msg) {
-  	if(msg.data) {this->manualPop = true; 
-  	ROS_WARN("Received manual pop request");
+  	if(msg.data) {
+  	  this->manualPop = true;
+  	  ROS_WARN("Received manual pop request");
   	}
   }
 }

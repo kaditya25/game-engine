@@ -73,12 +73,19 @@ namespace game_engine {
 
         if (infraction_occurred || locked_freeze_.at(quad_name)) {
           quad_state_watchdog_status->Write(quad_name, MediationLayerCode::QuadViolatesMapBoundaries);
-          locked_freeze_[quad_name] = true;
+          if(!joy_mode_) {
+            locked_freeze_[quad_name] = true;
+          } else {
+            if(quad_state_watchdog_status->ReadExecution(quad_name)) {
+              quad_state_watchdog_status->Write(quad_name, MediationLayerCode::Success);
+              std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+            }
+          }
         }
 
         else if (quad_state_watchdog_status->ReadExecution(quad_name)) {
           quad_state_watchdog_status->Write(quad_name, MediationLayerCode::Success);
-          std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+          std::this_thread::sleep_for(std::chrono::milliseconds(1500));
         }
 
           // Check if current quad too close to another quad

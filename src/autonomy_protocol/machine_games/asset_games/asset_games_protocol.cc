@@ -289,7 +289,7 @@ namespace game_engine {
       {
         pursuer_height_ = pursuer_total_state_[2];
         evader_height_ = evader_total_state_[2];
-        target_ = (red_balloon_status_->position).head(2);
+        target_ = (*red_balloon_position_).head(2);
         if (!initialized_)
         {
           initialized_ = true;

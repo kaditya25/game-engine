@@ -68,8 +68,8 @@ namespace game_engine {
     }
 
     // Obtain current balloon positions and popped states
-    const Eigen::Vector3d red_balloon_pos = red_balloon_status_->position;
-    const Eigen::Vector3d blue_balloon_pos = blue_balloon_status_->position;
+    const Eigen::Vector3d red_balloon_pos = *red_balloon_position_;
+    const Eigen::Vector3d blue_balloon_pos = *blue_balloon_position_;
     const bool red_balloon_popped = red_balloon_status_->popped;
     const bool blue_balloon_popped = blue_balloon_status_->popped;
 

@@ -207,7 +207,6 @@ int main(int argc, char** argv) {
     const std::string& color = kv.second;
     const std::string& quad_name = kv.first;
     quad_view_options.quads.push_back(std::make_pair<>(std::make_pair<>(color, quad_name), quad_state_warden));
-//    quad_view_options.quads.push_back(std::make_pair<>(color, quad_state_guards[quad_name]));
   }
 
   ViewManager::BalloonViewOptions balloon_view_options;

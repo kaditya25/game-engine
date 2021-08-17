@@ -176,6 +176,12 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
+  bool joy_mode;
+  if(false == nh.getParam("joy_mode", joy_mode)) {
+    std::cerr << "Required parameter not found on server: joy_mode" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
   // For every quad, subscribe to its corresponding state topic
   std::vector<std::shared_ptr<QuadStateSubscriberNode>> state_subscribers;
   for(const auto& kv: quad_state_topics) {
@@ -282,6 +288,13 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
+  // Balloon Position
+  std::map<std::string, std::string> balloon_position_topics;
+  if(false == nh.getParam("balloon_position_topics", balloon_position_topics)) {
+    std::cerr << "Required parameter not found on server: balloon_position_topics" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
   // Goal Status
   std::map<std::string, std::string> goal_status_topics;
   if(false == nh.getParam("goal_status_topics", goal_status_topics)) {
@@ -321,6 +334,11 @@ int main(int argc, char** argv) {
   auto blue_balloon_status_publisher_node
     = std::make_shared<BalloonStatusPublisherNode>(balloon_status_topics["blue"]);
 
+  auto red_balloon_position_publisher_node
+      = std::make_shared<BalloonPositionPublisherNode>(balloon_position_topics["red"]);
+  auto blue_balloon_position_publisher_node
+      = std::make_shared<BalloonPositionPublisherNode>(balloon_position_topics["blue"]);
+
   auto red_balloon_watchdog = std::make_shared<BalloonWatchdog>();
   auto blue_balloon_watchdog = std::make_shared<BalloonWatchdog>();
 
@@ -329,6 +347,7 @@ int main(int argc, char** argv) {
         red_balloon_watchdog->Run(
             red_balloon_status_publisher_node,
             red_balloon_status_subscriber_node,
+            red_balloon_position_publisher_node,
             quad_state_warden,
             quad_names,
             red_balloon_position,
@@ -344,6 +363,7 @@ int main(int argc, char** argv) {
         blue_balloon_watchdog->Run(
             blue_balloon_status_publisher_node,
             blue_balloon_status_subscriber_node,
+            blue_balloon_position_publisher_node,
             quad_state_warden,
             quad_names,
             blue_balloon_position,
@@ -364,7 +384,7 @@ int main(int argc, char** argv) {
     safety_monitor_status->Register(quad_name);
   }
 
-  auto quad_state_watchdog = std::make_shared<QuadStateWatchdog>(quad_safety_limits);
+  auto quad_state_watchdog = std::make_shared<QuadStateWatchdog>(quad_safety_limits, joy_mode);
   std::thread quad_state_watchdog_thread(
       [&]() {
         quad_state_watchdog->Run(
@@ -389,6 +409,19 @@ int main(int argc, char** argv) {
       }
   );
 
+//  auto safety_monitor = std::make_shared<SafetyMonitor>(revision_mode);
+//  std::thread safety_monitor_thread(
+//      [&]() {
+//          safety_monitor->Run(
+//              quad_names,
+//              safety_monitor_status,
+//              quad_state_warden,
+//              quad_state_watchdog_status,
+//              trajectory_warden_pub,
+//              trajectory_watchdog_status,
+//              map);
+//      }
+//  );
 
   auto goal_status = std::make_shared<GoalStatus>();
 
@@ -414,7 +447,7 @@ int main(int argc, char** argv) {
   // integrating the proposed trajectories and modifying them so that the
   // various agents will not crash into each other. Data is asynchonously read
   // and written from the TrajectoryWardens
-  auto mediation_layer = std::make_shared<MediationLayer>(quad_safety_limits);
+  auto mediation_layer = std::make_shared<MediationLayer>(quad_safety_limits, joy_mode);
   std::thread mediation_layer_thread(
       [&]() {
         mediation_layer->Run(
@@ -451,6 +484,7 @@ int main(int argc, char** argv) {
         goal_watchdog->Stop();
         quad_state_watchdog->Stop();
         trajectory_watchdog->Stop();
+//        safety_monitor->Stop();
       });
 
   // Spin for ros subscribers
@@ -466,6 +500,7 @@ int main(int argc, char** argv) {
   goal_watchdog_thread.join();
   quad_state_watchdog_thread.join();
   trajectory_watchdog_thread.join();
+//  safety_monitor_thread.join();
 
   return EXIT_SUCCESS;
 }

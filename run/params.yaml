@@ -17,6 +17,10 @@ balloon_status_topics:
   "red": "/game_engine/red_balloon_status"
   "blue": "/game_engine/blue_balloon_status"
 
+balloon_position_topics:
+  "red": "/game_engine/red_balloon_position"
+  "blue": "/game_engine/blue_balloon_position"
+
 goal_status_topics:
   "home": "/game_engine/home_status"
 
