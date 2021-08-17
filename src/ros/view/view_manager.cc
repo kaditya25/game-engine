@@ -119,11 +119,25 @@ namespace game_engine {
     auto red_balloon_status = std::make_shared<BalloonStatus>();
     auto blue_balloon_status = std::make_shared<BalloonStatus>();
 
-    auto red_balloon_status_subscriber_node 
-      = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
-    auto blue_balloon_status_subscriber_node 
-      = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["blue"], blue_balloon_status);
+    auto red_balloon_status_subscriber_node
+        = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
+    auto blue_balloon_status_subscriber_node
+        = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["blue"], blue_balloon_status);
 
+
+    std::map<std::string, std::string> balloon_position_topics;
+    if(false == nh.getParam("balloon_position_topics", balloon_position_topics)) {
+      std::cerr << "Required parameter not found on server: balloon_position_topics" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    auto red_balloon_position = std::make_shared<Eigen::Vector3d>();
+    auto blue_balloon_position = std::make_shared<Eigen::Vector3d>();
+
+    auto red_balloon_position_subscriber_node
+      = std::make_shared<BalloonPositionSubscriberNode>(balloon_position_topics["red"], red_balloon_position);
+    auto blue_balloon_position_subscriber_node
+      = std::make_shared<BalloonPositionSubscriberNode>(balloon_position_topics["blue"], blue_balloon_position);
 
     // Main loop
     // 50 Hz. 
@@ -133,12 +147,12 @@ namespace game_engine {
         // if balloon view position is not approx equal to balloon status position,
         // set balloon view position to balloon status position
         if (view.options_.r == 1.0f){ // red balloon
-          if (!view.balloon_position_.isApprox(red_balloon_status_subscriber_node->balloon_status_->position)) {
-            view.balloon_position_ = red_balloon_status_subscriber_node->balloon_status_->position;
+          if (!view.balloon_position_.isApprox(*(red_balloon_position_subscriber_node->balloon_position_))) {
+            view.balloon_position_ = *(red_balloon_position_subscriber_node->balloon_position_);
           }
         } else if (view.options_.b == 1.0f) { // blue balloon{
-          if (!view.balloon_position_.isApprox(blue_balloon_status_subscriber_node->balloon_status_->position)) {
-            view.balloon_position_ = blue_balloon_status_subscriber_node->balloon_status_->position;
+          if (!view.balloon_position_.isApprox(*(blue_balloon_position_subscriber_node->balloon_position_))) {
+            view.balloon_position_ = *(blue_balloon_position_subscriber_node->balloon_position_);
           }
         }
         

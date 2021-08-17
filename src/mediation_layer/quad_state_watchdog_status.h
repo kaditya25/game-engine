@@ -24,7 +24,7 @@ namespace game_engine {
       void Register(const std::string& quad_name);
       InfractionInfo Read(const std::string& quad_name) const;
       void Write(const std::string& quad_name, const MediationLayerCode infraction_occurred);
-      void AllowExecution(const std::string& quad_name);
+      void SetExecution(const std::string& quad_name, const bool execution);
       bool ReadExecution(const std::string& quad_name);
 
     private:

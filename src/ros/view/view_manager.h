@@ -18,6 +18,7 @@
 #include <ros/ros.h>
 #include "balloon_status.h"
 #include "balloon_status_subscriber_node.h"
+#include "balloon_position_subscriber_node.h"
 
 #include "goal_status.h"
 #include "goal_status_subscriber_node.h"

@@ -17,9 +17,6 @@ namespace game_engine {
     // The time the balloon was popped at
     double pop_time;
 
-    //Eigen::Vector3d position = Eigen::Matrix<double, 3, 1>::Zero();
-    Eigen::Vector3d position;
-
     bool set_start;
   };
 }

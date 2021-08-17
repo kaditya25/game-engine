@@ -31,7 +31,7 @@ namespace game_engine {
       return freeze_trajectory_vector;
     }
 
-    bool MediationLayer::IsQuadMovingAwayFromObstacle(const Trajectory main_trajectory, const Polyhedron violation_space) {
+    bool MediationLayer::IsQuadMovingAwayFromOtherQuad(const Trajectory main_trajectory, const Polyhedron violation_space) {
       // lookahead 15 trajectory points
       size_t look = 15;
       // or pick the total number of points if that is smaller
@@ -47,6 +47,28 @@ namespace game_engine {
 //            return false;
 //          }
           if((main_trajectory.Position(idx) - cm).norm() < min_dist) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    bool MediationLayer::IsQuadMovingAwayFromObstacle(const Trajectory main_trajectory,
+                                                      const Map3D inflated_map) {
+      // lookahead 15 trajectory points
+      size_t look = 15;
+      // or pick the total number of points if that is smaller
+      size_t lookahead_index = std::min(main_trajectory.Size(), look);
+      if(lookahead_index == 0) {
+        return false;
+      } else {
+        for(size_t idx = 0; idx < lookahead_index; ++idx) {
+          // Evaluate whether the current position intersects an obstacle
+          bool infraction_occurred = !inflated_map.IsFreeSpace(main_trajectory.Position(idx)) ||
+                                     !inflated_map.Contains(main_trajectory.Position(idx));
+
+          if(infraction_occurred) {
             return false;
           }
         }
@@ -100,6 +122,8 @@ namespace game_engine {
        std::shared_ptr<TrajectoryPublisherNode> publisher) {
 
       TrajectoryVetter trajectory_vetter(quad_safety_limits_);
+      const Map3D inflated_map = map.Inflate(inflation_distance_);
+
       while(this->ok_) {
         // 1) Determine if trajectory has violated constraints
         // 2) Grab lock
@@ -120,9 +144,31 @@ namespace game_engine {
           trajectory_warden_srv->SetTrajectoryStatus(key, trajectoryCode);
 
           TrajectoryVector3D freeze_trajectory_vector = FreezeQuad(key, current_position);
-
           trajectory_warden_pub->Write(key, freeze_trajectory_vector, publisher);
           std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+          if(joy_mode_) {
+            // if joy mode is true we want the walls of the arena to act as "padded walls", meaning we don't have
+            // a permanent game over freeze as we do with regular autonomy protocols
+            if(trajectory_warden_srv->ModifiedStatus(key)){
+              Trajectory trajectory;
+              trajectory_warden_srv->Await(key, trajectory);
+
+              bool safe_to_move = IsQuadMovingAwayFromObstacle(trajectory, inflated_map);
+              if(safe_to_move) {
+                TrajectoryCode trajectoryCode = trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
+                trajectory_warden_srv->SetTrajectoryStatus(key, trajectoryCode);
+                if (trajectoryCode.code != MediationLayerCode::Success) {
+                  std::cout << "Trajectory did not pass vetting: rejected with code "
+                            << static_cast<unsigned int>(trajectoryCode.code) <<
+                            "." << std::endl;
+                  continue;
+                }
+                quad_state_watchdog_status->SetExecution(key, true);
+                trajectory_warden_pub->Write(key, trajectory, publisher);
+              }
+            }
+          }
         } else if((quad_state_watchdog_status->Read(key)).code == MediationLayerCode::QuadTooCloseToAnotherQuad) {
 //          std::cout << key << " Quad too close to another quad." << std::endl;
           TrajectoryCode trajectoryCode;
@@ -131,6 +177,7 @@ namespace game_engine {
 
           TrajectoryVector3D freeze_trajectory_vector = FreezeQuad(key, current_position);
           trajectory_warden_pub->Write(key, freeze_trajectory_vector, publisher);
+          std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
           if(trajectory_warden_srv->ModifiedStatus(key)){
             Trajectory trajectory;
@@ -146,7 +193,7 @@ namespace game_engine {
                 const Eigen::Vector3d other_quad_current_position = other_quad_current_state.Position();
                 const Polyhedron expanded_quad = ExpandQuad(other_quad_current_position, 1.0);
 
-                bool safe_to_move = IsQuadMovingAwayFromObstacle(trajectory, expanded_quad);
+                bool safe_to_move = IsQuadMovingAwayFromOtherQuad(trajectory, expanded_quad);
                 if(safe_to_move) {
                   TrajectoryCode trajectoryCode = trajectory_vetter.Vet(trajectory, map, quad_state_warden, key);
                   trajectory_warden_srv->SetTrajectoryStatus(key, trajectoryCode);
@@ -156,7 +203,7 @@ namespace game_engine {
                               "." << std::endl;
                     continue;
                   }
-                  quad_state_watchdog_status->AllowExecution(key);
+                  quad_state_watchdog_status->SetExecution(key, true);
                   trajectory_warden_pub->Write(key, trajectory, publisher);
                 }
               }
@@ -169,7 +216,8 @@ namespace game_engine {
           double time = main_trajectory.Time((trajectory_watchdog_status->Read(key)).index);
           std::cout << key << " Trajectory collides with another quad in " << time << " seconds." << std::endl;
           if(time < 5.0) {
-            // TBD
+            // intervene in some way
+
           }
         }
 

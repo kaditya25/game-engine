@@ -8,11 +8,13 @@
 #include <stdexcept>
 #include <iostream>
 
+#include "quad_safety_status.h"
 #include "warden.h"
 #include "safety_monitor_status.h"
 #include "quad_state_watchdog_status.h"
 #include "trajectory_watchdog_status.h"
 #include "map3d.h"
+#include "helper/potential_field.h"
 
 namespace game_engine {
 

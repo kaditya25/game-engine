@@ -344,8 +344,8 @@ namespace game_engine {
 
 	    	//get the home position of the quad and positions of the balloons
 	    	home_pos[ii] = current_pos[ii];
-	    	red_balloon_pos = red_balloon_status_->position;
-	    	blue_balloon_pos = blue_balloon_status_->position;
+	    	red_balloon_pos = *red_balloon_position_;
+	    	blue_balloon_pos = *blue_balloon_position_;
 	    	//convert them to grid coords for Astar
 	    	std::tuple<int,int,int> home_grid = occupancy_grid.mapToGridCoordinates(home_pos[ii]);
 	    	home_ptr = std::make_shared<Node3D>(Eigen::Vector3d(

@@ -50,7 +50,9 @@ namespace game_engine {
     std::shared_ptr<PreSubmissionTrajectoryVetter> prevetter_;
     Map3D map3d_;
     std::shared_ptr<BalloonStatus> red_balloon_status_;
+    std::shared_ptr<Eigen::Vector3d> red_balloon_position_;
     std::shared_ptr<BalloonStatus> blue_balloon_status_;
+    std::shared_ptr<Eigen::Vector3d> blue_balloon_position_;
     Eigen::Vector3d goal_position_;
     WindIntensity wind_intensity_;
 
@@ -67,7 +69,9 @@ namespace game_engine {
                      const std::shared_ptr<PreSubmissionTrajectoryVetter> prevetter,
                      const Map3D& map3d,
                      const std::shared_ptr<BalloonStatus> red_balloon_status,
+                     const std::shared_ptr<Eigen::Vector3d> red_balloon_position,
                      const std::shared_ptr<BalloonStatus> blue_balloon_status,
+                     const std::shared_ptr<Eigen::Vector3d> blue_balloon_position,
                      const Eigen::Vector3d& goal_position,
                      const WindIntensity& wind_intensity)
     : friendly_names_(friendly_names),
@@ -77,7 +81,9 @@ namespace game_engine {
       prevetter_(prevetter),
       map3d_(map3d),
       red_balloon_status_(red_balloon_status),
+      red_balloon_position_(red_balloon_position),
       blue_balloon_status_(blue_balloon_status),
+      blue_balloon_position_(blue_balloon_position),
       goal_position_(goal_position),
       wind_intensity_(wind_intensity) {}
 
@@ -104,15 +110,12 @@ namespace game_engine {
   Run(std::unordered_map<std::string,
       std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients,
       bool joy_mode) {
+
     while(ok_) {
       // Request trajectory updates from the virtual function
-      const std::unordered_map<std::string, Trajectory> trajectories =
-        UpdateTrajectories();
+      const std::unordered_map<std::string, Trajectory> trajectories = UpdateTrajectories();
 
-      // TODO: consider creating a local thread pool here to iterate through the trajectory_clients
-
-      // For every friendly quad, push the intended trajectory to the trajectory
-      // warden
+      // For every friendly quad, push the intended trajectory to the trajectory warden
       for(const std::string& quad_name: friendly_names_) {
         try {
           const Trajectory trajectory = trajectories.at(quad_name);
@@ -125,14 +128,13 @@ namespace game_engine {
           continue;
         }
       }
-      if (joy_mode == true) {
-        // Sleep for 100 ms. This essentially creates a loop that runs at 10 Hz for the joy mode.
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      } else {
-        // Sleep for 200 ms. This essentially creates a loop that runs at 5 Hz. A
-        // new trajectory may be specified once every 200 ms.
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      // Sleep for 200 ms is the default. This essentially creates a loop that runs at 5 Hz.
+      int sleep_time = 200;
+      if (joy_mode) {
+        // Sleep for 100 ms. This creates a loop that runs at 10 Hz for the joy mode.
+        sleep_time = 100;
       }
+      std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
     }
   }
 

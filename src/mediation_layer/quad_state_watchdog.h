@@ -25,8 +25,10 @@ namespace game_engine {
       };
 
       QuadStateWatchdog(const int& quad_safety_limits,
-                       const Options& options = Options())
+                        const bool& joy_mode,
+                        const Options& options = Options())
           : quad_safety_limits_(quad_safety_limits),
+            joy_mode_(joy_mode),
             options_(options) {
         if (quad_safety_limits_ == 2) {
           // extreme mode
@@ -56,6 +58,7 @@ namespace game_engine {
       volatile std::atomic_bool ok_{true};
       Options options_;
       int quad_safety_limits_;
+      bool joy_mode_;
       std::unordered_map<std::string, bool> locked_freeze_;
 
   };

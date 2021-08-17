@@ -11,6 +11,7 @@
 #include "trajectory_client.h"
 #include "trajectory_publisher_node.h"
 #include "trajectory_code.h"
+#include "quad_safety_status.h"
 #include "map3d.h"
 
 #include "polyhedron.h"
@@ -27,6 +28,8 @@ namespace game_engine {
   class MediationLayer {
     private:
       int quad_safety_limits_ = 0;
+      bool joy_mode_ = false;
+      double inflation_distance_ = 0;
       volatile std::atomic_bool ok_{true};
 
       // Transfers data associated with key from trajectory_warden_srv to
@@ -43,12 +46,26 @@ namespace game_engine {
           std::shared_ptr<TrajectoryPublisherNode> publisher);
 
       TrajectoryVector3D FreezeQuad(const std::string& key, const Eigen::Vector3d freeze_quad_position);
-      bool IsQuadMovingAwayFromObstacle(const Trajectory main_trajectory, const Polyhedron violation_space);
+      bool IsQuadMovingAwayFromOtherQuad(const Trajectory main_trajectory, const Polyhedron violation_space);
+      bool IsQuadMovingAwayFromObstacle(const Trajectory main_trajectory, const Map3D inflated_map);
       Polyhedron ExpandQuad(const Eigen::Vector3d cm, const double inflation_distance);
 
     public:
-      MediationLayer(const int& quad_safety_limits)
-          : quad_safety_limits_(quad_safety_limits) {}
+      MediationLayer(const int& quad_safety_limits,
+                     const bool& joy_mode)
+          : quad_safety_limits_(quad_safety_limits),
+            joy_mode_(joy_mode) {
+          if (quad_safety_limits_ == 2) {
+            // extreme mode
+            inflation_distance_ = 1.25 * 0.5; // tested value on the real quads for unfreezing capabilities.
+          } else if (quad_safety_limits_ == 1) {
+            // sport mode
+            inflation_distance_ = 1.0 * 0.75;
+          } else {
+            // leisure mode and default
+            inflation_distance_ = 0.4 * 0.75;
+          }
+      }
 
       // Run the mediation layer.
       //

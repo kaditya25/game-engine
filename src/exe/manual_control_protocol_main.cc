@@ -19,6 +19,8 @@
 
 #include "balloon_status_subscriber_node.h"
 #include "balloon_status_publisher_node.h"
+#include "balloon_position_subscriber_node.h"
+#include "balloon_position_publisher_node.h"
 #include "balloon_status.h"
 #include "joy_subscriber_node.h"
 
@@ -214,6 +216,13 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
+  // Balloon Position
+  std::map<std::string, std::string> balloon_position_topics;
+  if(false == nh.getParam("balloon_position_topics", balloon_position_topics)) {
+    std::cerr << "Required parameter not found on server: balloon_position_topics" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
   // Goal Status
   std::map<std::string, std::string> goal_status_topics;
   if(false == nh.getParam("goal_status_topics", goal_status_topics)) {
@@ -241,6 +250,23 @@ int main(int argc, char** argv) {
   BalloonStatus setStartStatusBlue = *(blue_balloon_status_subscriber_node->balloon_status_);
   setStartStatusBlue.set_start = true;
 
+  // balloon position
+  auto red_balloon_position = std::make_shared<Eigen::Vector3d>();
+  auto blue_balloon_position = std::make_shared<Eigen::Vector3d>();
+
+  auto red_balloon_position_subscriber_node
+      = std::make_shared<BalloonPositionSubscriberNode>(balloon_position_topics["red"], red_balloon_position);
+  auto blue_balloon_position_subscriber_node
+      = std::make_shared<BalloonPositionSubscriberNode>(balloon_position_topics["blue"], blue_balloon_position);
+
+  auto red_balloon_position_publisher_node
+      = std::make_shared<BalloonPositionPublisherNode>(balloon_position_topics["red"]);
+  auto blue_balloon_position_publisher_node
+      = std::make_shared<BalloonPositionPublisherNode>(balloon_position_topics["blue"]);
+
+  Eigen::Vector3d setStartPositionRed = *(red_balloon_position_subscriber_node->balloon_position_);
+  Eigen::Vector3d setStartPositionBlue = *(blue_balloon_position_subscriber_node->balloon_position_);
+
   // goal status
   auto goal_status = std::make_shared<GoalStatus>();
   auto goal_status_subscriber_node
@@ -259,6 +285,8 @@ int main(int argc, char** argv) {
 
   red_balloon_status_publisher_node->Publish(setStartStatusRed);
   blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
+  red_balloon_position_publisher_node->Publish(setStartPositionRed);
+  blue_balloon_position_publisher_node->Publish(setStartPositionBlue);
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
   // The AutonomyProtocol
@@ -271,7 +299,9 @@ int main(int argc, char** argv) {
       prevetter,
       map3d,
       red_balloon_status,
+      red_balloon_position,
       blue_balloon_status,
+      blue_balloon_position,
       goal_position,
       wind_intensity,
       joy_input);

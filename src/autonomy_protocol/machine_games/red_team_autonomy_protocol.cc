@@ -83,8 +83,8 @@ namespace game_engine {
       this->snapshot_->Position(enemy_quad_name, enemy_current_pos[ii]);
       this->snapshot_->Velocity(enemy_quad_name, enemy_current_vel[ii]);
 
-      red_balloon_pos = red_balloon_status_->position;
-      blue_balloon_pos = blue_balloon_status_->position;
+      red_balloon_pos = *red_balloon_position_;
+      blue_balloon_pos = *blue_balloon_position_;
 
       std::vector<Eigen::Vector3d> path_points;
       std::vector<double> times;
