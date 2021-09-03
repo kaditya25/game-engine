@@ -182,6 +182,12 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
+  bool camera_mode;
+  if(false == nh.getParam("camera_mode", camera_mode)) {
+    std::cerr << "Required parameter not found on server: camera_mode" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
   // For every quad, subscribe to its corresponding state topic
   std::vector<std::shared_ptr<QuadStateSubscriberNode>> state_subscribers;
   for(const auto& kv: quad_state_topics) {
@@ -293,6 +299,12 @@ int main(int argc, char** argv) {
   if(false == nh.getParam("balloon_position_topics", balloon_position_topics)) {
     std::cerr << "Required parameter not found on server: balloon_position_topics" << std::endl;
     std::exit(EXIT_FAILURE);
+  }
+
+  for(auto& kv: balloon_position_topics) {
+    // ML only cares about the true location of the balloon
+    std::string &balloon_position_topic = kv.second;
+    balloon_position_topic += "/true";
   }
 
   // Goal Status

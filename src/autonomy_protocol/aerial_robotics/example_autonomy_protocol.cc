@@ -72,6 +72,16 @@ namespace game_engine {
     const Eigen::Vector3d blue_balloon_pos = *blue_balloon_position_;
     const bool red_balloon_popped = red_balloon_status_->popped;
     const bool blue_balloon_popped = blue_balloon_status_->popped;
+    // Draws estimates of the Balloon Position (if you are pulling in the real values, the spheres will be
+    // overlaid on the balloons). While the balloon is not popped, we will keep displaying
+    // the sphere until the balloon is popped. The red balloon position is a pink sphere and the blue balloon position
+    // is a turquoise sphere.
+    if(!red_balloon_popped) {
+      visualizer.drawBalloonPosition(red_balloon_pos, "red");
+    }
+    if(!blue_balloon_popped) {
+      visualizer.drawBalloonPosition(blue_balloon_pos, "blue");
+    }
 
     // Condition some decisions on wind intensity
     switch (wind_intensity_) {

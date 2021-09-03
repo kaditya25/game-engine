@@ -63,6 +63,9 @@ quad_safety_limits: 0
 # change to true if running in joy stick mode
 joy_mode: false
 
+# change to true if using the camera
+camera_mode: false
+
 goal_position: [-12.4, 13.5, -4.0]
 
 initial_quad_positions:

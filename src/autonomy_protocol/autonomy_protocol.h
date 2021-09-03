@@ -95,7 +95,8 @@ namespace game_engine {
     // Main loop for this thread
     void Run(std::unordered_map<std::string,
              std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients,
-             bool joy_mode = false);
+             bool joy_mode = false,
+             bool camera_mode = false);
 
     // Virtual function to be implemented as by an actor. Input is a snapshot
     // of the system, output is an intended trajectory for each of the
@@ -109,7 +110,8 @@ namespace game_engine {
   inline void AutonomyProtocol::
   Run(std::unordered_map<std::string,
       std::shared_ptr<TrajectoryClientNode>> proposed_trajectory_clients,
-      bool joy_mode) {
+      bool joy_mode,
+      bool camera_mode) {
 
     while(ok_) {
       // Request trajectory updates from the virtual function
@@ -130,6 +132,10 @@ namespace game_engine {
       }
       // Sleep for 200 ms is the default. This essentially creates a loop that runs at 5 Hz.
       int sleep_time = 200;
+      if (camera_mode) {
+        // TBD: need to test with how fast camera values come in
+        sleep_time = 200;
+      }
       if (joy_mode) {
         // Sleep for 100 ms. This creates a loop that runs at 10 Hz for the joy mode.
         sleep_time = 100;
