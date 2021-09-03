@@ -44,10 +44,3 @@ For example, the QuadStateWatchdog periodically checks to see if the
 QuadcopterState has violated one of the prescribed constraints. If so, it
 triggers a shutdown of the system. Watchdogs tend to be very lightweight and
 were preferred over increasing the complexity/responsibilities of other objects.
-
-### Dispatcher Pattern
-The Dispatcher Pattern maintains a small threadpool to automatically transfer
-data between the Warden buffer and a specific Guard instance. Together, the
-Gaurd, Warden, and Dispatcher pattern for a sort of publisher/subscriber system
-where incoming data is asynchronously published to the warden and outgoing data
-asynchonously subscribes via the Dispatcher.

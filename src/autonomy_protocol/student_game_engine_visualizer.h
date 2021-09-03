@@ -18,6 +18,7 @@ public:
   void spin();
   void drawPath(std::vector<Eigen::Vector3d> path, int id);
   void drawDot(Eigen::Vector3d pt, int id, bool good);
+  void drawBalloonPosition(Eigen::Vector3d pt, std::string balloon_color);
   void drawTrajectory(game_engine::Trajectory traj, int id_offset=0);
   void drawCurve(std::vector<Eigen::Vector3d> pts, int id, Eigen::Vector3d rgb);
 };

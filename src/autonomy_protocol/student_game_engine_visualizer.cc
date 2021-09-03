@@ -63,7 +63,7 @@ void Student_game_engine_visualizer::drawPath(std::vector<Eigen::Vector3d> path,
   publisher_.publish(msg2);
 }
 
-void Student_game_engine_visualizer::drawTrajectory(game_engine::Trajectory trajectory,int id_offset) {
+void Student_game_engine_visualizer::drawTrajectory(game_engine::Trajectory trajectory, int id_offset) {
 
   // Draw position points as a LineStrip
   visualization_msgs::Marker msg;
@@ -126,6 +126,45 @@ void Student_game_engine_visualizer::drawDot(Eigen::Vector3d pt, int id, bool go
 
   publisher_.publish(msg);
 }
+
+void Student_game_engine_visualizer::drawBalloonPosition(Eigen::Vector3d pt, std::string balloon_color) {
+  visualization_msgs::Marker msg;
+  msg.header.frame_id = "world";
+  if(balloon_color == "red") {
+    // bright pink dot
+    msg.id = 5678;
+    msg.color.r = 1.0f;
+    msg.color.g = 0.0f;
+    msg.color.b = 0.7f;
+    msg.color.a = 1.0f;
+  } else if(balloon_color == "blue") {
+    // turquoise blue dot
+    msg.id = 5679;
+    msg.color.r = 0.0f;
+    msg.color.g = 0.7f;
+    msg.color.b = 1.0f;
+    msg.color.a = 1.0f;
+  } else {
+    msg.id = 5670;
+    msg.color.r = 1.0f;
+    msg.color.g = 1.0f;
+    msg.color.b = 1.0f;
+    msg.color.a = 1.0f;
+  }
+  msg.ns = "sphere";
+  msg.type = visualization_msgs::Marker::SPHERE;
+  msg.action = visualization_msgs::Marker::ADD;
+  msg.scale.x = 0.25;
+  msg.scale.y = 0.25;
+  msg.scale.z = 0.25;
+  msg.pose.orientation.w = 1;
+  msg.pose.position.x = pt[0];
+  msg.pose.position.y = pt[1];
+  msg.pose.position.z = pt[2];
+
+  publisher_.publish(msg);
+}
+
 void Student_game_engine_visualizer::drawCurve(std::vector<Eigen::Vector3d> pts, int id, Eigen::Vector3d rgb) {
   // Draw position points as a LineStrip
   visualization_msgs::Marker msg;

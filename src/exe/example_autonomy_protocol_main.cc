@@ -114,6 +114,12 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
+  bool camera_mode;
+  if(false == nh.getParam("camera_mode", camera_mode)) {
+    std::cerr << "Required parameter not found on server: camera_mode" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
   // Team Assignments
   std::vector<std::string> red_quad_names;
   std::vector<std::string> blue_quad_names;
@@ -213,6 +219,15 @@ int main(int argc, char** argv) {
     std::exit(EXIT_FAILURE);
   }
 
+  for(auto& kv: balloon_position_topics) {
+    std::string &balloon_position_topic = kv.second;
+    if(camera_mode == true) {
+      balloon_position_topic += "/estimated";
+    } else {
+      balloon_position_topic += "/true";
+    }
+  }
+
   // Goal Status
   std::map<std::string, std::string> goal_status_topics;
   if(false == nh.getParam("goal_status_topics", goal_status_topics)) {
@@ -272,8 +287,8 @@ int main(int argc, char** argv) {
 
   red_balloon_status_publisher_node->Publish(setStartStatusRed);
   blue_balloon_status_publisher_node->Publish(setStartStatusBlue);
-  red_balloon_position_publisher_node->Publish(setStartPositionRed);
-  blue_balloon_position_publisher_node->Publish(setStartPositionBlue);
+//  red_balloon_position_publisher_node->Publish(setStartPositionRed);
+//  blue_balloon_position_publisher_node->Publish(setStartPositionBlue);
   goal_status_publisher_node->Publish(setStartStatusGoal);
 
   // The AutonomyProtocol
@@ -295,7 +310,7 @@ int main(int argc, char** argv) {
   // Start the autonomy protocol
   std::thread ap_thread_example(
       [&]() {
-          example_autonomy_protocol->Run(proposed_trajectory_clients, joy_mode);
+          example_autonomy_protocol->Run(proposed_trajectory_clients, joy_mode, camera_mode);
       });
 
   // Start the kill thread

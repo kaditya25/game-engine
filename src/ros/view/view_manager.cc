@@ -130,6 +130,11 @@ namespace game_engine {
       std::cerr << "Required parameter not found on server: balloon_position_topics" << std::endl;
       std::exit(EXIT_FAILURE);
     }
+    for(auto& kv: balloon_position_topics) {
+      // always want to grab the real position of the balloons to visualize
+      std::string &balloon_position_topic = kv.second;
+      balloon_position_topic += "/true";
+    }
 
     auto red_balloon_position = std::make_shared<Eigen::Vector3d>();
     auto blue_balloon_position = std::make_shared<Eigen::Vector3d>();
