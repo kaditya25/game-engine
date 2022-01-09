@@ -126,9 +126,9 @@ After the first time you build `game-engine`, you'll need to add a command
 to your your `.zshrc` configuration file so that whenever you open a terminal,
 the shell will run the necessary ROS setup scripts.
 
-First open `.zshrc` in your favorite editor; e.g., for sublime:
+First open `.zshrc` in your favorite editor; e.g., for VS Code:
 ```bash
-subl ~/.zshrc
+code ~/.zshrc
 ```
 Then add this line to the bottom of the file:
 ```bash
@@ -192,7 +192,7 @@ to RVIZ for display.
 cd game-engine/bin
 ./visualizer
 ```
-Note that it may take some time (a few 10s of seconds) for all the elements of
+Note that it may take some time (a few tens of seconds) for all the elements of
 the arena to get populated into the RVIZ display.
 
 ### Autonomy Protocol

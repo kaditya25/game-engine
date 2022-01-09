@@ -24,10 +24,10 @@ balloon_position_topics:
 goal_status_topics:
   "home": "/game_engine/home_status"
 
-map_file_path: "/home/aerial-robotics/Workspace/game-engine/resources/maps/woods.map"
-quad_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/quad.stl"
-balloon_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/balloon.stl"
-goal_mesh_file_path: "file:///home/aerial-robotics/Workspace/game-engine/resources/meshes/torus.stl"
+map_file_path: "/home/aeronaut/Workspace/game-engine/resources/maps/woods.map"
+quad_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/meshes/quad.stl"
+balloon_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/meshes/balloon.stl"
+goal_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/meshes/torus.stl"
 
 blue_balloon_position: [-16.95, 18.05, -3.5]
 red_balloon_position:  [-25.05, 18.45, -2.65]
