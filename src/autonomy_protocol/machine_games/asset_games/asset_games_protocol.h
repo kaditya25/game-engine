@@ -19,17 +19,19 @@ enum ControlCode
   VelMatch =1,
 };
 
-using costFunction = std::function<void(double&,
-    const Eigen::VectorXd&, // x_self
-    const Eigen::VectorXd&, // u_self
-    const Eigen::VectorXd&, // x_other
-    const Eigen::VectorXd&  // u_other
-    )>;
+using costFunction = std::function<double(
+    const Eigen::VectorXd& /* x_self  */,
+    const Eigen::VectorXd& /* u_self  */,
+    const Eigen::VectorXd& /* x_other */,
+    const Eigen::VectorXd& /* u_other */,
+    double                 /* dt      */
+)>;
 
-using dynFunction = std::function<void(Eigen::VectorXd&, // x_k+1
-    const Eigen::VectorXd&, // x_k
-    const Eigen::VectorXd&, // u
-    const double&           // dt
+using dynFunction = std::function<void(
+    Eigen::VectorXd&       /* x_k+1 */,
+    const Eigen::VectorXd& /* x_k   */,
+    const Eigen::VectorXd& /* u     */,
+    double                 /* dt    */
     )>;
 
 namespace game_engine {
@@ -79,7 +81,7 @@ namespace game_engine {
           {
             case NashGame:
               {
-                std::unique_ptr<Controller> ctrl(new nashController(
+                std::unique_ptr<controller> ctrl(new nashController(
                       u_pursuer_enum_,
                       u_evader_enum_,
                       K_start_, K_steps_, dt_,
@@ -94,7 +96,7 @@ namespace game_engine {
               }
             case VelMatch:
               {
-                std::unique_ptr<Controller> ctrl(new velMatchController(
+                std::unique_ptr<controller> ctrl(new velMatchController(
                       pursuer_state_,
                       evader_state_,
                       target_,
@@ -112,7 +114,7 @@ namespace game_engine {
           {
             case NashGame:
               {
-                std::unique_ptr<Controller> ctrl(new nashController(
+                std::unique_ptr<controller> ctrl(new nashController(
                       u_evader_enum_,
                       u_pursuer_enum_,
                       K_start_, K_steps_, dt_,
@@ -128,7 +130,7 @@ namespace game_engine {
               }
             case VelMatch:
               {
-                std::unique_ptr<Controller> ctrl(new velMatchController(
+                std::unique_ptr<controller> ctrl(new velMatchController(
                       evader_state_,
                       pursuer_state_,
                       target_,
@@ -169,7 +171,7 @@ namespace game_engine {
 
       // unique_ptr used, since the pointer needs to be created in the constructor
       // but the object itself will go out of scope without passing ownership
-      std::vector<std::unique_ptr<Controller>> controllers_;
+      std::vector<std::unique_ptr<controller>> controllers_;
 
       // controller states and control inputs
       Eigen::VectorXd pursuer_state_;
@@ -203,16 +205,18 @@ namespace game_engine {
     public:
   
       // cost functions are public because they have to be passed to the costCalculators via functors
-        void jCostPursuer( double& cost_total,
+        double jCostPursuer(
             const Eigen::VectorXd& x_self, 
             const Eigen::VectorXd& u_self, 
             const Eigen::VectorXd& x_other,
-            const Eigen::VectorXd& u_other);
-        void jCostEvader( double& cost_total,
+            const Eigen::VectorXd& u_other,
+            double);
+        double jCostEvader(
             const Eigen::VectorXd& x_self, 
             const Eigen::VectorXd& u_self, 
             const Eigen::VectorXd& x_other,
-            const Eigen::VectorXd& u_other);
+            const Eigen::VectorXd& u_other,
+            double);
 
     private:
 

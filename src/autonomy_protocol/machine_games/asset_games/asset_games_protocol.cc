@@ -47,14 +47,17 @@ namespace game_engine {
     }
   }
 
-  void AssetGamesProtocol::jCostEvader( double& cost_total,
+  double AssetGamesProtocol::jCostEvader( 
       const Eigen::VectorXd& x_self, 
       const Eigen::VectorXd& u_self, 
       const Eigen::VectorXd& x_other,
-      const Eigen::VectorXd& u_other)
+      const Eigen::VectorXd& u_other,
+      double)
   {
     double acc_max = acc_max_evader_+0.01;
     double vel_max = vel_max_evader_+0.01;
+    double cost = 0.0;
+
     Eigen::DiagonalMatrix<double,4> Q_pur;
     Q_pur.diagonal() << 5,5,0,0;
     Eigen::DiagonalMatrix<double,2> R_pur;
@@ -67,18 +70,18 @@ namespace game_engine {
       // cumulative cost calculation
       //cost_total += -(double)(e.transpose()*Q_pur*e) *e_target.dot(e_target);
       //cost_total += (double)(e_target.transpose()*Q_target*e_target) *e.head(2).dot(e.head(2));
-      cost_total += -(double)(e.transpose()*Q_pur*e) ;
-      cost_total += (double)(e_target.transpose()*Q_target*e_target) ;
+      cost += -(double)(e.transpose()*Q_pur*e) ;
+      cost += (double)(e_target.transpose()*Q_target*e_target) ;
 
     // end condition: if target has been reached
     if (e_target.norm() < 1)
     { 
-      cost_total += -2000/ (e_target.norm()+.1 );
-      cost_total += -2000* ( x_self.tail<2>().norm() );
+      cost += -2000/ (e_target.norm()+.1 );
+      cost += -2000* ( x_self.tail<2>().norm() );
     }
     // end condition: if evader has been caughtk
     if (e.norm() < 1.25)
-    { cost_total += 1000/ (e.norm()+.1); }
+    { cost += 1000/ (e.norm()+.1); }
 
 
     //since this is only 2d, going to use an artificial height for testing
@@ -87,23 +90,25 @@ namespace game_engine {
 
     // soft limits on acceleration and velocity 
     if (u_self.norm()>acc_max)
-      cost_total += 20000;
+      cost += 20000;
     if (x_self.tail(2).norm()>vel_max)
-      cost_total += 20000;
+      cost += 20000;
 
-    costBounds(cost_total,pos);
+    costBounds(cost,pos);
 
-    return;
+    return cost;
   }
 
-  void AssetGamesProtocol::jCostPursuer( double& cost_total,
+  double AssetGamesProtocol::jCostPursuer( 
       const Eigen::VectorXd& x_self, 
       const Eigen::VectorXd& u_self, 
       const Eigen::VectorXd& x_other,
-      const Eigen::VectorXd& u_other)
+      const Eigen::VectorXd& u_other,
+      double)
   {
     double acc_max = acc_max_pursuer_+0.01;
     double vel_max = vel_max_pursuer_+0.01;
+    double cost = 0;
     Eigen::DiagonalMatrix<double,4> Q_pur;
     Q_pur.diagonal() << 5,5,3,3;
     Eigen::DiagonalMatrix<double,2> R_pur;
@@ -114,16 +119,16 @@ namespace game_engine {
     Eigen::VectorXd e_target = x_other.head(2)-target_;
 
     // cumulative cost calculation
-    cost_total += (double)(e.transpose()*Q_pur*e) ;
+    cost += (double)(e.transpose()*Q_pur*e) ;
     //cost_total += u_self.transpose()*R_pur*u_self;
-    cost_total += (double)(-e_target.transpose()*Q_target*e_target) ;
+    cost += (double)(-e_target.transpose()*Q_target*e_target) ;
 
     // end condition: if target has been reached
     if (e_target.norm() < 1)
-    { cost_total += 2000/ (e_target.norm()+.1); }
+    { cost += 2000/ (e_target.norm()+.1); }
     // end condition: if evader has been caught
     if (e.norm() < 1.25)
-    { cost_total += -1000/ (e.norm()+.1); }
+    { cost += -1000/ (e.norm()+.1); }
 
     //since this is only 2d, going to use an artificial height for testing
     double test_height = -4;
@@ -131,17 +136,17 @@ namespace game_engine {
 
     // soft limits on acceleration and velocity 
     if (u_self.norm()>acc_max)
-      cost_total += 20000;
+      cost += 20000;
     if (x_self.tail(2).norm()>vel_max)
-      cost_total += 20000;
+      cost += 20000;
 
     // idea: pursuer cannot 'camp' the target
     //if ( (x_self.head<2>()-target_).norm()<1.5 )
     //{ cost_total += 10000; }
 
-    costBounds(cost_total,pos);
+    costBounds(cost,pos);
 
-    return;
+    return cost;
   }
 
   std::vector<Eigen::VectorXd> AssetGamesProtocol::constAccCtrlInputAndZero(double acc,int num)
