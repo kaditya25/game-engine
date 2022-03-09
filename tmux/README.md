@@ -1,7 +1,7 @@
-# Setting up tmux to facilitate work on `game-engine`
+# Setting up tmux to facilitate work on Game Engine
 
 tmux is a handy terminal multiplexer that you may find useful as you work
-within `game-engine`.  It allows you to control multiple shells in the same
+within Game Engine.  It allows you to control multiple shells in the same
 terminal, which is convenient when you have several different executables
 (e.g., `mediation_layer`, `student_autonomy_protocol`, etc) that you need to
 run at the same time.  tmux is already installed on the VM.  You can use it in
@@ -34,8 +34,9 @@ tutorial on tmux. Note that the tmux configuration you installed from
 `dotfiles` alters the default tmux behavior somewhat:
 
 - By default, tmux's prefix key is `C-b` (Ctrl-b).  But this requires pressing
-  two buttons!  The RNL's prefix key is the backtick `, which is right
-  next to the numeric 1 key.
+  two buttons!  The RNL's prefix key is the backtick `, which is right next to
+  the numeric 1 key.  You're welcome to edit `~/.tmux.conf` if you'd like to
+  change back to the original prefix, or select another prefix.
 - To switch to window 2: prefix 2
 - To split the current pane vertically: prefix Left or Right
 - To split the current pane horizontally: prefix Down or Up
@@ -45,6 +46,6 @@ tutorial on tmux. Note that the tmux configuration you installed from
 You can have a look at all tmux settings by inspecting the file
 `~/.tmux.conf`.
 
-To set up a tmux session tailored for working in `game-engine`, open a new
+To set up a tmux session tailored for working in Game Engine, open a new
 terminal and type `stmux`.
 
