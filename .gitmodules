@@ -9,3 +9,6 @@
 	path = src/dependencies/mg-msgs
 	url = https://gitlab.com/radionavlab/public/mg-msgs.git
     branch = master
+[submodule "src/dependencies/joy-dependency"]
+	path = src/dependencies/joy-dependency
+	url = https://gitlab.com/radionavlab/public/joy-dependency.git
