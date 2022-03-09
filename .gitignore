@@ -4,3 +4,4 @@ debug
 *.swp
 tags
 bin
+src/autonomy_protocol/research-autonomy-protocols/

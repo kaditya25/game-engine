@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(GameEngine)
 
+option(RESEARCH "Build Game Engine with research extensions." OFF)
+
 set(default_build_type "RelWithDebInfo")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
@@ -10,6 +12,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
     "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
+
 add_subdirectory(src)
 add_subdirectory(test) 
 add_subdirectory(labs) 

@@ -7,13 +7,8 @@ find_package (Eigen3 3.3 NO_MODULE)
 set(SOURCE_FILES
   aerial_robotics/example_autonomy_protocol.cc
   aerial_robotics/student_autonomy_protocol.cc
-  machine_games/multi_quad_autonomy_protocol.cc
-  machine_games/red_team_autonomy_protocol.cc
-  machine_games/blue_team_autonomy_protocol.cc
-  machine_games/manual_control_protocol.cc
   game_snapshot.cc
   student_game_engine_visualizer.cc
-  machine_games/asset_games/asset_games_protocol.cc
   )
 
 add_library(${TARGET} STATIC ${SOURCE_FILES})
@@ -29,7 +24,6 @@ target_link_libraries(${TARGET} PUBLIC
   lib_util
   lib_p4
   lib_joy
-  lib_asset_games
   ${Boost_LIBRARIES}
   Eigen3::Eigen)
 
@@ -43,4 +37,6 @@ target_compile_options(${TARGET} PRIVATE
   -Wfatal-errors
 )
 
-add_subdirectory(machine_games/asset_games/asset-games-lib)
+if (RESEARCH)
+   add_subdirectory(research-autonomy-protocols)
+endif()
