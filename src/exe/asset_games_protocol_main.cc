@@ -27,7 +27,7 @@
 #include "goal_status_subscriber_node.h"
 #include "goal_status.h"
 
-#include "machine_games/asset_games/asset_games_protocol.h"
+#include "research-autonomy-protocols/asset_games/asset_games_protocol.h"
 #include "game_snapshot.h"
 #include "map3d.h"
 #include "presubmission_trajectory_vetter.h"

@@ -115,7 +115,7 @@ target_link_libraries(multi_quad_autonomy_protocol
         lib_mediation_layer
         lib_ros_node
         lib_ros_view
-        lib_autonomy_protocol
+        lib_research_autonomy_protocol
         yaml-cpp
         ${catkin_LIBRARIES})
 set_target_properties(multi_quad_autonomy_protocol
@@ -126,6 +126,7 @@ set_target_properties(multi_quad_autonomy_protocol
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
         )
 
+#[[
 add_executable(red_team_autonomy_protocol red_team_autonomy_protocol_main.cc)
 target_include_directories(red_team_autonomy_protocol PUBLIC ${catkin_INCLUDE_DIRS})
 target_link_libraries(red_team_autonomy_protocol
@@ -135,7 +136,7 @@ target_link_libraries(red_team_autonomy_protocol
         lib_mediation_layer
         lib_ros_node
         lib_ros_view
-        lib_autonomy_protocol
+        lib_research_autonomy_protocol
         yaml-cpp
         ${catkin_LIBRARIES})
 set_target_properties(red_team_autonomy_protocol
@@ -146,6 +147,7 @@ set_target_properties(red_team_autonomy_protocol
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
         )
 
+
 add_executable(blue_team_autonomy_protocol blue_team_autonomy_protocol_main.cc)
 target_include_directories(blue_team_autonomy_protocol PUBLIC ${catkin_INCLUDE_DIRS})
 target_link_libraries(blue_team_autonomy_protocol
@@ -155,7 +157,7 @@ target_link_libraries(blue_team_autonomy_protocol
         lib_mediation_layer
         lib_ros_node
         lib_ros_view
-        lib_autonomy_protocol
+        lib_research_autonomy_protocol
         yaml-cpp
         ${catkin_LIBRARIES})
 set_target_properties(blue_team_autonomy_protocol
@@ -165,6 +167,7 @@ set_target_properties(blue_team_autonomy_protocol
         CXX_EXTENSIONS NO
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
         )
+]]
         
 add_executable(manual_control_protocol manual_control_protocol_main.cc)
 target_include_directories(manual_control_protocol PUBLIC ${catkin_INCLUDE_DIRS})
@@ -175,7 +178,7 @@ target_link_libraries(manual_control_protocol
         lib_mediation_layer
         lib_ros_node
         lib_ros_view
-        lib_autonomy_protocol
+        lib_research_autonomy_protocol
         yaml-cpp
         lib_joy
         ${catkin_LIBRARIES})
@@ -196,7 +199,7 @@ target_link_libraries(asset_games_protocol
         lib_mediation_layer
         lib_ros_node
         lib_ros_view
-        lib_autonomy_protocol
+        lib_research_autonomy_protocol
         yaml-cpp
         ${catkin_LIBRARIES})
 set_target_properties(asset_games_protocol
