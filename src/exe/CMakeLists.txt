@@ -106,6 +106,8 @@ set_target_properties(student_autonomy_protocol
   RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
+if(RESEARCH)
+
 add_executable(multi_quad_autonomy_protocol multi_quad_autonomy_protocol_main.cc)
 target_include_directories(multi_quad_autonomy_protocol PUBLIC ${catkin_INCLUDE_DIRS})
 target_link_libraries(multi_quad_autonomy_protocol
@@ -228,3 +230,5 @@ set_target_properties(test_camera
         CXX_STANDARD_REQUIRED YES
         CXX_EXTENSIONS NO
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+
+endif()
