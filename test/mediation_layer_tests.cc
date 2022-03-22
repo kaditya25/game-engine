@@ -17,6 +17,7 @@ void test_TrajectoryWarden() {
 
     Trajectory dummy_trajectory;
     assert(0 == warden.Keys().size());
+    assert(MediationLayerCode::Success == warden.Register(""));
     assert(MediationLayerCode::Success == warden.Read("", dummy_trajectory));
     assert(MediationLayerCode::Success == warden.Write("", dummy_trajectory));
     assert(MediationLayerCode::Success == warden.Await("", dummy_trajectory));
@@ -73,6 +74,7 @@ void test_QuadStateWarden() {
 
     QuadState dummy_state;
     assert(0 == warden.Keys().size());
+    assert(MediationLayerCode::Success == warden.Register(""));
     assert(MediationLayerCode::Success == warden.Read("", dummy_state));
     assert(MediationLayerCode::Success == warden.Write("", dummy_state));
     assert(MediationLayerCode::Success == warden.Await("", dummy_state));
