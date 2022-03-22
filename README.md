@@ -33,6 +33,7 @@ cd build
 cmake ..
 make -j
 ```
+If this build procedure does not work, you may need to build and install individual Game Engine submodules, as described [here](build_from_scratch.md). 
 
 ### Configure for ROS
 After the first time you build Game Engine, you'll need to add a command
