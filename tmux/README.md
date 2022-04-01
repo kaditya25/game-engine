@@ -4,9 +4,7 @@ tmux is a handy terminal multiplexer that you may find useful as you work within
 Game Engine.  It allows you to control multiple shells in the same terminal,
 which is convenient when you have several different executables (e.g.,
 `mediation_layer`, `student_autonomy_protocol`, etc.) that you need to run at
-the same time.  tmux is already installed on the VM.  You can use it in its
-default mode without any further setup.  If you'd like to adopt Dr. Humphreys's
-setup, follow the instructions below.
+the same time.  tmux is already installed on the VM. 
 
 ## Setup
 
