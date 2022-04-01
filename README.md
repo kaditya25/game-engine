@@ -55,7 +55,7 @@ source ~/Workspace/game-engine/build/devel/setup.zsh
 Game Engine is composed of several interacting executables. After building, you
 may proceed to run each executable. You are encouraged to use a terminal
 multiplexer like `tmux` and start each program in a separate pane. See
-[here](tmux/README.md) for further information on tmux.
+[here](tmux/README.md) for further information on tmux.    
 
 ### ROS Core
 ```bash

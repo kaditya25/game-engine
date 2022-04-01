@@ -98,7 +98,7 @@ while true ; do
 		cd $filepath/bin
 		case $yn in
         		[Yy]* ) ./visualizer &
-                	read -p "Press enter to continue once the params are laoded in visualizer..";;
+                	read -p "Press enter to continue once the params are loaded in visualizer..";;
 		esac
 		break;
 	done
