@@ -57,10 +57,7 @@ make -j
 sudo make install
 ```
 
-### Build
-
-Note: you may need to tell CMake where to find the OSQP dependency. To do this,
-open the cmake curses interface:
+### Build Game Engine
 
 ```bash
 cd ~/Workspace/game-engine
@@ -68,11 +65,7 @@ rm -rf build  # remove any prior build directory
 mkdir build 
 cd build
 cmake ..
+make -j
 ```
 
-Navigate to the `osqp_DIR` setting and change it to the location of the osqp
-binaries:
-```
-/home/aeronaut/Workspace/game-engine/src/dependencies/P4/dependencies/osqp/build
-```
 
