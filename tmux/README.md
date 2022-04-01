@@ -16,6 +16,12 @@ git clone https://gitlab.com/radionavlab/public/dotfiles.git
 cd dotfiles
 ./install
 ```
+or, if `dotfiles` is already present, pull the latest from the repository:
+```bash
+cd ~/dotfiles
+git pull origin master
+./install
+```
 
 Next, move the `stmux` bash script into `/usr/local/bin` so that it can be run
 by typing `stmux` on the command line:
