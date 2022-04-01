@@ -34,7 +34,7 @@ tutorial on tmux. Note that the tmux configuration you installed from `dotfiles`
 alters the default tmux behavior somewhat:
 
 - By default, tmux's prefix key is `C-b` (Ctrl-b).  But this requires pressing
-  two buttons!  The RNL's prefix key is the backtick ```, which is left of the
+  two buttons!  The RNL's prefix key is the backtick `` ` ``, which is left of the
   the numeric 1 key.  You're welcome to edit `~/.tmux.conf` if you'd like to
   change back to the original prefix, or select another prefix.
 - To switch to window 2: prefix 2
