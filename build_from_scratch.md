@@ -13,7 +13,7 @@ Note: If you want to make the dependencies available system-wide, follow the
 #### Eigen
 
 ```bash
-cd ~/Workspace/game-engine-student/src/dependencies/P4/dependencies/eigen
+cd ~/Workspace/game-engine/src/dependencies/P4/dependencies/eigen
 mkdir build 
 cd build
 cmake ..
@@ -23,7 +23,7 @@ make -j4
 #### osqp
 
 ```bash
-cd ~/Workspace/game-engine-student/src/dependencies/P4/dependencies/osqp
+cd ~/Workspace/game-engine/src/dependencies/P4/dependencies/osqp
 mkdir build 
 cd build
 cmake ..
@@ -34,7 +34,7 @@ sudo make install
 #### p4
 
 ```bash
-cd ~/Workspace/game-engine-student/src/dependencies/P4/
+cd ~/Workspace/game-engine/src/dependencies/P4/
 mkdir build 
 cd build
 cmake ..
@@ -44,7 +44,7 @@ make -j4
 #### mg-msgs
 
 ```bash
-cd ~/Workspace/game-engine-student/src/dependencies/mg-msgs/
+cd ~/Workspace/game-engine/src/dependencies/mg-msgs/
 mkdir build 
 cd build
 cmake ..
@@ -54,7 +54,7 @@ make -j4
 #### yaml-cpp
 
 ```bash
-cd ~/Workspace/game-engine-student/src/dependencies/yaml-cpp/
+cd ~/Workspace/game-engine/src/dependencies/yaml-cpp/
 mkdir build 
 cd build
 cmake ..
@@ -79,7 +79,7 @@ cmake ..
 ```
 Navigate to the `osqp_DIR` setting and change it to the location of the osqp binaries. It may be different depending where you cloned the repositories to, but for my virtual machine, it looks something like this:
 ```
-/home/aerial-robotics/Workspace/game-engine-student/src/dependencies/P4/dependencies/osqp/build
+/home/aerial-robotics/Workspace/game-engine/src/dependencies/P4/dependencies/osqp/build
 ```
 </details>
 </p>
