@@ -1,12 +1,12 @@
 # Setting up tmux to facilitate work on Game Engine
 
-tmux is a handy terminal multiplexer that you may find useful as you work
-within Game Engine.  It allows you to control multiple shells in the same
-terminal, which is convenient when you have several different executables
-(e.g., `mediation_layer`, `student_autonomy_protocol`, etc) that you need to
-run at the same time.  tmux is already installed on the VM.  You can use it in
-its default mode without any further setup.  If you'd like to adopt
-Dr. Humphreys's setup, follow the instructions below.
+tmux is a handy terminal multiplexer that you may find useful as you work within
+Game Engine.  It allows you to control multiple shells in the same terminal,
+which is convenient when you have several different executables (e.g.,
+`mediation_layer`, `student_autonomy_protocol`, etc.) that you need to run at
+the same time.  tmux is already installed on the VM.  You can use it in its
+default mode without any further setup.  If you'd like to adopt Dr. Humphreys's
+setup, follow the instructions below.
 
 ## Setup
 
@@ -30,11 +30,11 @@ sudo cp stmux /usr/local/bin
 
 You'll find
 [here](https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/) a good
-tutorial on tmux. Note that the tmux configuration you installed from
-`dotfiles` alters the default tmux behavior somewhat:
+tutorial on tmux. Note that the tmux configuration you installed from `dotfiles`
+alters the default tmux behavior somewhat:
 
 - By default, tmux's prefix key is `C-b` (Ctrl-b).  But this requires pressing
-  two buttons!  The RNL's prefix key is the backtick `, which is right next to
+  two buttons!  The RNL's prefix key is the backtick ```, which is left of the
   the numeric 1 key.  You're welcome to edit `~/.tmux.conf` if you'd like to
   change back to the original prefix, or select another prefix.
 - To switch to window 2: prefix 2
@@ -43,8 +43,7 @@ tutorial on tmux. Note that the tmux configuration you installed from
 - To navigate between panes: C-Down or Up or Right or Left
 - To close a pane: C-d
 
-You can have a look at all tmux settings by inspecting the file
-`~/.tmux.conf`.
+You can have a look at all tmux settings by inspecting the file `~/.tmux.conf`.
 
 To set up a tmux session tailored for working in Game Engine, open a new
 terminal and type `stmux`.
