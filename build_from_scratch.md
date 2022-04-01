@@ -4,12 +4,6 @@ If you are cloning or using the repository for the first time, you will need to
 build the dependencies (the submodules). They all use the same build process,
 included below.
 
-<p>
-<details>
-
-Note: If you want to make the dependencies available system-wide, follow the
-`make` command with `sudo make install`.
-
 #### Eigen
 
 ```bash
@@ -17,7 +11,8 @@ cd ~/Workspace/game-engine/src/dependencies/P4/dependencies/eigen
 mkdir build 
 cd build
 cmake ..
-make -j4
+make -j
+sudo make install
 ```
 
 #### osqp
@@ -27,7 +22,7 @@ cd ~/Workspace/game-engine/src/dependencies/P4/dependencies/osqp
 mkdir build 
 cd build
 cmake ..
-make -j4
+make -j
 sudo make install
 ```
 
@@ -38,7 +33,7 @@ cd ~/Workspace/game-engine/src/dependencies/P4/
 mkdir build 
 cd build
 cmake ..
-make -j4
+make -j
 ```
 
 #### mg-msgs
@@ -48,7 +43,7 @@ cd ~/Workspace/game-engine/src/dependencies/mg-msgs/
 mkdir build 
 cd build
 cmake ..
-make -j4
+make -j
 ```
 
 #### yaml-cpp
@@ -58,28 +53,26 @@ cd ~/Workspace/game-engine/src/dependencies/yaml-cpp/
 mkdir build 
 cd build
 cmake ..
-make -j4
+make -j
+sudo make install
 ```
-
-</details>
-</p>
 
 ### Build
 
-Note: you may need to tell CMake where to find the OSQP dependency. 
-
-<p>
-<details>
-To do this, open the cmake curses interface:
+Note: you may need to tell CMake where to find the OSQP dependency. To do this,
+open the cmake curses interface:
 
 ```bash
-mkdir build # (if the build directory hasn't already been created)
+cd ~/Workspace/game-engine
+rm -rf build  # remove any prior build directory
+mkdir build 
 cd build
 cmake ..
 ```
-Navigate to the `osqp_DIR` setting and change it to the location of the osqp binaries. It may be different depending where you cloned the repositories to, but for my virtual machine, it looks something like this:
+
+Navigate to the `osqp_DIR` setting and change it to the location of the osqp
+binaries:
 ```
-/home/aerial-robotics/Workspace/game-engine/src/dependencies/P4/dependencies/osqp/build
+/home/aeronaut/Workspace/game-engine/src/dependencies/P4/dependencies/osqp/build
 ```
-</details>
-</p>
+

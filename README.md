@@ -33,7 +33,9 @@ cd build
 cmake ..
 make -j
 ```
-If this build procedure does not work, you may need to build and install individual Game Engine submodules, as described [here](build_from_scratch.md). 
+
+If this build procedure does not work, you may need to build and install
+individual Game Engine submodules, as described [here](build_from_scratch.md).
 
 ### Configure for ROS
 After the first time you build Game Engine, you'll need to add a command
@@ -51,8 +53,8 @@ source ~/Workspace/game-engine/build/devel/setup.zsh
 
 ## Running Game Engine
 Game Engine is composed of several interacting executables. After building, you
-must ensure that the following programs are running. You are encouraged to use
-a terminal multiplexer like `tmux` and start each program in a separate pane. See
+may proceed to run each executable. You are encouraged to use a terminal
+multiplexer like `tmux` and start each program in a separate pane. See
 [here](tmux/README.md) for further information on tmux.
 
 ### ROS Core
@@ -65,9 +67,9 @@ The ROS parameters found in `game-engine/run/params.yaml` must be loaded after
 `roscore` has been started or re-loaded if any of the parameters have changed
 since loading.
 
-First, modify the file paths in `/game-engine/run/params.yaml` (e.g.,
-`map_file_path`) so that they are correct for your system.  Then load the
-parameters into the `game_engine` namespace as follows:
+First, check that the file paths in `/game-engine/run/params.yaml` (e.g.,
+`map_file_path`) are correct for your system.  Then load the parameters into the
+`game_engine` namespace:
 ```bash
 cd game-engine/run
 rosparam load params.yaml /game_engine/
@@ -75,7 +77,7 @@ rosparam load params.yaml /game_engine/
 
 ### ROS Visualizer
 The ROS visualizer (RVIZ) manages a 3D visualization environment in which the
-arena, obstacles, balloons, and quadcopters are displayed.
+arena, obstacles, balloons, and quadcopters are displayed. 
 ```
 cd game-engine/run
 rosrun rviz rviz -d config.rviz
