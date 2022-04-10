@@ -52,8 +52,7 @@ namespace game_engine {
     // Position constraints
     for(size_t idx = 0; idx < trajectory_size; ++idx) {
       const Eigen::Vector3d point = trajectory.Position(idx);
-      const Map3D inflated_map = map.Inflate(1);
-      if(false == inflated_map.Contains(point)) {
+      if(!map.Contains(point)) {
         std::cerr
           << "Specified trajectory point ["
           << point.transpose()
@@ -64,7 +63,7 @@ namespace game_engine {
         trajectory_code_.index = idx;
         return trajectory_code_;
       }
-      if(false == map.IsFreeSpace(point)) {
+      if(!map.IsFreeSpace(point)) {
         std::cerr
           << "Specified trajectory point ["
           << point.transpose()
