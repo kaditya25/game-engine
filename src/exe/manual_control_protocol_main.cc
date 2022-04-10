@@ -291,11 +291,10 @@ int main(int argc, char** argv) {
   GoalStatus setStartStatusGoal = *(goal_status_subscriber_node->goal_status_);
   setStartStatusGoal.set_start = true;
 
-
   auto joy_input = std::make_shared<joyStruct>();
   auto joy_subscriber_node = std::make_shared<JoySubscriberNode>("/joy",joy_input);
 
-  // wait for .5 sec
+  //wait for .5 seconds
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   red_balloon_status_publisher_node->Publish(setStartStatusRed);
@@ -337,9 +336,7 @@ int main(int argc, char** argv) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
           }
         }
-
         ros::shutdown();
-
         manual_control_protocol->Stop();
         quad_state_warden->Stop();
         trajectory_warden_client->Stop();
