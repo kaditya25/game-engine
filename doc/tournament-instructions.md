@@ -30,10 +30,10 @@ Note that the interface only specifies the input and output (quad state ->
 quad trajectory), but not how to accomplish the implied task. It is up to you
 to determine how best to complete the function.
 
-The entire obstacle course challenge thus boils down to writing a single
+The entire obstacle course challenge boils down to writing a single
 function in one file.  But understand that the problem set before you is not
 trivial. The problem of prescribing a time-optimal trajectory through a
-cluttered environment in the presence of disturbances is very difficult.
+cluttered environment in the presence of disturbances is difficult.
 
 For lab 4, you planned paths through a cluttered 2D environment. For that lab,
 much of the 2D files were already written, tested, debugged, and vetted.  For
