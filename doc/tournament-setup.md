@@ -9,7 +9,6 @@ for your machine and setup.
 Each team member should already have created a GitLab account.  If not, then create one.
 
 ## Create a remote GitLab repository
-
 Designate one of your team members to host your team's remote repository. This
 person should create a `game-engine` repository on his or her account in
 GitLab. Name both the repository and the slug `game-engine`. Make the
@@ -18,33 +17,26 @@ your opponents to see your secrets!
 
 In the repository settings/members, add your team members as Maintainer to
 your repository. This allows them to view and edit the code. Also add our
-inimitable TAs Corey and Kristen as Reporter so they can follow your
-progress. Their GitLab handles are @coh328 and @kmichaelson.
+superlative TAs Robert and Zacharias as Reporter so they can follow your
+progress. Their GitLab handles are @roberttenny and @zackkomo.
 
 ## Clone `game-engine`
 In the `~/Workspace` directory, either clone a fresh copy of the
-`game-engine-student` repository (if you want to start with a clean slate), or
+`game-engine` repository (if you want to start with a clean slate), or
 update your existing local `game-engine` repository (if one already exists at
 that location and you want to keep it).
 
 ### To clone a fresh copy:
 ```bash
 cd ~/Workspace/
-git clone https://gitlab.com/todd.humphreys/game-engine-student.git game-engine
+git clone https://gitlab.com/radionavlab/public/game-engine.git
 cd game-engine
 git submodule update --init --recursive
 ```
 
 ### To update an existing copy
 The code below assumes `origin` refers to
-`https://gitlab.com/todd.humphreys/game-engine-student.git`.
-
-If your local repository is named `game-engine-student`, rename it as
-`game-engine`:
-```bash
-cd ~/Workspace
-mv game-engine-student game-engine
-```
+`https://gitlab.com/radionavlab/public/game-engine.git`.
 
 Pull the latest changes from `origin` into your code:
 ```bash
@@ -55,7 +47,6 @@ git submodule update --init --recursive
 ```
 
 ## Configure the repository
-
 Configure your `game-engine` repository with your name and email. All commits
 that you make will be signed with this information.
 
@@ -67,11 +58,11 @@ git config user.email "YOUR EMAIL HERE"
 
 Your team's work will involve three repositories: (1) the `game-engine`
 repository on your local machine, (2) your team's remote `game-engine`
-repository on GitLab, and (3) the original `game-engine-student` repository on
+repository on GitLab, and (3) the original `game-engine` repository on
 GitLab. The three of these interact as follows: TAs will periodically push
-patches and changes to the original `game-engine-student` repository. You will
+patches and changes to the original `game-engine` repository. You will
 pull down and merge these changes into your local repository.  Likewise, you
-will pull down and merge changes your teammates have made to your team's
+will pull down and merge changes your teammates have made from your team's
 remote repository.  Finally, you will push changes present in your local
 repository to your team's remote repository so they are safely stored and
 accessible to your teammates.
@@ -79,7 +70,7 @@ accessible to your teammates.
 These three repositories will be referred to as
 - Your local `game-engine` repository -> `local`
 - Your team's remote repository on GitLab -> `origin`
-- The original `game-engine-student` remote repository on GitLab -> `source`
+- The original `game-engine` remote repository on GitLab -> `source`
 
 Configure these repositories in the git settings as follows. 
 ```
@@ -87,7 +78,7 @@ cd ~/Workspace/game-engine
 git remote rename origin source
 git remote add origin https://gitlab.com/YOUR_GITLAB_USERNAME/game-engine.git
 # For example:
-#   git remote add origin https://gitlab.com/tony.stark/game-engine.git
+#  git remote add origin https://gitlab.com/tony.stark/game-engine.git
 ```
 
 Now that your local repository is configured, push your local contents to
