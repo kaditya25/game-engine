@@ -6,3 +6,4 @@ tags
 bin
 src/autonomy_protocol/research-autonomy-protocols/
 labs/lab4/src/lab4-solution-aerial-robotics
+.idea/
