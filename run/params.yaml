@@ -24,7 +24,7 @@ balloon_position_topics:
 goal_status_topics:
   "home": "/game_engine/home_status"
 
-map_file_path: "/home/aeronaut/Workspace/game-engine/resources/maps/woods.map"
+map_file_path: "/home/aeronaut/Workspace/game-engine/resources/maps/arena_empty.map"
 quad_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/meshes/quad.stl"
 balloon_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/meshes/balloon.stl"
 goal_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/meshes/torus.stl"
@@ -44,7 +44,7 @@ use_seed: true
 seed: 31
 
 # 0: zero, 1: mild, 2: stiff, 3: intense, 4: ludicrous
-wind_intensity: 2
+wind_intensity: 0
 
 # revision mode
 # 0: NONE, 1: TIME, 2: SHAPE, 3: WAYPOINT

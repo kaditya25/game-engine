@@ -1,4 +1,4 @@
-map_file_path: "/home/todd/Workspace/game-engine/resources/maps/woods.map"
+map_file_path: "/home/todd/Workspace/game-engine/resources/maps/arena_empty.map"
 quad_mesh_file_path: "file:///home/todd/Workspace/game-engine/resources/meshes/quad.stl"
 balloon_mesh_file_path: "file:///home/todd/Workspace/game-engine/resources/meshes/balloon.stl"
 goal_mesh_file_path: "file:///home/todd/Workspace/game-engine/resources/meshes/torus.stl"
