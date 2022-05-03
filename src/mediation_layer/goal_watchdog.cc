@@ -3,6 +3,11 @@
 
 #include "goal_watchdog.h"
 #include "goal_status.h"
+#include "balloon_status_subscriber_node.h"
+#include "balloon_status_publisher_node.h"
+#include "balloon_position_subscriber_node.h"
+#include "balloon_position_publisher_node.h"
+#include "balloon_status.h"
 
 namespace game_engine {
   void GoalWatchdog::Run(
@@ -22,6 +27,16 @@ namespace game_engine {
 
     bool set_start;
     bool started = false; // set to true after SAP starts
+
+    // Get the balloon states
+    std::map<std::string, std::string> balloon_status_topics;
+    auto red_balloon_status = std::make_shared<BalloonStatus>();
+    auto blue_balloon_status = std::make_shared<BalloonStatus>();
+
+    auto red_balloon_status_subscriber_node
+            = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["red"], red_balloon_status);
+    auto blue_balloon_status_subscriber_node
+            = std::make_shared<BalloonStatusSubscriberNode>(balloon_status_topics["blue"], blue_balloon_status);
 
     // Main loop
     while(true == this->ok_) {
@@ -53,6 +68,9 @@ namespace game_engine {
               
               goal_reach_time = elapsed_sec;
               quad_scorer = quad_name;
+              if (red_balloon_status && blue_balloon_status){
+                ROS_INFO_STREAM("Goal Reached @ elapsed: " << goal_reach_time);
+              }
             } else {
               active = true;
             }
