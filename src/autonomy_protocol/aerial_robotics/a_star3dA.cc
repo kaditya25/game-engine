@@ -1,6 +1,6 @@
 #include <queue>
 
-#include "a_star2d.h"
+#include "a_star3dA.h"
 
 namespace game_engine {
   // Anonymous namespace. Put any file-local functions or variables in here
@@ -10,7 +10,7 @@ namespace game_engine {
     // node, and a heuristic cost from the current node to the destination.
     struct NodeWrapper {
       std::shared_ptr<struct NodeWrapper> parent;
-      std::shared_ptr<Node2D> node_ptr;
+      std::shared_ptr<Node3D> node_ptr;
 
       // True cost to this node
       double cost;
@@ -37,11 +37,15 @@ namespace game_engine {
     // YOU WILL NEED TO MODIFY THIS OR WRITE YOUR OWN FUNCTION
     ///////////////////////////////////////////////////////////////////
     double Heuristic(
-        const std::shared_ptr<Node2D>& current_ptr,
-        const std::shared_ptr<Node2D>& end_ptr) {
+        const std::shared_ptr<Node3D>& current_ptr,
+        const std::shared_ptr<Node3D>& end_ptr) {
+          return std::sqrt(std::pow(current_ptr->Data().x()-end_ptr->Data().x(),2) +
+          std::pow(current_ptr->Data().y()-end_ptr->Data().y(),2) + 
+          std::pow(current_ptr->Data().z()-end_ptr->Data().z(),2));
+          
       // return 0; //zero heuristic
-      // return (current_ptr->Data().x() - end_ptr->Data().y()) + (current_ptr->Data().y() - end_ptr->Data().y()); //Taking the Manhattan distane (Overestimating the cost)  
-      return sqrt((current_ptr->Data() - end_ptr->Data()).transpose() * ( current_ptr->Data() - end_ptr->Data())); //Taking the l2 norm error (Underestimating the cost)
+      // return (current_ptr->Data().x() - end_ptr->Data().x()) + (current_ptr->Data().y() - end_ptr->Data().y()); //Taking the Manhattan distane (Overestimating the cost)  
+      // return sqrt((current_ptr->Data() - end_ptr->Data()).transpose() * ( current_ptr->Data() - end_ptr->Data())); //Taking the l2 norm error (Underestimating the cost)
     }
 
   }
@@ -59,10 +63,10 @@ namespace game_engine {
     return false;
   }
 
-  PathInfo AStar2D::Run(
-      const Graph2D& graph, 
-      const std::shared_ptr<Node2D> start_ptr, 
-      const std::shared_ptr<Node2D> end_ptr) {
+  PathInfo AStar3D::Run(
+      const Graph3D& graph, 
+      const std::shared_ptr<Node3D> start_ptr, 
+      const std::shared_ptr<Node3D> end_ptr) {
     using NodeWrapperPtr = std::shared_ptr<NodeWrapper>;
 
     ///////////////////////////////////////////////////////////////////
@@ -115,7 +119,7 @@ namespace game_engine {
         explored.push_back(node_to_explore);
 
         // Iterate through the list of edges and add the neighbors
-        for(const DirectedEdge2D& edge: graph.Edges(node_to_explore->node_ptr)) 
+        for(const DirectedEdge3D& edge: graph.Edges(node_to_explore->node_ptr)) 
         {
           NodeWrapperPtr nw_ptr = std::make_shared<NodeWrapper>();
           nw_ptr->cost = node_to_explore->cost + edge.Cost();

@@ -20,6 +20,19 @@ namespace game_engine {
     };
   }
 
+  using NodeWrapperPtr = std::shared_ptr<NodeWrapper>;
+  bool subset(const std::vector<NodeWrapperPtr> &explored_nodes, const NodeWrapperPtr current_node)
+  {
+    for(const std::shared_ptr<NodeWrapper> explored_node: explored_nodes) 
+    {
+      if ( *(explored_node) == *(current_node) )
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   PathInfo DepthFirstSearch2D::Run(
       const Graph2D& graph, 
       const std::shared_ptr<Node2D> start_ptr, 
@@ -42,6 +55,8 @@ namespace game_engine {
     // SOME EXAMPLE CODE INCLUDED BELOW
     ///////////////////////////////////////////////////////////////////
 
+  
+
     // Create a NodeWrapperPtr
     NodeWrapperPtr nw_ptr = std::make_shared<NodeWrapper>();
     nw_ptr->parent = nullptr;
@@ -49,15 +64,56 @@ namespace game_engine {
     nw_ptr->cost = 0;
     to_explore.push(nw_ptr);
 
+    NodeWrapperPtr node_to_explore;
+
+    while (!to_explore.empty())
+    {
+      node_to_explore = to_explore.top();
+      to_explore.pop();
+
+      if (subset(explored,node_to_explore))
+      {
+        continue;
+      }
+      if (*(node_to_explore->node_ptr) == *end_ptr)
+      {
+        break;
+      }
+      else
+      {
+        explored.push_back(node_to_explore);
+
+        for(const DirectedEdge2D& edge: graph.Edges(node_to_explore->node_ptr)) 
+        {
+          NodeWrapperPtr nw_ptr = std::make_shared<NodeWrapper>();
+          nw_ptr->node_ptr = edge.Sink();
+          nw_ptr->cost = node_to_explore->cost + edge.Cost();
+          nw_ptr->parent = node_to_explore;
+          to_explore.push(nw_ptr);
+        }
+  
+      }
+    }
+
+    NodeWrapperPtr node = node_to_explore;
+
     // Create a PathInfo
     PathInfo path_info;
-    path_info.details.num_nodes_explored = 0;
-    path_info.details.path_length = 0;
-    path_info.details.path_cost = 0;
-    path_info.details.run_time = timer.Stop();
-    path_info.path = {};
+    path_info.details.num_nodes_explored = explored.size()+1;
+    path_info.details.path_cost = node->cost;
 
-    // You must return a PathInfo
+    path_info.details.path_length = 1;
+    while( node->parent != nullptr )
+    {
+      path_info.path.push_back( node->node_ptr );
+      node = node->parent; 
+      path_info.details.path_length++;
+    }
+    path_info.path.push_back( node->node_ptr );
+    std::reverse( path_info.path.begin(), path_info.path.end() );
+
+    path_info.details.run_time = timer.Stop();
+    
     return path_info;
   }
   
