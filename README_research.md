@@ -7,6 +7,8 @@ cd ~/Workspace/game-engine/src/autonomy_protocol
 git clone git@gitlab.com:radionavlab/machine-games/research-autonomy-protocols.git
 cd ~/Workspace/game-engine/src/autonomy_protocol/research-autonomy-protocols
 git submodule update --init --recursive
+cd ~/Workspace/game-engine/src/autonomy_protocol
+git clone git@gitlab.com:radionavlab/machine-games/ta-autonomy-protocol.git
 ```
 
 ## Build with Research Extensions
