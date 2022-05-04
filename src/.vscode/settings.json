@@ -1,12 +1,10 @@
 {
     "files.associations": {
-<<<<<<< HEAD
         "chrono": "cpp",
-=======
-        "deque": "cpp",
-        "string": "cpp",
-        "vector": "cpp",
->>>>>>> 34e57400fcec8b226fca2d301d4d7773ffc752c4
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "bitset": "cpp",
+        "algorithm": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -21,32 +19,18 @@
         "cwctype": "cpp",
         "array": "cpp",
         "atomic": "cpp",
-        "hash_map": "cpp",
-        "hash_set": "cpp",
         "strstream": "cpp",
         "*.tcc": "cpp",
-        "bitset": "cpp",
-<<<<<<< HEAD
         "complex": "cpp",
         "condition_variable": "cpp",
         "cstdint": "cpp",
         "deque": "cpp",
-=======
-        "chrono": "cpp",
-        "complex": "cpp",
-        "condition_variable": "cpp",
-        "cstdint": "cpp",
->>>>>>> 34e57400fcec8b226fca2d301d4d7773ffc752c4
         "forward_list": "cpp",
         "list": "cpp",
         "unordered_map": "cpp",
         "unordered_set": "cpp",
-<<<<<<< HEAD
         "vector": "cpp",
-=======
->>>>>>> 34e57400fcec8b226fca2d301d4d7773ffc752c4
         "exception": "cpp",
-        "algorithm": "cpp",
         "functional": "cpp",
         "iterator": "cpp",
         "map": "cpp",
@@ -57,10 +41,7 @@
         "random": "cpp",
         "ratio": "cpp",
         "set": "cpp",
-<<<<<<< HEAD
         "string": "cpp",
-=======
->>>>>>> 34e57400fcec8b226fca2d301d4d7773ffc752c4
         "string_view": "cpp",
         "system_error": "cpp",
         "tuple": "cpp",
