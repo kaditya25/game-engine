@@ -68,7 +68,7 @@ namespace game_engine {
               
               goal_reach_time = elapsed_sec;
               quad_scorer = quad_name;
-              if (red_balloon_status && blue_balloon_status){
+              if (!red_balloon_status->popped && !blue_balloon_status->popped){
                 ROS_INFO_STREAM("Goal Reached @ elapsed: " << goal_reach_time);
               }
             } else {

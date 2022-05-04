@@ -32,11 +32,11 @@ goal_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/mesh
 blue_balloon_position: [-16.95, 18.05, -3.5]
 red_balloon_position:  [-25.05, 18.45, -2.65]
 
-move_blue: false
+move_blue: true
 blue_balloon_position_new: [-20.5, 15.5, -4.4]
 blue_balloon_max_move_time: 60.0
 
-move_red: false
+move_red: true
 red_balloon_position_new:  [-20.5, 16.5, -4.4]
 red_balloon_max_move_time: 60.0
 
@@ -44,7 +44,7 @@ use_seed: true
 seed: 31
 
 # 0: zero, 1: mild, 2: stiff, 3: intense, 4: ludicrous
-wind_intensity: 0
+wind_intensity: 1
 
 # revision mode
 # 0: NONE, 1: TIME, 2: SHAPE, 3: WAYPOINT
@@ -60,7 +60,7 @@ joy_mode: false
 # change to true if using the camera
 camera_mode: false
 
-goal_position: [-12.4, 13.5, -4.0]
+goal_position: [-12.4, 13.5, -3.0]
 
 initial_quad_positions:
   "apollo": "-12.4 13.5 -4.0"
