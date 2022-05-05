@@ -1,28 +1,25 @@
 #include "trajectory_server.h"
 
 namespace game_engine {
-  TrajectoryServerNode::
-  TrajectoryServerNode(const std::string& topic,
-                       const std::string& key,
-                       std::shared_ptr<TrajectoryWardenServer> warden) {
-    this->key_ = key;
-    this->warden_ = warden;
-    this->node_handle_ = ros::NodeHandle("/game_engine/");
-    this->service_ =
-      node_handle_.advertiseService(topic,
-                                    &TrajectoryServerNode::ServiceCallback,
-                                    this);
-  }
+TrajectoryServerNode::TrajectoryServerNode(
+    const std::string& topic, const std::string& key,
+    std::shared_ptr<TrajectoryWardenServer> warden) {
+  this->key_ = key;
+  this->warden_ = warden;
+  this->node_handle_ = ros::NodeHandle("/game_engine/");
+  this->service_ = node_handle_.advertiseService(
+      topic, &TrajectoryServerNode::ServiceCallback, this);
+}
 
-  bool TrajectoryServerNode::ServiceCallback(mg_msgs::PVAYT::Request &req,
-                                             mg_msgs::PVAYT::Response &res) {
-    // Required data structure. Formatted as follows:
-    //   [ pos(3), vel(3), acc(3), yaw(1), time(1)]
-    std::vector<
-      Eigen::Matrix<double, 11, 1>,
-      Eigen::aligned_allocator<Eigen::Matrix<double, 11, 1>>> data;
-    
-  for(const mg_msgs::PVAYStamped& instant: req.trajectory) {
+bool TrajectoryServerNode::ServiceCallback(mg_msgs::PVAYT::Request& req,
+                                           mg_msgs::PVAYT::Response& res) {
+  // Required data structure. Formatted as follows:
+  //   [ pos(3), vel(3), acc(3), yaw(1), time(1)]
+  std::vector<Eigen::Matrix<double, 11, 1>,
+              Eigen::aligned_allocator<Eigen::Matrix<double, 11, 1>>>
+      data;
+
+  for (const mg_msgs::PVAYStamped& instant : req.trajectory) {
     Eigen::Matrix<double, 11, 1> local_instant;
     local_instant(0) = instant.pos.x;
     local_instant(1) = instant.pos.y;
@@ -34,14 +31,16 @@ namespace game_engine {
     local_instant(7) = instant.acc.y;
     local_instant(8) = instant.acc.z;
     local_instant(9) = instant.yaw;
-    local_instant(10) = instant.header.stamp.sec + (double)instant.header.stamp.nsec / 1e9;
+    local_instant(10) =
+        instant.header.stamp.sec + (double)instant.header.stamp.nsec / 1e9;
     data.push_back(local_instant);
   }
 
-  TrajectoryCode trajectory_status = warden_->Write(this->key_, Trajectory(data));
+  TrajectoryCode trajectory_status =
+      warden_->Write(this->key_, Trajectory(data));
   res.code = static_cast<unsigned int>(trajectory_status.code);
   res.value = trajectory_status.value;
   res.index = trajectory_status.index;
   return true;
-  }
 }
+}  // namespace game_engine

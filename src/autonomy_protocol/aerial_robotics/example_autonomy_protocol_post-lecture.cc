@@ -1,7 +1,6 @@
-#include "example_autonomy_protocol.h"
-
 #include <chrono>
 
+#include "example_autonomy_protocol.h"
 #include "graph.h"
 #include "occupancy_grid3d.h"
 #include "student_game_engine_visualizer.h"

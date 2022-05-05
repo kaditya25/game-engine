@@ -3,64 +3,64 @@
 
 #pragma once
 
-#include <string>
+#include <Eigen/Dense>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <vector>
-#include <Eigen/Dense>
 
-#include "map3d.h"
 #include "graph.h"
+#include "map3d.h"
 #include "node_eigen.h"
 
 namespace game_engine {
-  class OccupancyGrid3D {
-    private:
-      bool*** data_;
-      size_t size_x_, size_y_, size_z_;
-      bool heap_allocated_{false};
-      
-      //Added: the origin of occupancy grid in rviz coordinate
-      Eigen::Vector3d origin;
-      double gridsize;
+class OccupancyGrid3D {
+ private:
+  bool*** data_;
+  size_t size_x_, size_y_, size_z_;
+  bool heap_allocated_{false};
 
-    public:
-      OccupancyGrid3D() {}
-      ~OccupancyGrid3D();
+  // Added: the origin of occupancy grid in rviz coordinate
+  Eigen::Vector3d origin;
+  double gridsize;
 
-      // Prevent copies due to heap-allocated resouces
-      OccupancyGrid3D(const OccupancyGrid3D&) = delete;
-      OccupancyGrid3D& operator=(const OccupancyGrid3D&) = delete;
+ public:
+  OccupancyGrid3D() {}
+  ~OccupancyGrid3D();
 
-      // Prevent moves (for now)
-      OccupancyGrid3D& operator=(OccupancyGrid3D&& other) noexcept = delete;
-      OccupancyGrid3D(OccupancyGrid3D&& other) noexcept  = delete;
+  // Prevent copies due to heap-allocated resouces
+  OccupancyGrid3D(const OccupancyGrid3D&) = delete;
+  OccupancyGrid3D& operator=(const OccupancyGrid3D&) = delete;
 
-      // Load from various entities
-      bool LoadFromFile(const std::string& file_path);
-      bool LoadFromMap(const Map3D& map, const double sample_delta, const double safety_bound=0);
-      bool LoadFromBuffer(const bool** buffer, const size_t size_x, const size_t size_y, const size_t size_z);
+  // Prevent moves (for now)
+  OccupancyGrid3D& operator=(OccupancyGrid3D&& other) noexcept = delete;
+  OccupancyGrid3D(OccupancyGrid3D&& other) noexcept = delete;
 
-      // Create a graph representation of this occupancy grid. Every cell has a
-      // directed edge to the 8 cells around it.
-      Graph3D AsGraph() const;
-      double GridSize() const;
-      size_t SizeX() const;
-      size_t SizeY() const;
-      size_t SizeZ() const;
+  // Load from various entities
+  bool LoadFromFile(const std::string& file_path);
+  bool LoadFromMap(const Map3D& map, const double sample_delta,
+                   const double safety_bound = 0);
+  bool LoadFromBuffer(const bool** buffer, const size_t size_x,
+                      const size_t size_y, const size_t size_z);
 
-      Eigen::Vector3d Origin() const;
-      Eigen::Vector3d boxCorner(int x, int y, int z);
-      Eigen::Vector3d boxCenter(int x, int y, int z);
-      std::tuple<int,int,int> mapToGridCoordinates(Eigen::Vector3d pt);
-      bool IsOccupied(const size_t z, const size_t y, const size_t x) const;
+  // Create a graph representation of this occupancy grid. Every cell has a
+  // directed edge to the 8 cells around it.
+  Graph3D AsGraph() const;
+  double GridSize() const;
+  size_t SizeX() const;
+  size_t SizeY() const;
+  size_t SizeZ() const;
 
-      const bool*** Data() const;
-  };
-}
+  Eigen::Vector3d Origin() const;
+  Eigen::Vector3d boxCorner(int x, int y, int z);
+  Eigen::Vector3d boxCenter(int x, int y, int z);
+  std::tuple<int, int, int> mapToGridCoordinates(Eigen::Vector3d pt);
+  bool IsOccupied(const size_t z, const size_t y, const size_t x) const;
 
+  const bool*** Data() const;
+};
+}  // namespace game_engine
 
-
-#endif //GAMEENGINE_OCCUPANCYGRID3D_H
+#endif  // GAMEENGINE_OCCUPANCYGRID3D_H
