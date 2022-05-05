@@ -38,11 +38,7 @@ namespace game_engine {
     };
    
     // These must be filled
-<<<<<<< HEAD
     std::vector<std::shared_ptr<Node3D>> path;
-=======
-    std::vector<std::shared_ptr<Node2D>> path;
->>>>>>> 34e57400fcec8b226fca2d301d4d7773ffc752c4
     Details details;
   };
 }
