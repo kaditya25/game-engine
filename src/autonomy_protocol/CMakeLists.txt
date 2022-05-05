@@ -39,4 +39,5 @@ target_compile_options(${TARGET} PRIVATE
 
 if (RESEARCH)
    add_subdirectory(research-autonomy-protocols)
+   add_subdirectory(ta-autonomy-protocol)
 endif()
