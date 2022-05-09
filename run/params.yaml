@@ -24,7 +24,7 @@ balloon_position_topics:
 goal_status_topics:
   "home": "/game_engine/home_status"
 
-map_file_path: "/home/aeronaut/Workspace/game-engine/resources/maps/arena_empty.map"
+map_file_path: "/home/aeronaut/Workspace/game-engine/resources/maps/temple.map"
 quad_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/meshes/quad.stl"
 balloon_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/meshes/balloon.stl"
 goal_mesh_file_path: "file:///home/aeronaut/Workspace/game-engine/resources/meshes/torus.stl"

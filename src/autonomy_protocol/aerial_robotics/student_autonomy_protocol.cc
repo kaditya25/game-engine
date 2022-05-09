@@ -74,6 +74,11 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       end_chrono_time = start_chrono_time + T_chrono;
   static std::vector<double> seg_part;
   static int seg;
+  static int check1;
+  static int check2;
+  static int check22;
+  static int check3;
+  static int check33;
   // Load the current quad position
   const std::string& quad_name = friendly_names_[0];
   Eigen::Vector3d current_pos;
@@ -91,6 +96,11 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     start_pos = current_pos;
     seg_part = {0.25, 0.5, 0.8};
     seg = 0;
+    check1 = 0;
+    check2 = 0;
+    check22 = 0;
+    check3 = 0;
+    check33 = 0;
   }
 
   // Obtain current balloon positions and popped states
@@ -277,182 +287,114 @@ StudentAutonomyProtocol::UpdateTrajectories() {
   std::vector<p4::NodeInequalityBound> node_Inequality_bounds = {};
 
   std::vector<p4::SegmentInequalityBound> segment_Inequality_bounds = {
-      // p4::SegmentInequalityBound(0, 1, Eigen::Vector3d(1, 0, 0), 1.5),
-      // p4::SegmentInequalityBound(0, 1, Eigen::Vector3d(0, 1, 0), 1),
-      // p4::SegmentInequalityBound(0, 1, Eigen::Vector3d(0, 0, 1), 0.5),
-      // p4::SegmentInequalityBound(0, 1, Eigen::Vector3d(-1, 0, 0), 1.5),
-      // p4::SegmentInequalityBound(0, 1, Eigen::Vector3d(0, -1, 0), 1),
-      // p4::SegmentInequalityBound(0, 1, Eigen::Vector3d(0, 0, -1), 0.5),
-      // p4::SegmentInequalityBound(0, 2, Eigen::Vector3d(1, 0, 0), 0.3),
-      // p4::SegmentInequalityBound(0, 2, Eigen::Vector3d(0, 1, 0), 0.1),
-      // p4::SegmentInequalityBound(0, 2, Eigen::Vector3d(0, 0, 1), 0.05),
-      // p4::SegmentInequalityBound(0, 2, Eigen::Vector3d(-1, 0, 0), 0.3),
-      // p4::SegmentInequalityBound(0, 2, Eigen::Vector3d(0, -1, 0), 0.1),
-      // p4::SegmentInequalityBound(0, 2, Eigen::Vector3d(0, 0, -1), 0.05),
+
   };
 
+  Eigen::Vector3d point1 = {-15, 15.5, -3.8};
+  Eigen::Vector3d point2 = {-19, 17.4, -3.2};
+  Eigen::Vector3d point22 = {-23, 17.4, -3};
+  Eigen::Vector3d point3 = {-23, 17.5, -2.8};
+  Eigen::Vector3d point33 = {-16, 15.7, -3.7};
+  Eigen::Vector3d dv1 = current_pos - point1;
+  Eigen::Vector3d dv2 = current_pos - point2;
+  Eigen::Vector3d dv22 = current_pos - point22;
+  Eigen::Vector3d dv3 = current_pos - point3;
+  Eigen::Vector3d dv33 = current_pos - point33;
+  if (dv1.norm() < 1 && seg == 0) {
+    check1 = 1;
+  } else if (dv2.norm() < 1 && seg == 1) {
+    check2 = 1;
+  } else if (dv22.norm() < 1 && seg == 1) {
+    check22 = 1;
+  } else if (dv3.norm() < 1.5 && seg == 2) {
+    check3 = 1;
+  } else if (dv33.norm() < 2.5 && seg == 2) {
+    check33 = 1;
+  }
+  
   if (seg == 0) {
     // The second node constrains position
+    if (check1 == 0) {
+      node_equality_bounds.push_back(p4::NodeEqualityBound(0, 1, 0, point1(0)));
+      node_equality_bounds.push_back(p4::NodeEqualityBound(1, 1, 0, point1(1)));
+      node_equality_bounds.push_back(p4::NodeEqualityBound(2, 1, 0, point1(2)));
+      times.push_back(remaining_seg0_time / 2.0);
+    }
+
     node_equality_bounds.push_back(
-        p4::NodeEqualityBound(0, 1, 0, blue_balloon_pos(0)));
+        p4::NodeEqualityBound(0, 2 - check1, 0, blue_balloon_pos(0)));
     node_equality_bounds.push_back(
-        p4::NodeEqualityBound(1, 1, 0, blue_balloon_pos(1)));
+        p4::NodeEqualityBound(1, 2 - check1, 0, blue_balloon_pos(1)));
     node_equality_bounds.push_back(
-        p4::NodeEqualityBound(2, 1, 0, blue_balloon_pos(2)));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(
-    //     0, 2, 0, (blue_balloon_pos(0) + red_balloon_pos(0)) / 2));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(
-    //     1, 2, 0, (blue_balloon_pos(1) + red_balloon_pos(1)) / 2));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(
-    //     2, 2, 0, (blue_balloon_pos(2) + red_balloon_pos(2)) / 2));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(0, 1, 1, -1.8));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(1, 1, 1, 0));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(2, 1, 1, 0));
+        p4::NodeEqualityBound(2, 2 - check1, 0, blue_balloon_pos(2)));
+    node_equality_bounds.push_back(
+        p4::NodeEqualityBound(2, 2 - check1, 1, -0.1));
+
     times.push_back(remaining_seg0_time);
-    // times.push_back((remaining_seg0_time + remaining_seg1_time) / 2);
-    // node_Inequality_bounds.push_back(p4::NodeInequalityBound(1, 2, 1, -2,
-    // 0)); segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 1, Eigen::Vector3d(1, 0,
-    //     0), 1.5));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 1, Eigen::Vector3d(0, 1, 0), 1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 1, Eigen::Vector3d(0, 0, 1),
-    //     0.5));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 1, Eigen::Vector3d(-1, 0,
-    //     0), 1.5));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 1, Eigen::Vector3d(0, -1, 0),
-    //     1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 1, Eigen::Vector3d(0, 0, -1),
-    //     0.5));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 2, Eigen::Vector3d(1, 0, 0),
-    //     0.35));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 2, Eigen::Vector3d(0, 1, 0),
-    //     0.2));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 2, Eigen::Vector3d(0, 0, 1),
-    //     0.1));
-    // segment_Inequality_bounds.push_back(p4::SegmentInequalityBound(
-    //     1 - seg, 2, Eigen::Vector3d(-1, 0, 0), 0.35));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 2, Eigen::Vector3d(0, -1, 0),
-    //     0.2));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(1 - seg, 2, Eigen::Vector3d(0, 0, -1),
-    //     0.1));
   };
 
   if (seg == 1) {
     // The third node constrains position
+    if (check2 == 0) {
+      node_equality_bounds.push_back(p4::NodeEqualityBound(0, 1, 0, point2(0)));
+      node_equality_bounds.push_back(p4::NodeEqualityBound(1, 1, 0, point2(1)));
+      node_equality_bounds.push_back(p4::NodeEqualityBound(2, 1, 0, point2(2)));
+      times.push_back(remaining_seg1_time / 3.0);
+    }
+    if (check22 == 0) {
+      node_equality_bounds.push_back(
+          p4::NodeEqualityBound(0, 2 - check2, 0, point22(0)));
+      node_equality_bounds.push_back(
+          p4::NodeEqualityBound(1, 2 - check2, 0, point22(1)));
+      node_equality_bounds.push_back(
+          p4::NodeEqualityBound(2, 2 - check2, 0, point22(2)));
+      times.push_back((2 - check2) * remaining_seg1_time / (3 - check2));
+    }
+    node_equality_bounds.push_back(p4::NodeEqualityBound(
+        0, 4 - seg - check2 - check22, 0, red_balloon_pos(0)));
+    node_equality_bounds.push_back(p4::NodeEqualityBound(
+        1, 4 - seg - check2 - check22, 0, red_balloon_pos(1)));
+    node_equality_bounds.push_back(p4::NodeEqualityBound(
+        2, 4 - seg - check2 - check22, 0, red_balloon_pos(2)));
     node_equality_bounds.push_back(
-        p4::NodeEqualityBound(0, 2 - seg, 0, red_balloon_pos(0)));
+        p4::NodeEqualityBound(0, 4 - seg - check2 - check22, 1, 0));
     node_equality_bounds.push_back(
-        p4::NodeEqualityBound(1, 2 - seg, 0, red_balloon_pos(1)));
+        p4::NodeEqualityBound(1, 4 - seg - check2 - check22, 1, 0));
     node_equality_bounds.push_back(
-        p4::NodeEqualityBound(2, 2 - seg, 0, red_balloon_pos(2)));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(
-    //     0, 2, 0, (goal_position_(0) + red_balloon_pos(0)) / 2));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(
-    //     1, 2, 0, (goal_position_(1) + red_balloon_pos(1)) / 2));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(
-    //     2, 2, 0, (goal_position_(2) + red_balloon_pos(2)) / 2));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(0, 2 - seg, 1, 0));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(1, 2 - seg, 1, 0));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(2, 2 - seg, 1, 0));
+        p4::NodeEqualityBound(2, 4 - seg - check2 - check22, 1, 0));
     times.push_back(remaining_seg1_time);
-    // times.push_back((remaining_seg2_time + remaining_seg1_time) / 2);
-    // node_Inequality_bounds.push_back(p4::NodeInequalityBound(1, 2, 1, -2,
-    // 0)); segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 1, Eigen::Vector3d(1, 0,
-    //     0), 1.8));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 1, Eigen::Vector3d(0, 1, 0), 1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 1, Eigen::Vector3d(0, 0, 1),
-    //     0.1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 1, Eigen::Vector3d(-1, 0,
-    //     0), 1.8));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 1, Eigen::Vector3d(0, -1, 0),
-    //     1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 1, Eigen::Vector3d(0, 0, -1),
-    //     0.1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 2, Eigen::Vector3d(1, 0, 0),
-    //     0.35));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 2, Eigen::Vector3d(0, 1, 0),
-    //     0.2));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 2, Eigen::Vector3d(0, 0, 1),
-    //     0.1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 2, Eigen::Vector3d(-1, 0, 0),
-    //     0.35));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 2, Eigen::Vector3d(0, -1, 0),
-    //     0.2));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(2 - seg, 2, Eigen::Vector3d(0, 0, -1),
-    //     0.1));
   }
   if (seg == 2) {
     // The fourth node constrains position
+    if (check3 == 0) {
+      node_equality_bounds.push_back(p4::NodeEqualityBound(0, 1, 0, point3(0)));
+      node_equality_bounds.push_back(p4::NodeEqualityBound(1, 1, 0, point3(1)));
+      node_equality_bounds.push_back(p4::NodeEqualityBound(2, 1, 0, point3(2)));
+      times.push_back(remaining_seg2_time / 6);
+    }
+    if (check33 == 0) {
+      node_equality_bounds.push_back(
+          p4::NodeEqualityBound(0, 2 - check3, 0, point33(0)));
+      node_equality_bounds.push_back(
+          p4::NodeEqualityBound(1, 2 - check3, 0, point33(1)));
+      node_equality_bounds.push_back(
+          p4::NodeEqualityBound(2, 2 - check3, 0, point33(2)));
+      times.push_back(remaining_seg2_time / 2);
+    }
     node_equality_bounds.push_back(
-        p4::NodeEqualityBound(0, 3 - seg, 0, goal_position_(0)));
+        p4::NodeEqualityBound(0, 3 - check3 - check33, 0, goal_position_(0)));
     node_equality_bounds.push_back(
-        p4::NodeEqualityBound(1, 3 - seg, 0, goal_position_(1)));
+        p4::NodeEqualityBound(1, 3 - check3 - check33, 0, goal_position_(1)));
     node_equality_bounds.push_back(
-        p4::NodeEqualityBound(2, 3 - seg, 0, goal_position_(2)));
-    node_equality_bounds.push_back(p4::NodeEqualityBound(0, 3 - seg, 1, 0));
-    node_equality_bounds.push_back(p4::NodeEqualityBound(1, 3 - seg, 1, 0));
-    node_equality_bounds.push_back(p4::NodeEqualityBound(2, 3 - seg, 1, 0));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(0, 3 - seg, 2, 0));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(1, 3 - seg, 2, 0));
-    // node_equality_bounds.push_back(p4::NodeEqualityBound(2, 3 - seg, 2, 0));
+        p4::NodeEqualityBound(2, 3 - check3 - check33, 0, goal_position_(2)));
+    node_equality_bounds.push_back(
+        p4::NodeEqualityBound(0, 3 - check3 - check33, 1, 0));
+    node_equality_bounds.push_back(
+        p4::NodeEqualityBound(1, 3 - check3 - check33, 1, 0));
+    node_equality_bounds.push_back(
+        p4::NodeEqualityBound(2, 3 - check3 - check33, 1, 0));
+
     times.push_back(remaining_seg2_time);
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 1, Eigen::Vector3d(1, 0,
-    //     0), 1.8));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 1, Eigen::Vector3d(0, 1, 0), 1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 1, Eigen::Vector3d(0, 0, 1),
-    //     0.5));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 1, Eigen::Vector3d(-1, 0, 0),
-    //     -1.8));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 1, Eigen::Vector3d(0, -1, 0),
-    //     -1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 1, Eigen::Vector3d(0, 0, -1),
-    //     -0.5));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 2, Eigen::Vector3d(1, 0, 0),
-    //     0.35));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 2, Eigen::Vector3d(0, 1, 0),
-    //     0.2));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 2, Eigen::Vector3d(0, 0, 1),
-    //     0.1));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 2, Eigen::Vector3d(-1, 0, 0),
-    //     0.35));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 2, Eigen::Vector3d(0, -1, 0),
-    //     0.2));
-    // segment_Inequality_bounds.push_back(
-    //     p4::SegmentInequalityBound(3 - seg, 2, Eigen::Vector3d(0, 0, -1),
-    //     0.1));
   }
 
   // Options to configure the polynomial solver with
@@ -587,7 +529,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     case MediationLayerCode::ExceedsMaxVelocity: {
       std::cout << "too fast! :" << seg_part[seg] << std::endl;
       seg_part[seg] = seg_part[seg] + 0.05;
-      std::cout << "slow down! :" << seg_part[seg] << std::endl;
+      // std::cout << "slow down! :" << seg_part[seg] << std::endl;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
       std::cout << "Prevet value: " << prevetter_response.value << std::endl;
@@ -598,7 +540,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     case MediationLayerCode::MeanValueExceedsMaxVelocity: {
       std::cout << "too fast! :" << seg_part[seg] << std::endl;
       seg_part[seg] = seg_part[seg] + 0.05;
-      std::cout << "slow down! :" << seg_part[seg] << std::endl;
+      //   std::cout << "slow down! :" << seg_part[seg] << std::endl;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
       std::cout << "Prevet value: " << prevetter_response.value << std::endl;
@@ -609,7 +551,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     case MediationLayerCode::ExceedsMaxAcceleration: {
       std::cout << "too fast! :" << seg_part[seg] << std::endl;
       seg_part[seg] = seg_part[seg] + 0.05;
-      std::cout << "slow down! :" << seg_part[seg] << std::endl;
+      //   std::cout << "slow down! :" << seg_part[seg] << std::endl;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
       std::cout << "Prevet value: " << prevetter_response.value << std::endl;
@@ -620,7 +562,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     case MediationLayerCode::MeanValueExceedsMaxAcceleration: {
       std::cout << "too fast! :" << seg_part[seg] << std::endl;
       seg_part[seg] = seg_part[seg] + 0.05;
-      std::cout << "slow down! :" << seg_part[seg] << std::endl;
+      //   std::cout << "slow down! :" << seg_part[seg] << std::endl;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
       std::cout << "Prevet value: " << prevetter_response.value << std::endl;

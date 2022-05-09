@@ -1,7 +1,7 @@
-#include <thread>
-#include <cmath>
-
 #include "student_game_engine_visualizer.h"
+
+#include <cmath>
+#include <thread>
 
 void Student_game_engine_visualizer::startVisualizing(std::string msg_name) {
   auto nodeHandle = ros::NodeHandle("/occupancy_visualizer/");
@@ -27,7 +27,8 @@ void Student_game_engine_visualizer::spin() {
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
-void Student_game_engine_visualizer::drawPath(std::vector<Eigen::Vector3d> path, int id) {
+void Student_game_engine_visualizer::drawPath(std::vector<Eigen::Vector3d> path,
+                                              int id) {
   visualization_msgs::Marker msg;
   msg.header.frame_id = "world";
   msg.id = 12347 + id;
@@ -63,12 +64,12 @@ void Student_game_engine_visualizer::drawPath(std::vector<Eigen::Vector3d> path,
   publisher_.publish(msg2);
 }
 
-void Student_game_engine_visualizer::drawTrajectory(game_engine::Trajectory trajectory, int id_offset) {
-
+void Student_game_engine_visualizer::drawTrajectory(
+    game_engine::Trajectory trajectory, int id_offset) {
   // Draw position points as a LineStrip
   visualization_msgs::Marker msg;
   msg.header.frame_id = "world";
-  msg.id = 12348+id_offset;
+  msg.id = 12348 + id_offset;
   msg.ns = "trajectory";
   msg.type = visualization_msgs::Marker::LINE_STRIP;
   msg.action = visualization_msgs::Marker::ADD;
@@ -106,7 +107,8 @@ void Student_game_engine_visualizer::drawTrajectory(game_engine::Trajectory traj
   publisher_.publish(msg);
 }
 
-void Student_game_engine_visualizer::drawDot(Eigen::Vector3d pt, int id, bool good) {
+void Student_game_engine_visualizer::drawDot(Eigen::Vector3d pt, int id,
+                                             bool good) {
   visualization_msgs::Marker msg;
   msg.header.frame_id = "world";
   msg.id = id;
@@ -116,8 +118,8 @@ void Student_game_engine_visualizer::drawDot(Eigen::Vector3d pt, int id, bool go
   msg.scale.x = 0.1;
   msg.scale.y = 0.1;
   msg.scale.z = 0.1;
-  msg.color.g = good?1:0;
-  msg.color.r = good?0:1;
+  msg.color.g = good ? 1 : 0;
+  msg.color.r = good ? 0 : 1;
   msg.color.a = 1;
   msg.pose.orientation.w = 1;
   msg.pose.position.x = pt[0];
@@ -127,17 +129,18 @@ void Student_game_engine_visualizer::drawDot(Eigen::Vector3d pt, int id, bool go
   publisher_.publish(msg);
 }
 
-void Student_game_engine_visualizer::drawBalloonPosition(Eigen::Vector3d pt, std::string balloon_color) {
+void Student_game_engine_visualizer::drawBalloonPosition(
+    Eigen::Vector3d pt, std::string balloon_color) {
   visualization_msgs::Marker msg;
   msg.header.frame_id = "world";
-  if(balloon_color == "red") {
+  if (balloon_color == "red") {
     // bright pink dot
     msg.id = 5678;
     msg.color.r = 1.0f;
     msg.color.g = 0.0f;
     msg.color.b = 0.7f;
     msg.color.a = 1.0f;
-  } else if(balloon_color == "blue") {
+  } else if (balloon_color == "blue") {
     // turquoise blue dot
     msg.id = 5679;
     msg.color.r = 0.0f;
@@ -165,7 +168,8 @@ void Student_game_engine_visualizer::drawBalloonPosition(Eigen::Vector3d pt, std
   publisher_.publish(msg);
 }
 
-void Student_game_engine_visualizer::drawCurve(std::vector<Eigen::Vector3d> pts, int id, Eigen::Vector3d rgb) {
+void Student_game_engine_visualizer::drawCurve(std::vector<Eigen::Vector3d> pts,
+                                               int id, Eigen::Vector3d rgb) {
   // Draw position points as a LineStrip
   visualization_msgs::Marker msg;
   msg.header.frame_id = "world";
