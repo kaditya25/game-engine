@@ -1,6 +1,7 @@
+#include "example_autonomy_protocol.h"
+
 #include <chrono>
 
-#include "example_autonomy_protocol.h"
 #include "graph.h"
 #include "occupancy_grid3d.h"
 #include "student_game_engine_visualizer.h"
@@ -269,8 +270,7 @@ ExampleAutonomyProtocol::UpdateTrajectories() {
   // what it displays like you do with the Student_game_engine_visualizer
   // invoked below.
 
-  // TODO: invoke visualizer, load trajectory into quad_to_trajectory_map, and
-  // return.
+  // TODO: invoke visualizer, load trajectory into quad_to_trajectory_map, and return.
   return 0;
 }
 }  // namespace game_engine

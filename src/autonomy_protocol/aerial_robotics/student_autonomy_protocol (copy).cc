@@ -71,12 +71,13 @@ TrajectoryVector3D generateTrajectoryVector(
         p4::NodeEqualityBound(2, i, 0, xyz_Phy(2, i)));
     times.push_back(dt_factor * i);
   }
-  node_equality_bounds.push_back(
-      p4::NodeEqualityBound(0, xyz_Phy.cols() - 1, 1, 0));
+  // node_equality_bounds.push_back(p4::NodeEqualityBound(0, xyz_Phy.cols()-1,
+  // 1, xyz_Phy(0, i)));
   node_equality_bounds.push_back(
       p4::NodeEqualityBound(1, xyz_Phy.cols() - 1, 1, 0));
-  node_equality_bounds.push_back(
-      p4::NodeEqualityBound(2, xyz_Phy.cols() - 1, 1, 0));
+  // node_equality_bounds.push_back(p4::NodeEqualityBound(2, xyz_Phy.cols()-1,
+  // 1, xyz_Phy(2, i)));
+
   // Various options for P4 Solver
   p4::PolynomialSolver::Options solver_options;
   solver_options.num_dimensions = 3;
@@ -95,15 +96,15 @@ TrajectoryVector3D generateTrajectoryVector(
 
   // Sets up P4 Position Sampler options
   p4::PolynomialSampler::Options sampler_p_options;
-  sampler_p_options.frequency = 100;
+  sampler_p_options.frequency = 200;
   sampler_p_options.derivative_order = 0;
   // Sets up P4 Velocity Sampler options
   p4::PolynomialSampler::Options sampler_v_options;
-  sampler_v_options.frequency = 100;
+  sampler_v_options.frequency = 200;
   sampler_v_options.derivative_order = 1;
   // Sets up P4 Acceleration Sampler options
   p4::PolynomialSampler::Options sampler_a_options;
-  sampler_a_options.frequency = 100;
+  sampler_a_options.frequency = 200;
   sampler_a_options.derivative_order = 2;
 
   // Runs P4 Sampler
@@ -131,9 +132,9 @@ TrajectoryVector3D generateTrajectoryVector(
   return ret;
 }
 
-std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(15);
-constexpr double DISCRETE_LENGTH = 0.3;
-constexpr double SAFETY_BOUNDS = 0.6;
+std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(100);
+constexpr double DISCRETE_LENGTH = 0.2;
+constexpr double SAFETY_BOUNDS = 0.5;
 
 std::unordered_map<std::string, Trajectory>
 StudentAutonomyProtocol::UpdateTrajectories() {
@@ -146,13 +147,12 @@ StudentAutonomyProtocol::UpdateTrajectories() {
   static const std::string& quad_name = friendly_names_[0];
   static const std::chrono::time_point<std::chrono::system_clock>
       start_chrono_time = std::chrono::system_clock::now();
-  static double dt_factor = 2;
+  static double dt_factor = 1.2;
   static Eigen::Vector3d start_pos;
   static Eigen::Vector3d prev_pos;
   static int
       target;  // 0 - red balloon || 1 - blue balloon || 2 - return to home
-  static int check1 = 0;
-  static int check2 = 0;
+
   std::unordered_map<std::string, Trajectory> quad_to_trajectory_map;
   Eigen::Vector3d current_pos;
   Eigen::Vector3d current_vel;
@@ -188,70 +188,36 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     first_time = false;
   }
 
-  const Eigen::Vector3d dv = current_pos - goal_position_;
-  TrajectoryVector3D trajectory_vector;
-  if ((halt || dv.norm() < 0.4) && red_balloon_popped && blue_balloon_popped) {
-    halt = true;
-    for (size_t idx = 0; idx < 20; ++idx) {
-      const std::chrono::duration<double> flight_chrono_time =
-          current_chrono_time.time_since_epoch() + idx * dt_chrono;
-      const double flight_time = flight_chrono_time.count();
-      trajectory_vector.push_back(
-          (Eigen::Matrix<double, 11, 1>() << goal_position_.x(),
-           goal_position_.y(), goal_position_.z(), 0, 0, 0, 0, 0, 0, 0,
-           flight_time)
-              .finished());
-    }
-    Trajectory trajectory(trajectory_vector);
-    visualizer.drawTrajectory(trajectory);
-    quad_to_trajectory_map[quad_name] = trajectory;
-    return quad_to_trajectory_map;
-  }
-
   Eigen::Vector3d target_pos;
   switch (target) {
     case 0:
       if (!red_balloon_popped && !blue_balloon_popped) {
         target_pos = red_balloon_pos;
-
+        dt_factor = 1.5;
       } else if (red_balloon_popped && !blue_balloon_popped) {
         target_pos = blue_balloon_pos;
-        if (check1 == 0) {
-          check1 = 1;
-          dt_factor = 3;
-        }
-
+        dt_factor = 1.5;
       } else {
-        if (check2 == 0) {
-          check2 = 1;
-          dt_factor = 3;
-        }
         target_pos = start_pos;
+        dt_factor = 1.5;
       }
       break;
     case 1:
       if (!red_balloon_popped && !blue_balloon_popped) {
         target_pos = blue_balloon_pos;
-        // dt_factor = 2;
+        dt_factor = 1.5;
+
       } else if (!red_balloon_popped && blue_balloon_popped) {
         target_pos = red_balloon_pos;
-        if (check1 == 0) {
-          check1 = 1;
-          dt_factor = 3;
-        }
-        // dt_factor = 2;
+        dt_factor = 1.5;
       } else {
-        if (check2 == 0) {
-          check2 = 1;
-          dt_factor = 3;
-        }
         target_pos = start_pos;
-        // dt_factor = 2;
+        dt_factor = 1.5;
       }
       break;
   }
 
-  // std::cout << "target_pos: " << target_pos << std::endl;
+  std::cout << "target_pos: " << target_pos << std::endl;
   // std::shared_ptr<Node3D> com_cur_pos =
   //     ptr_Phy2Com(current_pos, occupancy_grid);
   // not sure why this function gives errors but work well outside
@@ -290,14 +256,14 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     xyz_Phy.col(i) = occupancy_grid.boxCenter(x_ind, y_ind, z_ind);
   }
   // end here~~~~~~~~~~~~~~~~~~~~~~
-  trajectory_vector = generateTrajectoryVector(
+  TrajectoryVector3D trajectory_vector = generateTrajectoryVector(
       2, dt_factor, current_chrono_time, xyz_Phy, current_vel);
 
   Trajectory trajectory(trajectory_vector);
-
+  std::unordered_map<std::string, Trajectory> empty_quad_to_trajectory_map;
   TrajectoryCode prevetter_response =
       prevetter_->PreVet(quad_name, trajectory, map3d_);
-  std::unordered_map<std::string, Trajectory> empty_quad_to_trajectory_map;
+
   switch (prevetter_response.code) {
     case MediationLayerCode::Success:
       // Invoke the visualizer to see the proposed trajectory, which will be
@@ -323,7 +289,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       break;
     }
     case MediationLayerCode::StartPointFarFromCurrentPosition: {
-      dt_factor = 2;
+      dt_factor = 1.5;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
       // std::cout << "Prevet value: " << prevetter_response.value << std::endl;
@@ -348,7 +314,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     }
     case MediationLayerCode::ExceedsMaxVelocity: {
       std::cout << "too fast! :" << dt_factor << std::endl;
-      dt_factor = dt_factor + 0.1;
+      dt_factor = dt_factor + 0.05;
       // std::cout << "slow down! :" << seg_part[seg] << std::endl;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
@@ -359,7 +325,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     }
     case MediationLayerCode::MeanValueExceedsMaxVelocity: {
       std::cout << "too fast! :" << dt_factor << std::endl;
-      dt_factor = dt_factor + 0.1;
+      dt_factor = dt_factor + 0.05;
       //   std::cout << "slow down! :" << seg_part[seg] << std::endl;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
@@ -370,7 +336,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     }
     case MediationLayerCode::ExceedsMaxAcceleration: {
       std::cout << "too fast! :" << dt_factor << std::endl;
-      dt_factor = dt_factor + 0.1;
+      dt_factor = dt_factor + 0.05;
       //   std::cout << "slow down! :" << seg_part[seg] << std::endl;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
@@ -381,7 +347,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     }
     case MediationLayerCode::MeanValueExceedsMaxAcceleration: {
       std::cout << "too fast! :" << dt_factor << std::endl;
-      dt_factor = dt_factor + 0.1;
+      dt_factor = dt_factor + 0.05;
       //   std::cout << "slow down! :" << seg_part[seg] << std::endl;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
@@ -410,5 +376,5 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       break;
     }
   }
-}  // namespace game_engine
+}
 }  // namespace game_engine

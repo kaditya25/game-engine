@@ -7,6 +7,7 @@ find_package (Eigen3 3.3 NO_MODULE)
 set(SOURCE_FILES
   aerial_robotics/example_autonomy_protocol.cc
   aerial_robotics/student_autonomy_protocol.cc
+  aerial_robotics/a_star3d.cc
   game_snapshot.cc
   student_game_engine_visualizer.cc
   )

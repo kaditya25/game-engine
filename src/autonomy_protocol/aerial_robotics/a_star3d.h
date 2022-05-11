@@ -11,10 +11,10 @@
 
 namespace game_engine {
 
-  struct AStar3D {
-    // Students will implement this function
-    PathInfo Run(const Graph3D& graph, 
-                 const std::shared_ptr<Node3D> start_ptr, 
-                 const std::shared_ptr<Node3D> end_ptr);
-  };
+	struct AStar3D {
+		// Students will implement this function
+		PathInfo Run(const Graph3D& graph, 
+								 const std::shared_ptr<Node3D> start_ptr, 
+								 const std::shared_ptr<Node3D> end_ptr);
+	};
 }
