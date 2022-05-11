@@ -18,16 +18,6 @@ OccupancyGrid3D::~OccupancyGrid3D() {
   std::free(this->data_);
 }
 
-Eigen::Vector3d OccupancyGrid3D::Origin() const { return this->origin; }
-
-size_t OccupancyGrid3D::SizeX() const { return this->size_x_; }
-
-size_t OccupancyGrid3D::SizeY() const { return this->size_y_; }
-
-size_t OccupancyGrid3D::SizeZ() const { return this->size_z_; }
-
-double OccupancyGrid3D::GridSize() const { return this->gridsize; }
-
 bool OccupancyGrid3D::IsOccupied(const size_t z, const size_t y,
                                  const size_t x) const {
   if (x < 0 || y < 0 || z < 0 || x >= size_x_ || y >= size_y_ || z >= size_z_) {
@@ -129,8 +119,8 @@ bool OccupancyGrid3D::LoadFromMap(const Map3D& map, const double sample_delta,
   this->size_z_ = std::ceil((max_z - min_z) / sample_delta) + 1;
 
   Eigen::Vector3d origin(min_x, min_y, min_z);
-  this->origin = origin;
-  this->gridsize = sample_delta;
+  this->origin_ = origin;
+  this->gridsize_ = sample_delta;
 
   // Allocate memory on the heap for the file
   this->data_ =
@@ -187,21 +177,21 @@ bool OccupancyGrid3D::LoadFromBuffer(const bool** buffer, const size_t size_x,
 
 // Returns the minimum corner coordinates of the grid cell at index [x,y,z]
 Eigen::Vector3d OccupancyGrid3D::boxCorner(int x, int y, int z) {
-  return Eigen::Vector3d(x * gridsize + origin.x(), y * gridsize + origin.y(),
-                         z * gridsize + origin.z());
+  return Eigen::Vector3d(x * gridsize_ + origin_.x(), y * gridsize_ + origin_.y(),
+                         z * gridsize_ + origin_.z());
 }
 
 // Returns the center coordinates of the grid cell at index [x,y,z]
 Eigen::Vector3d OccupancyGrid3D::boxCenter(int x, int y, int z) {
   return boxCorner(x, y, z) +
-         Eigen::Vector3d(gridsize * 0.5, gridsize * 0.5, gridsize * 0.5);
+         Eigen::Vector3d(gridsize_ * 0.5, gridsize_ * 0.5, gridsize_ * 0.5);
 }
 
 std::tuple<int, int, int> OccupancyGrid3D::mapToGridCoordinates(
     Eigen::Vector3d pt) {
-  return std::tuple<int, int, int>(floor((pt[0] - origin.x()) / gridsize),
-                                   floor((pt[1] - origin.y()) / gridsize),
-                                   floor((pt[2] - origin.z()) / gridsize));
+  return std::tuple<int, int, int>(floor((pt[0] - origin_.x()) / gridsize_),
+                                   floor((pt[1] - origin_.y()) / gridsize_),
+                                   floor((pt[2] - origin_.z()) / gridsize_));
 }
 
 Graph3D OccupancyGrid3D::AsGraph() const {
