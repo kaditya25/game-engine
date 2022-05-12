@@ -6,7 +6,7 @@
 #include "occupancy_grid3d.h"
 #include "student_game_engine_visualizer.h"
 
-// The length of one side of a cube in meters in the occupancy grid
+// The length of one side of a cubic cell, in meters, in the occupancy grid
 constexpr double DISCRETE_LENGTH = 0.2;
 // How big the "inflation" bubble around obstacles will be, in meters
 constexpr double SAFETY_BOUNDS = 0.34;
@@ -38,6 +38,13 @@ ExampleAutonomyProtocol::UpdateTrajectories() {
   // variables, you could instead make these data members of your
   // StudentAutonomyProtocol class, which is a more standard C++ code design
   // pattern.
+  //
+  // The OccupancyGrid3D class, which has already been written for you, divides
+  // the arena space into cells of a size you specify (by DISCRETE_LENGTH).  It
+  // has convenient functions for determining whether a cell is occupied and for
+  // translating between a cell's 3d grid index and its 3d cell center position,
+  // in meters.  Have a look at game-engine/src/environment/occupancy_grid3d.h
+  // to see the functions this class offers.
   static OccupancyGrid3D occupancy_grid;
   static Graph3D graph_of_arena;
   // Student_game_engine_visualizer is a class that supports visualizing paths,
