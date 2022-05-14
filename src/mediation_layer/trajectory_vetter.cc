@@ -44,9 +44,10 @@ TrajectoryCode TrajectoryVetter::Vet(
   }
 
   // Position constraints
+  const Map3D inflated_map = map.Inflate(this->options_.min_distance);
   for (size_t idx = 0; idx < trajectory_size; ++idx) {
     const Eigen::Vector3d point = trajectory.Position(idx);
-    if (!map.Contains(point)) {
+    if (!inflated_map.Contains(point)) {
       std::cerr << "Specified trajectory point [" << point.transpose()
                 << "] exceeded map bounds" << std::endl;
 
@@ -54,7 +55,7 @@ TrajectoryCode TrajectoryVetter::Vet(
       trajectory_code_.index = idx;
       return trajectory_code_;
     }
-    if (!map.IsFreeSpace(point)) {
+    if (!inflated_map.IsFreeSpace(point)) {
       std::cerr << "Specified trajectory point [" << point.transpose()
                 << "] is contained within an obstacle" << std::endl;
 

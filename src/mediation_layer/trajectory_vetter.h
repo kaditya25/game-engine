@@ -40,6 +40,9 @@ class TrajectoryVetter {
     // The maximum time between trajectory samples in seconds
     double max_delta_t = 0.020;
 
+    // Minimum l-infinity distance from all obstacles that a quad may fly
+    double min_distance;
+
     Options() {}
   };
 
@@ -53,14 +56,17 @@ class TrajectoryVetter {
       // sport mode
       options_.max_velocity_magnitude = 3.0;
       options_.max_acceleration_magnitude = 1.5;
-    } else if (quad_safety_limits_ == 2) {
+      options_.min_distance = 1.25;
+    } else if (quad_safety_limits_ == 1.25) {
       // extreme mode
       options_.max_velocity_magnitude = 3.0;
       options_.max_acceleration_magnitude = 3.0;
+      options_.min_distance = 1.0;
     } else {
       // safe and default
       options_.max_velocity_magnitude = 2.0;
       options_.max_acceleration_magnitude = 0.4;
+      options_.min_distance = .40;
     }
   }
 
