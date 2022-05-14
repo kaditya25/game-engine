@@ -21,30 +21,6 @@ PathInfo runAStar(const Graph3D& graph,
   return ret;
 }
 
-// std::shared_ptr<Node3D> ptr_Phy2Com(Eigen::Vector3d phy_pos,
-//                                     OccupancyGrid3D occupancy_grid) {
-//   std::tuple<int, int, int> pos_ind =
-//       occupancy_grid.mapToGridCoordinates(phy_pos);
-//   // std::shared_ptr<Node3D> require an Eigen::Vector3d, but
-//   // mapToGridCoordinates produces int
-//   Eigen::Vector3d com_pos = {std::get<0>(pos_ind), std::get<1>(pos_ind),
-//                              std::get<2>(pos_ind)};
-//   std::shared_ptr<Node3D> pos_ptr = std::make_shared<Node3D>(com_pos);
-//   return pos_ptr;
-// }
-
-// Eigen::MatrixXd ptr_Com2Phy(const PathInfo& path_info,
-//                             OccupancyGrid3D occupancy_grid) {
-//   Eigen::MatrixXd xyz_Phy;
-//   for (int i = 0; i < path_info.details.path_length; i++) {
-//     int x_ind = lround(path_info.path[i]->Data().x());
-//     int y_ind = lround(path_info.path[i]->Data().y());
-//     int z_ind = lround(path_info.path[i]->Data().z());
-//     xyz_Phy.row(i) = occupancy_grid.boxCenter(x_ind, y_ind, z_ind);
-//   }
-//   return xyz_Phy;
-// }
-
 double reset_ETA(
     std::chrono::time_point<std::chrono::system_clock> end_chrono_time) {
   double ETA = std::chrono::duration_cast<std::chrono::seconds>(
@@ -178,7 +154,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       std::chrono::system_clock::now();
   double dt = std::chrono::duration<double>(dt_chrono).count() / 1000;
   const double dt_factor_default = 1.5;
-  const int P4_inflate = 5;
+  static int P4_inflate = 6;
   snapshot_->Position(quad_name, current_pos);
   snapshot_->Velocity(quad_name, current_vel);
 
@@ -199,12 +175,11 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     Eigen::Vector3d dist_blue = current_pos - *blue_balloon_position_;
     ETA = reset_ETA(end_chrono_time);
     // Chooses an initial target depending on which balloon is closer
-    // if (dist_red.norm() < dist_blue.norm()) {
-    //   target = 0;
-    // } else {
-    //   target = 1;
-    // }
-    target = 0;
+    if (dist_red.norm() < dist_blue.norm()) {
+      target = 0;
+    } else {
+      target = 1;
+    }
     first_time = false;
     dt_factor = dt_factor_default;
   }
@@ -285,28 +260,6 @@ StudentAutonomyProtocol::UpdateTrajectories() {
   }
   // function ends here~~~~~~~~~~~~~~~~
 
-  // if ((target_pos - current_pos).norm() < std::sqrt(3) * DISCRETE_LENGTH) {
-  //   int bigger = 1;
-  //   while (true) {
-  //     TrajectoryVector3D trajectory_vector_temp;
-  //     trajectory_vector_temp = generateTrajectoryVector(
-  //         3, dt_factor, current_chrono_time, xyz_Phy, current_vel,
-  //         P4_inflate);
-  //     Trajectory trajectory(trajectory_vector_temp);
-  //     TrajectoryCode prevetter_response =
-  //         prevetter_->PreVet(quad_name, trajectory, map3d_);
-
-  //     if (prevetter_response.code == MediationLayerCode::Success) {
-  //       std::cout << "good!!" << std::endl;
-  //       break;
-  //     }
-  //   }
-  //   return quad_to_trajectory_map;
-  // }
-
-  // std::shared_ptr<Node3D> com_cur_pos =
-  //     ptr_Phy2Com(current_pos, occupancy_grid);
-  // not sure why this function gives errors but work well outside
   // function start here~~~~~~~~
   std::tuple<int, int, int> pos_ind1 =
       occupancy_grid.mapToGridCoordinates(current_pos);
@@ -344,28 +297,15 @@ StudentAutonomyProtocol::UpdateTrajectories() {
   // end here~~~~~~~~~~~~~~~~~~~~~~
 
   std::unordered_map<std::string, Trajectory> empty_quad_to_trajectory_map;
-  // if (xyz_Phy.cols() < 2 * P4_inflate) {
-  //   if ((target_pos - current_pos).norm() < std::sqrt(3) * DISCRETE_LENGTH) {
-  //       std::cout << "close to the target < 2*inflate. " << std::endl;
-  //       trajectory_vector = generateTrajectoryVector(
-  //           3, 1, current_chrono_time, xyz_Phy, current_vel, 1);
-  //       Trajectory trajectory(trajectory_vector);
-  //       TrajectoryCode prevetter_response =
-  //           prevetter_->PreVet(quad_name, trajectory, map3d_);
-  //       visualizer.drawTrajectory(trajectory);
-  //       quad_to_trajectory_map[quad_name] = trajectory;
-  //       return quad_to_trajectory_map;
-  //   }
-  //   std::cout << "close to the target. " << std::endl;
-  //   return empty_quad_to_trajectory_map;
-  // }
+
   if (xyz_Phy.cols() < 2 * P4_inflate && xyz_Phy.cols() >= 2) {
     double dt_temp = 1;
-    
-    while ((check2 && !check1) || (!check2 && check1) && !once ) {
+    int P_inflate_temp = P4_inflate - 1;
+    while ((check2 && !check1) || (!check2 && check1) && !once) {
       // std::cout << "close to the target < 2*inflate. " << std::endl;
-      trajectory_vector = generateTrajectoryVector(
-          3, dt_temp, current_chrono_time, xyz_Phy, (Eigen::Vector3d {0,0,0}), 1);
+      trajectory_vector =
+          generateTrajectoryVector(3, dt_temp, current_chrono_time, xyz_Phy,
+                                   (Eigen::Vector3d{0, 0, 0}), P_inflate_temp);
       Trajectory trajectory(trajectory_vector);
       TrajectoryCode prevetter_response =
           prevetter_->PreVet(quad_name, trajectory, map3d_);
@@ -376,6 +316,11 @@ StudentAutonomyProtocol::UpdateTrajectories() {
         return quad_to_trajectory_map;
       }
       dt_temp = dt_temp + 0.1;
+      if (P_inflate_temp > 2) {
+        P_inflate_temp = P_inflate_temp - 1;
+      } else {
+        P_inflate_temp = 1;
+      }
     }
     return empty_quad_to_trajectory_map;
   } else if (xyz_Phy.cols() < 2) {
@@ -384,7 +329,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
   }
 
   trajectory_vector = generateTrajectoryVector(
-      3, dt_factor, current_chrono_time, xyz_Phy, current_vel, P4_inflate);
+      4, dt_factor, current_chrono_time, xyz_Phy, current_vel, P4_inflate);
 
   Trajectory trajectory(trajectory_vector);
 
@@ -398,11 +343,14 @@ StudentAutonomyProtocol::UpdateTrajectories() {
         ETA = trajectory_vector.back()(10, 0);
         visualizer.drawTrajectory(trajectory);
         quad_to_trajectory_map[quad_name] = trajectory;
+        P4_inflate = P4_inflate + 1;
 
-        std::cout << "New Path! with dt =" << dt_factor << std::endl;
+        std::cout << "New Path! with dt =" << dt_factor << std::endl
+                  << "P4_inflate = " << P4_inflate << std::endl
+                  << "ETA = " << ETA / 100000000 << std::endl;
         return quad_to_trajectory_map;
       } else {
-        dt_factor = dt_factor - 0.2;
+        dt_factor = dt_factor - 0.3;
         // std::cout << "no new path!" << std::endl;
         return empty_quad_to_trajectory_map;
       }
@@ -416,7 +364,8 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       break;
     }
     case MediationLayerCode::StartPointFarFromCurrentPosition: {
-      dt_factor = dt_factor_default + 1;
+      dt_factor = dt_factor_default + 0.5;
+      P4_inflate = 5;
       ETA = reset_ETA(end_chrono_time);
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
@@ -426,6 +375,8 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       break;
     }
     case MediationLayerCode::PointExceedsMapBounds: {
+      P4_inflate = 5;
+      dt_factor = dt_factor_default;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
       std::cout << "Prevet value: " << prevetter_response.value << std::endl;
@@ -434,6 +385,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       break;
     }
     case MediationLayerCode::PointWithinObstacle: {
+      P4_inflate = 5;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
       std::cout << "Prevet value: " << prevetter_response.value << std::endl;
