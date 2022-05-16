@@ -21,6 +21,30 @@ PathInfo runAStar(const Graph3D& graph,
   return ret;
 }
 
+// std::shared_ptr<Node3D> ptr_Phy2Com(Eigen::Vector3d phy_pos,
+//                                     OccupancyGrid3D occupancy_grid) {
+//   std::tuple<int, int, int> pos_ind =
+//       occupancy_grid.mapToGridCoordinates(phy_pos);
+//   // std::shared_ptr<Node3D> require an Eigen::Vector3d, but
+//   // mapToGridCoordinates produces int
+//   Eigen::Vector3d com_pos = {std::get<0>(pos_ind), std::get<1>(pos_ind),
+//                              std::get<2>(pos_ind)};
+//   std::shared_ptr<Node3D> pos_ptr = std::make_shared<Node3D>(com_pos);
+//   return pos_ptr;
+// }
+
+// Eigen::MatrixXd ptr_Com2Phy(const PathInfo& path_info,
+//                             OccupancyGrid3D occupancy_grid) {
+//   Eigen::MatrixXd xyz_Phy;
+//   for (int i = 0; i < path_info.details.path_length; i++) {
+//     int x_ind = lround(path_info.path[i]->Data().x());
+//     int y_ind = lround(path_info.path[i]->Data().y());
+//     int z_ind = lround(path_info.path[i]->Data().z());
+//     xyz_Phy.row(i) = occupancy_grid.boxCenter(x_ind, y_ind, z_ind);
+//   }
+//   return xyz_Phy;
+// }
+
 double reset_ETA(
     std::chrono::time_point<std::chrono::system_clock> end_chrono_time) {
   double ETA = std::chrono::duration_cast<std::chrono::seconds>(
@@ -120,7 +144,7 @@ TrajectoryVector3D generateTrajectoryVector(
 
 std::chrono::milliseconds dt_chrono = std::chrono::milliseconds(15);
 constexpr double DISCRETE_LENGTH = 0.3;
-constexpr double SAFETY_BOUNDS = 0.7;
+constexpr double SAFETY_BOUNDS = 0.6;
 constexpr int duration_sec = 300;
 const std::chrono::milliseconds T_chrono = std::chrono::seconds(duration_sec);
 
@@ -154,7 +178,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       std::chrono::system_clock::now();
   double dt = std::chrono::duration<double>(dt_chrono).count() / 1000;
   const double dt_factor_default = 1.5;
-  static int P4_inflate = 6;
+  static int P4_inflate = 4;
   snapshot_->Position(quad_name, current_pos);
   snapshot_->Velocity(quad_name, current_vel);
 
@@ -180,6 +204,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     } else {
       target = 1;
     }
+    // target = 0;
     first_time = false;
     dt_factor = dt_factor_default;
   }
@@ -260,6 +285,9 @@ StudentAutonomyProtocol::UpdateTrajectories() {
   }
   // function ends here~~~~~~~~~~~~~~~~
 
+  // std::shared_ptr<Node3D> com_cur_pos =
+  //     ptr_Phy2Com(current_pos, occupancy_grid);
+  // not sure why this function gives errors but work well outside
   // function start here~~~~~~~~
   std::tuple<int, int, int> pos_ind1 =
       occupancy_grid.mapToGridCoordinates(current_pos);
@@ -335,7 +363,6 @@ StudentAutonomyProtocol::UpdateTrajectories() {
 
   TrajectoryCode prevetter_response =
       prevetter_->PreVet(quad_name, trajectory, map3d_);
-  // std::cout << ETA - trajectory_vector.back()(10, 0) << std::endl;
 
   switch (prevetter_response.code) {
     case MediationLayerCode::Success: {
@@ -365,7 +392,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     }
     case MediationLayerCode::StartPointFarFromCurrentPosition: {
       dt_factor = dt_factor_default + 0.5;
-      P4_inflate = 5;
+      P4_inflate = 4;
       ETA = reset_ETA(end_chrono_time);
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
@@ -375,7 +402,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       break;
     }
     case MediationLayerCode::PointExceedsMapBounds: {
-      P4_inflate = 5;
+      P4_inflate = 4;
       dt_factor = dt_factor_default;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
@@ -385,7 +412,7 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       break;
     }
     case MediationLayerCode::PointWithinObstacle: {
-      P4_inflate = 5;
+      P4_inflate = P4_inflate - 1;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
       std::cout << "Prevet value: " << prevetter_response.value << std::endl;
@@ -394,13 +421,31 @@ StudentAutonomyProtocol::UpdateTrajectories() {
       break;
     }
     case MediationLayerCode::ExceedsMaxVelocity: {
-      // std::cout << "too fast! :" << dt_factor << std::endl;
+
       dt_factor = dt_factor + 0.1;
-      // std::cout << "slow down! :" << seg_part[seg] << std::endl;
+      // TrajectoryVector3D trajectory_vector_temp;
+
+      // for (size_t idx = 0; idx < prevetter_response.index; ++idx) {
+      //   Eigen::Vector3d pos_temp = trajectory.Position(idx);
+      //   Eigen::Vector3d vel_temp = trajectory.Velocity(idx);
+      //   Eigen::Vector3d acc_temp = trajectory.Acceleration(idx);
+      //   double t_temp = trajectory.Time(idx);
+      //   trajectory_vector_temp.push_back(
+      //       (Eigen::Matrix<double, 11, 1>() << pos_temp(0), pos_temp(1),
+      //        pos_temp(2), vel_temp(0), vel_temp(1), vel_temp(2), acc_temp(0),
+      //        acc_temp(1), acc_temp(2), 0, t_temp)
+      //           .finished());
+      // }
+      // Trajectory trajectory_temp(trajectory_vector_temp);
+      // visualizer.drawTrajectory(trajectory_temp);
+      // quad_to_trajectory_map[quad_name] = trajectory_temp;
+      // std::cout << "trajectory size: " << trajectory_vector_temp.size()
+      //           << std::endl;
       std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
                 << std::endl;
       std::cout << "Prevet value: " << prevetter_response.value << std::endl;
       std::cout << "Prevet index: " << prevetter_response.index << std::endl;
+      // return quad_to_trajectory_map;
       return empty_quad_to_trajectory_map;
       break;
     }
@@ -418,11 +463,30 @@ StudentAutonomyProtocol::UpdateTrajectories() {
     case MediationLayerCode::ExceedsMaxAcceleration: {
       // std::cout << "too fast! :" << dt_factor << std::endl;
       dt_factor = dt_factor + 0.1;
-      //   std::cout << "slow down! :" << seg_part[seg] << std::endl;
-      std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
-                << std::endl;
-      std::cout << "Prevet value: " << prevetter_response.value << std::endl;
-      std::cout << "Prevet index: " << prevetter_response.index << std::endl;
+
+      // TrajectoryVector3D trajectory_vector_temp;
+
+      // for (size_t idx = 0; idx < prevetter_response.index; ++idx) {
+      //   Eigen::Vector3d pos_temp = trajectory.Position(idx);
+      //   Eigen::Vector3d vel_temp = trajectory.Velocity(idx);
+      //   Eigen::Vector3d acc_temp = trajectory.Acceleration(idx);
+      //   double t_temp = trajectory.Time(idx);
+      //   trajectory_vector_temp.push_back(
+      //       (Eigen::Matrix<double, 11, 1>() << pos_temp(0), pos_temp(1),
+      //        pos_temp(2), vel_temp(0), vel_temp(1), vel_temp(2), acc_temp(0),
+      //        acc_temp(1), acc_temp(2), 0, t_temp)
+      //           .finished());
+      // }
+      // Trajectory trajectory_temp(trajectory_vector_temp);
+      // quad_to_trajectory_map[quad_name] = trajectory_temp;
+      // visualizer.drawTrajectory(trajectory_temp);
+      // std::cout << "trajectory size: " << trajectory_vector_temp.size()
+      //           << std::endl;
+      // std::cout << "Prevet code: " << static_cast<int>(prevetter_response.code)
+      //           << std::endl;
+      // std::cout << "Prevet value: " << prevetter_response.value << std::endl;
+      // std::cout << "Prevet index: " << prevetter_response.index << std::endl;
+      // return quad_to_trajectory_map;
       return empty_quad_to_trajectory_map;
       break;
     }
